@@ -1,6 +1,7 @@
 package com.example.hms.controller;
 
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.DoctorProfile;
@@ -87,4 +88,13 @@ public class AdminController {
 
         return adminService.updateDoctor(id, request);
     }
+
+    @PostMapping("/appointments")
+    public String bookAppointment(
+
+            @Valid @RequestBody BookAppointmentRequest request) {
+
+        return adminService.bookAppointment(request);
+    }
+
 }

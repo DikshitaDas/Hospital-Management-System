@@ -1,10 +1,13 @@
 package com.example.hms.service;
 
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.entity.Appointment;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
+import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.DoctorProfileRepository;
 import com.example.hms.repository.UserRepository;
 
@@ -18,184 +21,232 @@ import java.util.Random;
 @Service
 public class AdminService {
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private DoctorProfileRepository doctorProfileRepository;
+        @Autowired
+        private DoctorProfileRepository doctorProfileRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
-    // Get all patients
-    public List<User> getAllPatients() {
+        @Autowired
+        private AppointmentRepository appointmentRepository;
 
-        return userRepository.findByRole("PATIENT");
-    }
+        // Get all patients
+        public List<User> getAllPatients() {
 
-    public List<User> searchPatients(String name) {
-
-        return userRepository
-                .findByNameContainingIgnoreCaseAndRole(
-                        name,
-                        "PATIENT");
-    }
-
-    public String deletePatient(Long id) {
-
-        User user = userRepository.findById(id)
-                .orElse(null);
-
-        if (user == null) {
-            return "Patient not found!";
+                return userRepository.findByRole("PATIENT");
         }
 
-        userRepository.delete(user);
+        public List<User> searchPatients(String name) {
 
-        return "Patient deleted successfully!";
-    }
-
-    public String updatePatient(
-            Long id,
-            UpdatePatientRequest request) {
-
-        User user = userRepository.findById(id)
-                .orElse(null);
-
-        if (user == null) {
-            return "Patient not found!";
+                return userRepository
+                                .findByNameContainingIgnoreCaseAndRole(
+                                                name,
+                                                "PATIENT");
         }
 
-        user.setName(request.getName());
-        user.setGender(request.getGender());
-        user.setAge(request.getAge());
-        user.setMobile(request.getMobile());
+        public String deletePatient(Long id) {
 
-        userRepository.save(user);
+                User user = userRepository.findById(id)
+                                .orElse(null);
 
-        return "Patient updated successfully!";
-    }
+                if (user == null) {
+                        return "Patient not found!";
+                }
 
-    public String addDoctor(AddDoctorRequest request) {
+                userRepository.delete(user);
 
-        if (userRepository.findByMobile(request.getMobile()).isPresent()) {
-            return "Mobile already registered!";
+                return "Patient deleted successfully!";
         }
 
-        // CREATE USER
-        User user = new User();
+        public String updatePatient(
+                        Long id,
+                        UpdatePatientRequest request) {
 
-        user.setUhid(generateUHID());
-        user.setName(request.getName());
-        user.setGender(request.getGender());
-        user.setAge(request.getAge());
-        user.setMobile(request.getMobile());
+                User user = userRepository.findById(id)
+                                .orElse(null);
 
-        user.setPassword(
-                passwordEncoder.encode(request.getPassword()));
+                if (user == null) {
+                        return "Patient not found!";
+                }
 
-        user.setRole("DOCTOR");
+                user.setName(request.getName());
+                user.setGender(request.getGender());
+                user.setAge(request.getAge());
+                user.setMobile(request.getMobile());
 
-        User savedUser = userRepository.save(user);
+                userRepository.save(user);
 
-        // CREATE DOCTOR PROFILE
-        DoctorProfile doctorProfile = new DoctorProfile();
-
-        doctorProfile.setSpecialization(
-                request.getSpecialization());
-
-        doctorProfile.setDepartment(
-                request.getDepartment());
-
-        doctorProfile.setConsultationFee(
-                request.getConsultationFee());
-
-        doctorProfile.setAvailability(
-                request.getAvailability());
-
-        // RELATIONSHIP
-        doctorProfile.setUser(savedUser);
-
-        doctorProfileRepository.save(doctorProfile);
-
-        return "Doctor added successfully!";
-    }
-
-    private String generateUHID() {
-
-        Random random = new Random();
-
-        int number = 100000 + random.nextInt(900000);
-
-        return "HMS" + number;
-    }
-
-    public List<DoctorProfile> getAllDoctors() {
-
-        return doctorProfileRepository.findAll();
-    }
-
-    public String deleteDoctor(Long userId) {
-
-        DoctorProfile doctorProfile = doctorProfileRepository
-                .findByUserId(userId)
-                .orElse(null);
-
-        if (doctorProfile == null) {
-            return "Doctor not found!";
-        }
-        // DELETE DOCTOR PROFILE
-        doctorProfileRepository.delete(doctorProfile);
-        // DELETE USER
-        userRepository.delete(doctorProfile.getUser());
-        return "Doctor deleted successfully!";
-    }
-
-    public List<DoctorProfile> searchDoctors(
-            String name) {
-
-        return doctorProfileRepository
-                .findByUserNameContainingIgnoreCase(name);
-    }
-
-    public String updateDoctor(
-            Long userId,
-            UpdateDoctorRequest request) {
-
-        DoctorProfile doctorProfile = doctorProfileRepository
-                .findByUserId(userId)
-                .orElse(null);
-
-        if (doctorProfile == null) {
-            return "Doctor not found!";
+                return "Patient updated successfully!";
         }
 
-        // USER TABLE UPDATE
-        User user = doctorProfile.getUser();
+        public String addDoctor(AddDoctorRequest request) {
 
-        user.setName(request.getName());
-        user.setGender(request.getGender());
-        user.setAge(request.getAge());
-        user.setMobile(request.getMobile());
+                if (userRepository.findByMobile(request.getMobile()).isPresent()) {
+                        return "Mobile already registered!";
+                }
 
-        userRepository.save(user);
+                // CREATE USER
+                User user = new User();
 
-        // DOCTOR PROFILE UPDATE
-        doctorProfile.setSpecialization(
-                request.getSpecialization());
+                user.setUhid(generateUHID());
+                user.setName(request.getName());
+                user.setGender(request.getGender());
+                user.setAge(request.getAge());
+                user.setMobile(request.getMobile());
 
-        doctorProfile.setDepartment(
-                request.getDepartment());
+                user.setPassword(
+                                passwordEncoder.encode(request.getPassword()));
 
-        doctorProfile.setConsultationFee(
-                request.getConsultationFee());
+                user.setRole("DOCTOR");
 
-        doctorProfile.setAvailability(
-                request.getAvailability());
+                User savedUser = userRepository.save(user);
 
-        doctorProfileRepository.save(doctorProfile);
+                // CREATE DOCTOR PROFILE
+                DoctorProfile doctorProfile = new DoctorProfile();
 
-        return "Doctor updated successfully!";
-    }
+                doctorProfile.setSpecialization(
+                                request.getSpecialization());
+
+                doctorProfile.setDepartment(
+                                request.getDepartment());
+
+                doctorProfile.setConsultationFee(
+                                request.getConsultationFee());
+
+                doctorProfile.setAvailability(
+                                request.getAvailability());
+
+                // RELATIONSHIP
+                doctorProfile.setUser(savedUser);
+
+                doctorProfileRepository.save(doctorProfile);
+
+                return "Doctor added successfully!";
+        }
+
+        private String generateUHID() {
+
+                Random random = new Random();
+
+                int number = 100000 + random.nextInt(900000);
+
+                return "HMS" + number;
+        }
+
+        public List<DoctorProfile> getAllDoctors() {
+
+                return doctorProfileRepository.findAll();
+        }
+
+        public String deleteDoctor(Long userId) {
+
+                DoctorProfile doctorProfile = doctorProfileRepository
+                                .findByUserId(userId)
+                                .orElse(null);
+
+                if (doctorProfile == null) {
+                        return "Doctor not found!";
+                }
+                // DELETE DOCTOR PROFILE
+                doctorProfileRepository.delete(doctorProfile);
+                // DELETE USER
+                userRepository.delete(doctorProfile.getUser());
+                return "Doctor deleted successfully!";
+        }
+
+        public List<DoctorProfile> searchDoctors(
+                        String name) {
+
+                return doctorProfileRepository
+                                .findByUserNameContainingIgnoreCase(name);
+        }
+
+        public String updateDoctor(
+                        Long userId,
+                        UpdateDoctorRequest request) {
+
+                DoctorProfile doctorProfile = doctorProfileRepository
+                                .findByUserId(userId)
+                                .orElse(null);
+
+                if (doctorProfile == null) {
+                        return "Doctor not found!";
+                }
+
+                // USER TABLE UPDATE
+                User user = doctorProfile.getUser();
+
+                user.setName(request.getName());
+                user.setGender(request.getGender());
+                user.setAge(request.getAge());
+                user.setMobile(request.getMobile());
+
+                userRepository.save(user);
+
+                // DOCTOR PROFILE UPDATE
+                doctorProfile.setSpecialization(
+                                request.getSpecialization());
+
+                doctorProfile.setDepartment(
+                                request.getDepartment());
+
+                doctorProfile.setConsultationFee(
+                                request.getConsultationFee());
+
+                doctorProfile.setAvailability(
+                                request.getAvailability());
+
+                doctorProfileRepository.save(doctorProfile);
+
+                return "Doctor updated successfully!";
+        }
+
+        public String bookAppointment(
+                        BookAppointmentRequest request) {
+
+                // FIND PATIENT
+                User patient = userRepository
+                                .findById(request.getPatientId())
+                                .orElse(null);
+
+                if (patient == null ||
+                                !patient.getRole().equals("PATIENT")) {
+
+                        return "Patient not found!";
+                }
+
+                // FIND DOCTOR
+                User doctor = userRepository
+                                .findById(request.getDoctorId())
+                                .orElse(null);
+
+                if (doctor == null ||
+                                !doctor.getRole().equals("DOCTOR")) {
+
+                        return "Doctor not found!";
+                }
+
+                // CREATE APPOINTMENT
+                Appointment appointment = new Appointment();
+
+                appointment.setAppointmentDate(
+                                request.getAppointmentDate());
+
+                appointment.setStatus("BOOKED");
+
+                // RELATIONSHIPS
+                appointment.setPatient(patient);
+
+                appointment.setDoctor(doctor);
+
+                appointmentRepository.save(appointment);
+
+                return "Appointment booked successfully!";
+        }
+
+        
 
 }
