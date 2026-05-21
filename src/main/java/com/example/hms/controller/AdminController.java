@@ -2,8 +2,10 @@ package com.example.hms.controller;
 
 import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.entity.Appointment;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
 import com.example.hms.service.AdminService;
@@ -95,6 +97,37 @@ public class AdminController {
             @Valid @RequestBody BookAppointmentRequest request) {
 
         return adminService.bookAppointment(request);
+    }
+
+    @GetMapping("/appointments")
+    public List<Appointment> getAllAppointments() {
+
+        return adminService.getAllAppointments();
+    }
+
+    @PutMapping("/appointments/cancel/{id}")
+    public String cancelAppointment(
+            @PathVariable Long id) {
+
+        return adminService.cancelAppointment(id);
+    }
+
+    @PutMapping("/appointments/reschedule/{id}")
+    public String rescheduleAppointment(
+
+            @PathVariable Long id,
+
+            @Valid @RequestBody RescheduleAppointmentRequest request) {
+
+        return adminService
+                .rescheduleAppointment(id, request);
+    }
+
+    @PutMapping("/appointments/approve/{id}")
+    public String approveAppointment(
+            @PathVariable Long id) {
+
+        return adminService.approveAppointment(id);
     }
 
 }

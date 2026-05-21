@@ -19,6 +19,8 @@ public class Appointment {
 
     private String status;
 
+    private Integer tokenNumber;
+
     // MANY APPOINTMENTS -> ONE PATIENT
     @ManyToOne
     @JoinColumn(name = "patient_id")

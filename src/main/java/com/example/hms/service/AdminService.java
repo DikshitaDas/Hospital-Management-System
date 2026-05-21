@@ -2,6 +2,7 @@ package com.example.hms.service;
 
 import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.Appointment;
@@ -242,10 +243,83 @@ public class AdminService {
 
                 appointment.setDoctor(doctor);
 
+                // GENERATE TOKEN NUMBER
+
+                Long totalAppointments = appointmentRepository
+                                .countByDoctorIdAndAppointmentDate(
+                                                doctor.getId(),
+                                                request.getAppointmentDate());
+
+                appointment.setTokenNumber(
+                                totalAppointments.intValue() + 1);
+
                 appointmentRepository.save(appointment);
 
                 return "Appointment booked successfully!";
         }
+
+        public List<Appointment> getAllAppointments() {
+                return appointmentRepository.findAll();
+        }
+
+        public String cancelAppointment(Long id) {
+
+                Appointment appointment = appointmentRepository
+                                .findById(id)
+                                .orElse(null);
+
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
+
+                appointment.setStatus("CANCELLED");
+
+                appointmentRepository.save(appointment);
+
+                return "Appointment cancelled successfully!";
+        }
+
+        public String rescheduleAppointment(
+
+                        Long id,
+
+                        RescheduleAppointmentRequest request) {
+
+                Appointment appointment = appointmentRepository
+                                .findById(id)
+                                .orElse(null);
+
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
+
+                appointment.setAppointmentDate(
+                                request.getAppointmentDate());
+
+                appointment.setStatus("RESCHEDULED");
+
+                appointmentRepository.save(appointment);
+
+                return "Appointment rescheduled successfully!";
+        }
+
+        public String approveAppointment(Long id) {
+
+                Appointment appointment = appointmentRepository
+                                .findById(id)
+                                .orElse(null);
+
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
+
+                appointment.setStatus("APPROVED");
+
+                appointmentRepository.save(appointment);
+
+                return "Appointment approved successfully!";
+        }
+
 
         
 
