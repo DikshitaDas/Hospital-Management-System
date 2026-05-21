@@ -21,11 +21,18 @@ public class AdminController {
 
         return adminService.getAllPatients();
     }
+
     @GetMapping("/patients/search")
     public List<User> searchPatients(
-            @RequestParam String name
-    ) {
+            @RequestParam String name) {
 
         return adminService.searchPatients(name);
+    }
+
+    @DeleteMapping("/patients/{id}")
+    public String deletePatient(
+            @PathVariable Long id) {
+
+        return adminService.deletePatient(id);
     }
 }

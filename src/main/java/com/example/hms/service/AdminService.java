@@ -22,10 +22,23 @@ public class AdminService {
 
     public List<User> searchPatients(String name) {
 
-    return userRepository
-            .findByNameContainingIgnoreCaseAndRole(
-                    name,
-                    "PATIENT"
-            );
-}
+        return userRepository
+                .findByNameContainingIgnoreCaseAndRole(
+                        name,
+                        "PATIENT");
+    }
+
+    public String deletePatient(Long id) {
+
+        User user = userRepository.findById(id)
+                .orElse(null);
+
+        if (user == null) {
+            return "Patient not found!";
+        }
+
+        userRepository.delete(user);
+
+        return "Patient deleted successfully!";
+    }
 }
