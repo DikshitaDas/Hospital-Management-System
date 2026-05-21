@@ -62,4 +62,11 @@ public class AdminController {
 
         return adminService.getAllDoctors();
     }
+
+    @DeleteMapping("/doctors/{id}")
+    public String deleteDoctor(
+            @PathVariable Long id) {
+
+        return adminService.deleteDoctor(id);
+    }
 }

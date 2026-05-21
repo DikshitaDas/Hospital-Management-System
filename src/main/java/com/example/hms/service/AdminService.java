@@ -134,4 +134,19 @@ public class AdminService {
         return doctorProfileRepository.findAll();
     }
 
+    public String deleteDoctor(Long userId) {
+
+        DoctorProfile doctorProfile = doctorProfileRepository
+                .findByUserId(userId)
+                .orElse(null);
+
+        if (doctorProfile == null) {
+            return "Doctor not found!";
+        }
+        // DELETE DOCTOR PROFILE
+        doctorProfileRepository.delete(doctorProfile);
+        // DELETE USER
+        userRepository.delete(doctorProfile.getUser());
+        return "Doctor deleted successfully!";
+    }
 }
