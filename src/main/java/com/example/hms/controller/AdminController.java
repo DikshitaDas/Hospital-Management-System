@@ -1,6 +1,7 @@
 package com.example.hms.controller;
 
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
@@ -68,5 +69,22 @@ public class AdminController {
             @PathVariable Long id) {
 
         return adminService.deleteDoctor(id);
+    }
+
+    @GetMapping("/doctors/search")
+    public List<DoctorProfile> searchDoctors(
+            @RequestParam String name) {
+
+        return adminService.searchDoctors(name);
+    }
+
+    @PutMapping("/doctors/{id}")
+    public String updateDoctor(
+
+            @PathVariable Long id,
+
+            @Valid @RequestBody UpdateDoctorRequest request) {
+
+        return adminService.updateDoctor(id, request);
     }
 }

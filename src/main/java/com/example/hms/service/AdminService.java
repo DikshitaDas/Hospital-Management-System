@@ -1,6 +1,7 @@
 package com.example.hms.service;
 
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
@@ -149,4 +150,52 @@ public class AdminService {
         userRepository.delete(doctorProfile.getUser());
         return "Doctor deleted successfully!";
     }
+
+    public List<DoctorProfile> searchDoctors(
+            String name) {
+
+        return doctorProfileRepository
+                .findByUserNameContainingIgnoreCase(name);
+    }
+
+    public String updateDoctor(
+            Long userId,
+            UpdateDoctorRequest request) {
+
+        DoctorProfile doctorProfile = doctorProfileRepository
+                .findByUserId(userId)
+                .orElse(null);
+
+        if (doctorProfile == null) {
+            return "Doctor not found!";
+        }
+
+        // USER TABLE UPDATE
+        User user = doctorProfile.getUser();
+
+        user.setName(request.getName());
+        user.setGender(request.getGender());
+        user.setAge(request.getAge());
+        user.setMobile(request.getMobile());
+
+        userRepository.save(user);
+
+        // DOCTOR PROFILE UPDATE
+        doctorProfile.setSpecialization(
+                request.getSpecialization());
+
+        doctorProfile.setDepartment(
+                request.getDepartment());
+
+        doctorProfile.setConsultationFee(
+                request.getConsultationFee());
+
+        doctorProfile.setAvailability(
+                request.getAvailability());
+
+        doctorProfileRepository.save(doctorProfile);
+
+        return "Doctor updated successfully!";
+    }
+
 }
