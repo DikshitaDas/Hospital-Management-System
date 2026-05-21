@@ -1,6 +1,8 @@
 package com.example.hms.controller;
 
+import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
 import com.example.hms.service.AdminService;
 
@@ -48,4 +50,16 @@ public class AdminController {
         return adminService.updatePatient(id, request);
     }
 
+    @PostMapping("/doctors")
+    public String addDoctor(
+            @Valid @RequestBody AddDoctorRequest request) {
+
+        return adminService.addDoctor(request);
+    }
+
+    @GetMapping("/doctors")
+    public List<DoctorProfile> getAllDoctors() {
+
+        return adminService.getAllDoctors();
+    }
 }
