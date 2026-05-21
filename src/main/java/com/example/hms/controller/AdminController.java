@@ -1,7 +1,10 @@
 package com.example.hms.controller;
 
+import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.User;
 import com.example.hms.service.AdminService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,4 +38,14 @@ public class AdminController {
 
         return adminService.deletePatient(id);
     }
+
+    @PutMapping("/patients/{id}")
+    public String updatePatient(
+            @PathVariable Long id,
+
+            @Valid @RequestBody UpdatePatientRequest request) {
+
+        return adminService.updatePatient(id, request);
+    }
+
 }

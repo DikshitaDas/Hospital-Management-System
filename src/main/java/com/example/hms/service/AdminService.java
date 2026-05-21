@@ -1,5 +1,6 @@
 package com.example.hms.service;
 
+import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.User;
 import com.example.hms.repository.UserRepository;
 
@@ -40,5 +41,26 @@ public class AdminService {
         userRepository.delete(user);
 
         return "Patient deleted successfully!";
+    }
+
+    public String updatePatient(
+            Long id,
+            UpdatePatientRequest request) {
+
+        User user = userRepository.findById(id)
+                .orElse(null);
+
+        if (user == null) {
+            return "Patient not found!";
+        }
+
+        user.setName(request.getName());
+        user.setGender(request.getGender());
+        user.setAge(request.getAge());
+        user.setMobile(request.getMobile());
+
+        userRepository.save(user);
+
+        return "Patient updated successfully!";
     }
 }
