@@ -13,4 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUhid(String uhid);
 
     List<User> findByRole(String role);
+
+    List<User> findByNameContainingIgnoreCaseAndRole(
+            String name,
+            String role);
 }

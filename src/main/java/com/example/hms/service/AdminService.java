@@ -19,4 +19,13 @@ public class AdminService {
 
         return userRepository.findByRole("PATIENT");
     }
+
+    public List<User> searchPatients(String name) {
+
+    return userRepository
+            .findByNameContainingIgnoreCaseAndRole(
+                    name,
+                    "PATIENT"
+            );
+}
 }

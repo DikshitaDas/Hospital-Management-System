@@ -21,4 +21,11 @@ public class AdminController {
 
         return adminService.getAllPatients();
     }
+    @GetMapping("/patients/search")
+    public List<User> searchPatients(
+            @RequestParam String name
+    ) {
+
+        return adminService.searchPatients(name);
+    }
 }
