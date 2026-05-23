@@ -5,6 +5,7 @@ import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
@@ -604,6 +605,52 @@ public class AdminService {
                 wardRepository.delete(ward);
 
                 return "Ward deleted successfully!";
+        }
+
+        public String emergencyAdmission(
+                        EmergencyAdmissionRequest request) {
+
+                // FIND PATIENT
+                User patient = userRepository
+                                .findById(request.getPatientId())
+                                .orElse(null);
+
+                if (patient == null ||
+                                !patient.getRole().equals("PATIENT")) {
+
+                        return "Patient not found!";
+                }
+
+                // AUTO FIND AVAILABLE BED
+                Bed bed = bedRepository
+                                .findFirstByWardWardTypeAndStatus(
+                                                request.getWardType(),
+                                                "AVAILABLE")
+                                .orElse(null);
+
+                if (bed == null) {
+                        return "No available bed in requested ward!";
+                }
+
+                // CREATE ADMISSION
+                Admission admission = new Admission();
+
+                admission.setAdmissionDate(LocalDate.now());
+
+                admission.setStatus("ADMITTED");
+
+                admission.setPatient(patient);
+
+                admission.setBed(bed);
+
+                admissionRepository.save(admission);
+
+                // OCCUPY BED
+                bed.setStatus("OCCUPIED");
+
+                bedRepository.save(bed);
+
+                return "Emergency bed allocated successfully!";
         }
 
 }

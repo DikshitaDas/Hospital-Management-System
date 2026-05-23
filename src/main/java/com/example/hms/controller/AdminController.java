@@ -5,6 +5,7 @@ import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
@@ -212,6 +213,15 @@ public class AdminController {
             @PathVariable Long id) {
 
         return adminService.deleteWard(id);
+    }
+
+    @PostMapping("/admissions/emergency")
+    public String emergencyAdmission(
+
+            @Valid @RequestBody EmergencyAdmissionRequest request) {
+
+        return adminService
+                .emergencyAdmission(request);
     }
 
 }
