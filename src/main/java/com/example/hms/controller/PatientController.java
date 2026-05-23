@@ -1,5 +1,7 @@
 package com.example.hms.controller;
 
+import com.example.hms.dto.ChangePasswordRequest;
+import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.patient.PatientDashboardResponse;
@@ -8,6 +10,7 @@ import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
 import com.example.hms.entity.Prescription;
 import com.example.hms.service.PatientService;
+import com.example.hms.entity.User;
 import com.example.hms.dto.patient.RescheduleAppointmentRequest;
 import jakarta.validation.Valid;
 
@@ -121,5 +124,44 @@ public class PatientController {
 
         return patientService
                 .requestBlood(request);
+    }
+
+    @GetMapping("/profile/{patientId}")
+    public User getPatientProfile(
+
+            @PathVariable Long patientId) {
+
+        return patientService.getPatientProfile(
+                patientId);
+    }
+
+    @PutMapping("/profile/{patientId}")
+    public String updatePatientProfile(
+
+            @PathVariable Long patientId,
+
+            @Valid @RequestBody UpdateProfileRequest request) {
+
+        return patientService
+                .updatePatientProfile(
+
+                        patientId,
+
+                        request);
+    }
+
+    @PutMapping("/profile/{patientId}/password")
+    public String changePatientPassword(
+
+            @PathVariable Long patientId,
+
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        return patientService
+                .changePatientPassword(
+
+                        patientId,
+
+                        request);
     }
 }

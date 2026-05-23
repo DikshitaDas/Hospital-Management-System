@@ -1,9 +1,13 @@
 package com.example.hms.service;
 
+import com.example.hms.dto.ChangePasswordRequest;
+import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.patient.PatientDashboardResponse;
 import com.example.hms.entity.Admission;
+import com.example.hms.entity.User;
+import com.example.hms.repository.UserRepository;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
 import com.example.hms.entity.Prescription;
@@ -15,6 +19,7 @@ import com.example.hms.dto.patient.RescheduleAppointmentRequest;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,6 +39,12 @@ public class PatientService {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public PatientDashboardResponse getPatientDashboard(Long patientId) {
 
@@ -160,6 +171,71 @@ public class PatientService {
 
         return adminService
                 .requestBlood(request);
+    }
+
+    public User getPatientProfile(Long patientId) {
+        return userRepository.findById(patientId).orElse(null);
+    }
+
+    public String updatePatientProfile(
+
+            Long patientId,
+
+            UpdateProfileRequest request) {
+
+        User patient = userRepository
+                .findById(patientId)
+                .orElse(null);
+
+        if (patient == null) {
+            return "Patient not found!";
+        }
+
+        patient.setName(request.getName());
+
+        patient.setGender(request.getGender());
+
+        patient.setAge(request.getAge());
+
+        patient.setMobile(request.getMobile());
+
+        userRepository.save(patient);
+
+        return "Patient profile updated successfully!";
+    }
+
+    public String changePatientPassword(
+
+            Long patientId,
+
+            ChangePasswordRequest request) {
+
+        User patient = userRepository
+                .findById(patientId)
+                .orElse(null);
+
+        if (patient == null) {
+            return "Patient not found!";
+        }
+
+        boolean matched = passwordEncoder.matches(
+
+                request.getOldPassword(),
+
+                patient.getPassword());
+
+        if (!matched) {
+            return "Old password incorrect!";
+        }
+
+        patient.setPassword(
+
+                passwordEncoder.encode(
+                        request.getNewPassword()));
+
+        userRepository.save(patient);
+
+        return "Password changed successfully!";
     }
 
 }
