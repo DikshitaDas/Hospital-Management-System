@@ -7,6 +7,7 @@ import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.CreateBillRequest;
 import com.example.hms.dto.CreatePrescriptionRequest;
+import com.example.hms.dto.DashboardStatsResponse;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
@@ -756,4 +757,55 @@ public class AdminService {
                 return billRepository.findAll();
         }
 
+        public String payBill(Long billId) {
+
+                Bill bill = billRepository
+                                .findById(billId)
+                                .orElse(null);
+
+                if (bill == null) {
+                        return "Bill not found!";
+                }
+
+                // CHECK ALREADY PAID
+                if (bill.getStatus().equals("PAID")) {
+                        return "Bill already paid!";
+                }
+
+                // UPDATE STATUS
+                bill.setStatus("PAID");
+
+                billRepository.save(bill);
+
+                return "Payment successful!";
+        }
+
+        public DashboardStatsResponse getDashboardStats() {
+
+                Long totalPatients = (long) userRepository
+                                .findByRole("PATIENT")
+                                .size();
+
+                Long totalDoctors = (long) userRepository
+                                .findByRole("DOCTOR")
+                                .size();
+
+                Long totalAppointments = appointmentRepository.count();
+
+                Double totalRevenue = billRepository.getTotalRevenue();
+
+                if (totalRevenue == null) {
+                        totalRevenue = 0.0;
+                }
+
+                return new DashboardStatsResponse(
+
+                                totalPatients,
+
+                                totalDoctors,
+
+                                totalAppointments,
+
+                                totalRevenue);
+        }
 }

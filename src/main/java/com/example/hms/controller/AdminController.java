@@ -7,6 +7,7 @@ import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.CreateBillRequest;
 import com.example.hms.dto.CreatePrescriptionRequest;
+import com.example.hms.dto.DashboardStatsResponse;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
@@ -266,4 +267,17 @@ public class AdminController {
         return adminService.getAllBills();
     }
 
+    @PutMapping("/bills/pay/{id}")
+    public String payBill(
+            @PathVariable Long id) {
+
+        return adminService.payBill(id);
+    }
+
+    @GetMapping("/dashboard/stats")
+    public DashboardStatsResponse getDashboardStats() {
+
+        return adminService
+                .getDashboardStats();
+    }
 }
