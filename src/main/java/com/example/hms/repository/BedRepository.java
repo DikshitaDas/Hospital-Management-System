@@ -9,4 +9,10 @@ public interface BedRepository
         extends JpaRepository<Bed, Long> {
 
     List<Bed> findByStatus(String status);
+
+    Long countByWardId(Long wardId);
+
+    Long countByWardIdAndStatus(
+            Long wardId,
+            String status);
 }

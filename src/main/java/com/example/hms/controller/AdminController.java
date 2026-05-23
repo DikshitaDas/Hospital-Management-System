@@ -6,8 +6,10 @@ import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
+import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.DoctorProfile;
@@ -171,5 +173,21 @@ public class AdminController {
         return adminService
                 .dischargePatient(patientId);
     }
+
+    @GetMapping("/wards/occupancy")
+    public List<WardOccupancyResponse> getWardOccupancy() {
+
+        return adminService.getWardOccupancy();
+    }
+
+    @PutMapping("/admissions/transfer")
+    public String transferPatient(
+
+            @Valid @RequestBody TransferPatientRequest request) {
+
+        return adminService
+                .transferPatient(request);
+    }
+
 
 }

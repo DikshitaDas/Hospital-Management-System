@@ -6,8 +6,10 @@ import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
+import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
@@ -26,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -462,6 +465,93 @@ public class AdminService {
                 bedRepository.save(bed);
 
                 return "Patient discharged successfully!";
+        }
+
+        public List<WardOccupancyResponse> getWardOccupancy() {
+
+                List<Ward> wards = wardRepository.findAll();
+
+                List<WardOccupancyResponse> response = new ArrayList<>();
+
+                for (Ward ward : wards) {
+
+                        Long totalBeds = bedRepository.countByWardId(
+                                        ward.getId());
+
+                        Long occupiedBeds = bedRepository
+                                        .countByWardIdAndStatus(
+                                                        ward.getId(),
+                                                        "OCCUPIED");
+
+                        Long availableBeds = totalBeds - occupiedBeds;
+
+                        WardOccupancyResponse wardResponse = new WardOccupancyResponse(
+
+                                        ward.getWardName(),
+
+                                        ward.getWardType(),
+
+                                        totalBeds,
+
+                                        occupiedBeds,
+
+                                        availableBeds);
+
+                        response.add(wardResponse);
+                }
+
+                return response;
+        }
+
+        public String transferPatient(
+                        TransferPatientRequest request) {
+
+                // FIND ACTIVE ADMISSION
+                Admission admission = admissionRepository
+                                .findByPatientIdAndStatus(
+                                                request.getPatientId(),
+                                                "ADMITTED")
+                                .orElse(null);
+
+                if (admission == null) {
+                        return "No active admission found!";
+                }
+
+                // FIND NEW BED
+                Bed newBed = bedRepository
+                                .findById(request.getNewBedId())
+                                .orElse(null);
+
+                if (newBed == null) {
+                        return "New bed not found!";
+                }
+
+                // CHECK NEW BED STATUS
+                if (!newBed.getStatus()
+                                .equals("AVAILABLE")) {
+
+                        return "Selected bed is occupied!";
+                }
+
+                // OLD BED
+                Bed oldBed = admission.getBed();
+
+                // FREE OLD BED
+                oldBed.setStatus("AVAILABLE");
+
+                bedRepository.save(oldBed);
+
+                // OCCUPY NEW BED
+                newBed.setStatus("OCCUPIED");
+
+                bedRepository.save(newBed);
+
+                // UPDATE ADMISSION
+                admission.setBed(newBed);
+
+                admissionRepository.save(admission);
+
+                return "Patient transferred successfully!";
         }
 
 }
