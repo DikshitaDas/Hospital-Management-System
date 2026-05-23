@@ -18,6 +18,7 @@ import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.dto.UpdateRoleRequest;
 import com.example.hms.dto.UpdateWardRequest;
 import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Appointment;
@@ -346,4 +347,23 @@ public class AdminController {
                 .donateBlood(request);
     }
 
+    @PutMapping("/users/{id}/role")
+    public String updateUserRole(
+
+            @PathVariable Long id,
+
+            @Valid @RequestBody UpdateRoleRequest request) {
+
+        return adminService
+                .updateUserRole(id, request);
+    }
+
+    @GetMapping("/users/role/{role}")
+    public List<User> getUsersByRole(
+
+            @PathVariable String role) {
+
+        return adminService
+                .getUsersByRole(role);
+    }
 }

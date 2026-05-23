@@ -1,0 +1,11 @@
+package com.example.hms.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class UpdateRoleRequest {
+
+    @NotBlank
+    private String role;
+}

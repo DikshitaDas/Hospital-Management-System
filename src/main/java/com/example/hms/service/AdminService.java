@@ -18,6 +18,7 @@ import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.dto.UpdateRoleRequest;
 import com.example.hms.dto.UpdateWardRequest;
 import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Admission;
@@ -1050,4 +1051,31 @@ public class AdminService {
                 return "Blood donated successfully!";
         }
 
+        public String updateUserRole(
+
+                        Long userId,
+
+                        UpdateRoleRequest request) {
+
+                User user = userRepository
+                                .findById(userId)
+                                .orElse(null);
+
+                if (user == null) {
+                        return "User not found!";
+                }
+
+                user.setRole(request.getRole());
+
+                userRepository.save(user);
+
+                return "User role updated successfully!";
+        }
+
+        public List<User> getUsersByRole(
+                        String role) {
+
+                return userRepository
+                                .findByRole(role);
+        }
 }
