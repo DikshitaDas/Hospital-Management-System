@@ -27,4 +27,8 @@ public interface AppointmentRepository
                         Long doctorId,
 
                         String name);
+
+        List<Appointment> findByPatientId(Long patientId);
+
+        List<Appointment> findByStatus(String status);
 }

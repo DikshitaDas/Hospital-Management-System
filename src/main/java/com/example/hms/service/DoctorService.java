@@ -27,278 +27,284 @@ import java.util.*;
 @Service
 public class DoctorService {
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
+        @Autowired
+        private AppointmentRepository appointmentRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PrescriptionRepository prescriptionRepository;
+        @Autowired
+        private PrescriptionRepository prescriptionRepository;
 
-    @Autowired
-    private DoctorProfileRepository doctorProfileRepository;
+        @Autowired
+        private DoctorProfileRepository doctorProfileRepository;
 
-    @Autowired
-    private AdminService adminService;
+        @Autowired
+        private AdminService adminService;
 
-    public DoctorDashboardResponse getDoctorDashboard() {
+        public DoctorDashboardResponse getDoctorDashboard() {
 
-        Long todayAppointments = appointmentRepository.count();
+                Long todayAppointments = appointmentRepository.count();
 
-        Long totalPatients = 0L;
+                Long totalPatients = 0L;
 
-        Long pendingReports = 0L;
+                Long pendingReports = 0L;
 
-        return new DoctorDashboardResponse(
+                return new DoctorDashboardResponse(
 
-                todayAppointments,
+                                todayAppointments,
 
-                totalPatients,
+                                totalPatients,
 
-                pendingReports);
-    }
-
-    public List<Appointment> getAllAppointments() {
-
-        return appointmentRepository.findAll();
-    }
-
-    public String updateAppointmentStatus(
-
-            Long appointmentId,
-
-            UpdateAppointmentStatusRequest request) {
-
-        Appointment appointment = appointmentRepository
-                .findById(appointmentId)
-                .orElse(null);
-
-        if (appointment == null) {
-            return "Appointment not found!";
+                                pendingReports);
         }
 
-        appointment.setStatus(
-                request.getStatus());
+        public List<Appointment> getAllAppointments() {
 
-        appointmentRepository.save(
-                appointment);
-
-        return "Appointment status updated successfully!";
-    }
-
-    public List<Appointment> getTodayAppointments() {
-
-        return appointmentRepository
-                .findByAppointmentDate(
-                        LocalDate.now());
-    }
-
-    public List<Appointment> searchAppointments(
-            String patientName) {
-
-        return appointmentRepository
-                .findByPatientNameContainingIgnoreCase(
-                        patientName);
-    }
-
-    public List<Prescription> getAllPrescriptions() {
-
-        return prescriptionRepository.findAll();
-    }
-
-    public String updatePrescription(
-
-            Long prescriptionId,
-
-            UpdatePrescriptionRequest request) {
-
-        Prescription prescription = prescriptionRepository
-                .findById(prescriptionId)
-                .orElse(null);
-
-        if (prescription == null) {
-            return "Prescription not found!";
+                return appointmentRepository.findAll();
         }
 
-        // UPDATE DETAILS
-        prescription.setDiagnosis(
-                request.getDiagnosis());
+        public String updateAppointmentStatus(
 
-        prescription.setMedicines(
-                request.getMedicines());
+                        Long appointmentId,
 
-        prescription.setDosageInstructions(
-                request.getDosageInstructions());
+                        UpdateAppointmentStatusRequest request) {
 
-        prescriptionRepository.save(
-                prescription);
+                Appointment appointment = appointmentRepository
+                                .findById(appointmentId)
+                                .orElse(null);
 
-        return "Prescription updated successfully!";
-    }
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
 
-    public List<User> getDoctorPatients(
-            Long doctorId) {
+                appointment.setStatus(
+                                request.getStatus());
 
-        List<Appointment> appointments = appointmentRepository
-                .findByDoctorId(doctorId);
+                appointmentRepository.save(
+                                appointment);
 
-        List<User> patients = new ArrayList<>();
-
-        for (Appointment appointment : appointments) {
-
-            User patient = appointment.getPatient();
-
-            // AVOID DUPLICATES
-            if (!patients.contains(patient)) {
-
-                patients.add(patient);
-            }
+                return "Appointment status updated successfully!";
         }
 
-        return patients;
-    }
+        public List<Appointment> getTodayAppointments() {
 
-    public List<User> searchDoctorPatients(
-
-            Long doctorId,
-
-            String patientName) {
-
-        List<Appointment> appointments = appointmentRepository
-
-                .findByDoctorIdAndPatientNameContainingIgnoreCase(
-
-                        doctorId,
-
-                        patientName);
-
-        List<User> patients = new ArrayList<>();
-
-        for (Appointment appointment : appointments) {
-
-            User patient = appointment.getPatient();
-
-            // AVOID DUPLICATES
-            if (!patients.contains(patient)) {
-
-                patients.add(patient);
-            }
+                return appointmentRepository
+                                .findByAppointmentDate(
+                                                LocalDate.now());
         }
 
-        return patients;
-    }
+        public List<Appointment> searchAppointments(
+                        String patientName) {
 
-    public User getDoctorProfile(
-            Long doctorId) {
-
-        return userRepository
-                .findById(doctorId)
-                .orElse(null);
-    }
-
-    public String updateDoctorProfile(
-
-            Long doctorId,
-
-            UpdateProfileRequest request) {
-
-        User doctor = userRepository
-                .findById(doctorId)
-                .orElse(null);
-
-        if (doctor == null) {
-            return "Doctor not found!";
+                return appointmentRepository
+                                .findByPatientNameContainingIgnoreCase(
+                                                patientName);
         }
 
-        doctor.setName(request.getName());
+        public List<Prescription> getAllPrescriptions() {
 
-        doctor.setGender(request.getGender());
-
-        doctor.setAge(request.getAge());
-
-        doctor.setMobile(request.getMobile());
-
-        userRepository.save(doctor);
-
-        return "Doctor profile updated successfully!";
-    }
-
-    public String changeDoctorPassword(
-
-            Long doctorId,
-
-            ChangePasswordRequest request) {
-
-        User doctor = userRepository
-                .findById(doctorId)
-                .orElse(null);
-
-        if (doctor == null) {
-            return "Doctor not found!";
+                return prescriptionRepository.findAll();
         }
 
-        // CHECK OLD PASSWORD
-        boolean matched = passwordEncoder.matches(
+        public String updatePrescription(
 
-                request.getOldPassword(),
+                        Long prescriptionId,
 
-                doctor.getPassword());
+                        UpdatePrescriptionRequest request) {
 
-        if (!matched) {
-            return "Old password incorrect!";
+                Prescription prescription = prescriptionRepository
+                                .findById(prescriptionId)
+                                .orElse(null);
+
+                if (prescription == null) {
+                        return "Prescription not found!";
+                }
+
+                // UPDATE DETAILS
+                prescription.setDiagnosis(
+                                request.getDiagnosis());
+
+                prescription.setMedicines(
+                                request.getMedicines());
+
+                prescription.setDosageInstructions(
+                                request.getDosageInstructions());
+
+                prescriptionRepository.save(
+                                prescription);
+
+                return "Prescription updated successfully!";
         }
 
-        // ENCRYPT NEW PASSWORD
-        doctor.setPassword(
+        public List<User> getDoctorPatients(
+                        Long doctorId) {
 
-                passwordEncoder.encode(
-                        request.getNewPassword()));
+                List<Appointment> appointments = appointmentRepository
+                                .findByDoctorId(doctorId);
 
-        userRepository.save(doctor);
+                List<User> patients = new ArrayList<>();
 
-        return "Password changed successfully!";
-    }
+                for (Appointment appointment : appointments) {
 
-    public String updateAvailability(
+                        User patient = appointment.getPatient();
 
-            Long doctorId,
+                        // AVOID DUPLICATES
+                        if (!patients.contains(patient)) {
 
-            UpdateAvailabilityRequest request) {
+                                patients.add(patient);
+                        }
+                }
 
-        DoctorProfile profile = doctorProfileRepository
-                .findByUserId(doctorId)
-                .orElse(null);
-
-        if (profile == null) {
-            return "Doctor profile not found!";
+                return patients;
         }
 
-        profile.setAvailabilityStatus(
+        public List<User> searchDoctorPatients(
 
-                request.getAvailabilityStatus());
+                        Long doctorId,
 
-        doctorProfileRepository.save(profile);
+                        String patientName) {
 
-        return "Availability updated successfully!";
-    }
+                List<Appointment> appointments = appointmentRepository
 
-    public BloodAvailabilityResponse checkBloodAvailability(
-            String bloodGroup) {
+                                .findByDoctorIdAndPatientNameContainingIgnoreCase(
 
-        return adminService
-                .checkBloodAvailability(
-                        bloodGroup);
-    }
+                                                doctorId,
 
-    public String requestBlood(
-            CreateBloodRequest request) {
+                                                patientName);
 
-        return adminService
-                .requestBlood(request);
-    }
+                List<User> patients = new ArrayList<>();
+
+                for (Appointment appointment : appointments) {
+
+                        User patient = appointment.getPatient();
+
+                        // AVOID DUPLICATES
+                        if (!patients.contains(patient)) {
+
+                                patients.add(patient);
+                        }
+                }
+
+                return patients;
+        }
+
+        public User getDoctorProfile(
+                        Long doctorId) {
+
+                return userRepository
+                                .findById(doctorId)
+                                .orElse(null);
+        }
+
+        public String updateDoctorProfile(
+
+                        Long doctorId,
+
+                        UpdateProfileRequest request) {
+
+                User doctor = userRepository
+                                .findById(doctorId)
+                                .orElse(null);
+
+                if (doctor == null) {
+                        return "Doctor not found!";
+                }
+
+                doctor.setName(request.getName());
+
+                doctor.setGender(request.getGender());
+
+                doctor.setAge(request.getAge());
+
+                doctor.setMobile(request.getMobile());
+
+                userRepository.save(doctor);
+
+                return "Doctor profile updated successfully!";
+        }
+
+        public String changeDoctorPassword(
+
+                        Long doctorId,
+
+                        ChangePasswordRequest request) {
+
+                User doctor = userRepository
+                                .findById(doctorId)
+                                .orElse(null);
+
+                if (doctor == null) {
+                        return "Doctor not found!";
+                }
+
+                // CHECK OLD PASSWORD
+                boolean matched = passwordEncoder.matches(
+
+                                request.getOldPassword(),
+
+                                doctor.getPassword());
+
+                if (!matched) {
+                        return "Old password incorrect!";
+                }
+
+                // ENCRYPT NEW PASSWORD
+                doctor.setPassword(
+
+                                passwordEncoder.encode(
+                                                request.getNewPassword()));
+
+                userRepository.save(doctor);
+
+                return "Password changed successfully!";
+        }
+
+        public String updateAvailability(
+
+                        Long doctorId,
+
+                        UpdateAvailabilityRequest request) {
+
+                DoctorProfile profile = doctorProfileRepository
+                                .findByUserId(doctorId)
+                                .orElse(null);
+
+                if (profile == null) {
+                        return "Doctor profile not found!";
+                }
+
+                profile.setAvailabilityStatus(
+
+                                request.getAvailabilityStatus());
+
+                doctorProfileRepository.save(profile);
+
+                return "Availability updated successfully!";
+        }
+
+        public BloodAvailabilityResponse checkBloodAvailability(
+                        String bloodGroup) {
+
+                return adminService
+                                .checkBloodAvailability(
+                                                bloodGroup);
+        }
+
+        public String requestBlood(
+                        CreateBloodRequest request) {
+
+                return adminService
+                                .requestBlood(request);
+        }
+
+        public List<Appointment> getPendingAppointments() {
+
+                return appointmentRepository
+                                .findByStatus("PENDING");
+        }
 
 }

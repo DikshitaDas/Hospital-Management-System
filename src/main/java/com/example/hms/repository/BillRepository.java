@@ -15,4 +15,8 @@ public interface BillRepository
 
     @Query("SELECT SUM(b.amount) FROM Bill b WHERE b.status='PAID'")
     Double getTotalRevenue();
+
+    
+
+
 }

@@ -23,160 +23,160 @@ import java.util.List;
 
 public class DoctorController {
 
-    @Autowired
-    private DoctorService doctorService;
+        @Autowired
+        private DoctorService doctorService;
 
-    @GetMapping("/dashboard")
-    public DoctorDashboardResponse getDoctorDashboard() {
+        @GetMapping("/dashboard")
+        public DoctorDashboardResponse getDoctorDashboard() {
 
-        return doctorService
-                .getDoctorDashboard();
-    }
+                return doctorService
+                                .getDoctorDashboard();
+        }
 
-    @GetMapping("/appointments")
-    public List<Appointment> getAllAppointments() {
+        @GetMapping("/appointments")
+        public List<Appointment> getAllAppointments() {
 
-        return doctorService
-                .getAllAppointments();
-    }
+                return doctorService
+                                .getAllAppointments();
+        }
 
-    @PutMapping("/appointments/{id}/status")
-    public String updateAppointmentStatus(
+        @PutMapping("/appointments/{id}/status")
+        public String updateAppointmentStatus(
 
-            @PathVariable Long id,
+                        @PathVariable Long id,
 
-            @Valid @RequestBody UpdateAppointmentStatusRequest request) {
+                        @Valid @RequestBody UpdateAppointmentStatusRequest request) {
 
-        return doctorService
-                .updateAppointmentStatus(
-                        id,
-                        request);
-    }
+                return doctorService
+                                .updateAppointmentStatus(
+                                                id,
+                                                request);
+        }
 
-    @GetMapping("/appointments/today")
-    public List<Appointment> getTodayAppointments() {
+        @GetMapping("/appointments/today")
+        public List<Appointment> getTodayAppointments() {
 
-        return doctorService
-                .getTodayAppointments();
-    }
+                return doctorService
+                                .getTodayAppointments();
+        }
 
-    @GetMapping("/appointments/search")
-    public List<Appointment> searchAppointments(
+        @GetMapping("/appointments/search")
+        public List<Appointment> searchAppointments(
 
-            @RequestParam String name) {
+                        @RequestParam String name) {
 
-        return doctorService
-                .searchAppointments(name);
-    }
+                return doctorService
+                                .searchAppointments(name);
+        }
 
-    @GetMapping("/prescriptions")
-    public List<Prescription> getAllPrescriptions() {
+        @GetMapping("/prescriptions")
+        public List<Prescription> getAllPrescriptions() {
 
-        return doctorService
-                .getAllPrescriptions();
-    }
+                return doctorService
+                                .getAllPrescriptions();
+        }
 
-    @PutMapping("/prescriptions/{id}")
-    public String updatePrescription(
+        @PutMapping("/prescriptions/{id}")
+        public String updatePrescription(
 
-            @PathVariable Long id,
+                        @PathVariable Long id,
 
-            @Valid @RequestBody UpdatePrescriptionRequest request) {
+                        @Valid @RequestBody UpdatePrescriptionRequest request) {
 
-        return doctorService
-                .updatePrescription(
-                        id,
-                        request);
-    }
+                return doctorService
+                                .updatePrescription(
+                                                id,
+                                                request);
+        }
 
-    @GetMapping("/{doctorId}/patients")
-    public List<User> getDoctorPatients(
+        @GetMapping("/{doctorId}/patients")
+        public List<User> getDoctorPatients(
 
-            @PathVariable Long doctorId) {
+                        @PathVariable Long doctorId) {
 
-        return doctorService
-                .getDoctorPatients(
-                        doctorId);
-    }
+                return doctorService
+                                .getDoctorPatients(
+                                                doctorId);
+        }
 
-    @GetMapping("/{doctorId}/patients/search")
-    public List<User> searchDoctorPatients(
+        @GetMapping("/{doctorId}/patients/search")
+        public List<User> searchDoctorPatients(
 
-            @PathVariable Long doctorId,
+                        @PathVariable Long doctorId,
 
-            @RequestParam String name) {
+                        @RequestParam String name) {
 
-        return doctorService
-                .searchDoctorPatients(
+                return doctorService
+                                .searchDoctorPatients(
 
-                        doctorId,
+                                                doctorId,
 
-                        name);
-    }
+                                                name);
+        }
 
-    @GetMapping("/profile/{doctorId}")
-    public User getDoctorProfile(
+        @GetMapping("/profile/{doctorId}")
+        public User getDoctorProfile(
 
-            @PathVariable Long doctorId) {
+                        @PathVariable Long doctorId) {
 
-        return doctorService
-                .getDoctorProfile(
-                        doctorId);
-    }
+                return doctorService
+                                .getDoctorProfile(
+                                                doctorId);
+        }
 
-    @PutMapping("/profile/{doctorId}/password")
-    public String changeDoctorPassword(
+        @PutMapping("/profile/{doctorId}/password")
+        public String changeDoctorPassword(
 
-            @PathVariable Long doctorId,
+                        @PathVariable Long doctorId,
 
-            @Valid @RequestBody ChangePasswordRequest request) {
+                        @Valid @RequestBody ChangePasswordRequest request) {
 
-        return doctorService
-                .changeDoctorPassword(
+                return doctorService
+                                .changeDoctorPassword(
 
-                        doctorId,
+                                                doctorId,
 
-                        request);
-    }
+                                                request);
+        }
 
-    @PutMapping("/profile/{doctorId}/availability")
-    public String updateAvailability(
+        @PutMapping("/profile/{doctorId}/availability")
+        public String updateAvailability(
 
-            @PathVariable Long doctorId,
+                        @PathVariable Long doctorId,
 
-            @Valid @RequestBody UpdateAvailabilityRequest request) {
+                        @Valid @RequestBody UpdateAvailabilityRequest request) {
 
-        return doctorService
-                .updateAvailability(
+                return doctorService
+                                .updateAvailability(
 
-                        doctorId,
+                                                doctorId,
 
-                        request);
-    }
+                                                request);
+        }
 
-    @GetMapping("/blood-stock/{bloodGroup}")
-    public BloodAvailabilityResponse checkBloodStock(
+        @GetMapping("/blood-stock/{bloodGroup}")
+        public BloodAvailabilityResponse checkBloodStock(
 
-            @PathVariable String bloodGroup) {
+                        @PathVariable String bloodGroup) {
 
-        return doctorService
-                .checkBloodAvailability(bloodGroup);
-    }
+                return doctorService
+                                .checkBloodAvailability(bloodGroup);
+        }
 
-    @PostMapping("/blood-requests")
-    public String requestBlood(
+        @PostMapping("/blood-requests")
+        public String requestBlood(
 
-            @Valid @RequestBody CreateBloodRequest request) {
+                        @Valid @RequestBody CreateBloodRequest request) {
 
-        return doctorService
-                .requestBlood(request);
-    }
+                return doctorService
+                                .requestBlood(request);
+        }
 
+        @GetMapping("/appointments/pending")
+        public List<Appointment> getPendingAppointments() {
 
-    
-
-
-
-
+                return doctorService
+                                .getPendingAppointments();
+        }
 
 }
