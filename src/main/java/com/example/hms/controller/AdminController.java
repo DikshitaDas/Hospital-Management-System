@@ -1,13 +1,18 @@
 package com.example.hms.controller;
 
 import com.example.hms.dto.AddBedRequest;
+import com.example.hms.dto.AddBloodStockRequest;
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.AddDonorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
+import com.example.hms.dto.BloodAvailabilityResponse;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.CreateBillRequest;
+import com.example.hms.dto.CreateBloodRequest;
 import com.example.hms.dto.CreatePrescriptionRequest;
 import com.example.hms.dto.DashboardStatsResponse;
+import com.example.hms.dto.DonateBloodRequest;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
@@ -18,6 +23,8 @@ import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.Bill;
+import com.example.hms.entity.BloodRequest;
+import com.example.hms.entity.BloodStock;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
@@ -280,4 +287,63 @@ public class AdminController {
         return adminService
                 .getDashboardStats();
     }
+
+    @PostMapping("/blood-stock")
+    public String addBloodStock(
+
+            @Valid @RequestBody AddBloodStockRequest request) {
+
+        return adminService
+                .addBloodStock(request);
+    }
+
+    @GetMapping("/blood-stock")
+    public List<BloodStock> getAllBloodStock() {
+
+        return adminService.getAllBloodStock();
+    }
+
+    @PostMapping("/blood-requests")
+    public String requestBlood(
+
+            @Valid @RequestBody CreateBloodRequest request) {
+
+        return adminService
+                .requestBlood(request);
+    }
+
+    @GetMapping("/blood-requests")
+    public List<BloodRequest> getAllBloodRequests() {
+
+        return adminService
+                .getAllBloodRequests();
+    }
+
+    @GetMapping("/blood-stock/{bloodGroup}")
+    public BloodAvailabilityResponse checkBloodAvailability(
+
+            @PathVariable String bloodGroup) {
+
+        return adminService
+                .checkBloodAvailability(
+                        bloodGroup);
+    }
+
+    @PostMapping("/donors")
+    public String addDonor(
+
+            @Valid @RequestBody AddDonorRequest request) {
+
+        return adminService.addDonor(request);
+    }
+
+    @PostMapping("/donations")
+    public String donateBlood(
+
+            @Valid @RequestBody DonateBloodRequest request) {
+
+        return adminService
+                .donateBlood(request);
+    }
+
 }

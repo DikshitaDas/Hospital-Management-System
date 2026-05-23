@@ -1,13 +1,18 @@
 package com.example.hms.service;
 
 import com.example.hms.dto.AddBedRequest;
+import com.example.hms.dto.AddBloodStockRequest;
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.AddDonorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
+import com.example.hms.dto.BloodAvailabilityResponse;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.CreateBillRequest;
+import com.example.hms.dto.CreateBloodRequest;
 import com.example.hms.dto.CreatePrescriptionRequest;
 import com.example.hms.dto.DashboardStatsResponse;
+import com.example.hms.dto.DonateBloodRequest;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
@@ -19,7 +24,11 @@ import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.Bill;
+import com.example.hms.entity.BloodRequest;
+import com.example.hms.entity.BloodStock;
 import com.example.hms.entity.DoctorProfile;
+import com.example.hms.entity.Donation;
+import com.example.hms.entity.Donor;
 import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
 import com.example.hms.entity.Ward;
@@ -27,7 +36,11 @@ import com.example.hms.repository.AdmissionRepository;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.BedRepository;
 import com.example.hms.repository.BillRepository;
+import com.example.hms.repository.BloodRequestRepository;
+import com.example.hms.repository.BloodStockRepository;
 import com.example.hms.repository.DoctorProfileRepository;
+import com.example.hms.repository.DonationRepository;
+import com.example.hms.repository.DonorRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
 import com.example.hms.repository.WardRepository;
@@ -68,6 +81,15 @@ public class AdminService {
         @Autowired
         private PrescriptionRepository prescriptionRepository;
 
+        @Autowired
+        private BloodRequestRepository bloodRequestRepository;
+
+        @Autowired
+        private DonorRepository donorRepository;
+
+        @Autowired
+        private DonationRepository donationRepository;
+
         // Get all patients
         public List<User> getAllPatients() {
 
@@ -76,6 +98,8 @@ public class AdminService {
 
         @Autowired
         private BillRepository billRepository;
+        @Autowired
+        private BloodStockRepository bloodStockRepository;
 
         public List<User> searchPatients(String name) {
 
@@ -808,4 +832,222 @@ public class AdminService {
 
                                 totalRevenue);
         }
+
+        public String addBloodStock(
+                        AddBloodStockRequest request) {
+
+                BloodStock existingStock = bloodStockRepository
+                                .findByBloodGroup(
+                                                request.getBloodGroup())
+                                .orElse(null);
+
+                // IF BLOOD GROUP EXISTS
+                if (existingStock != null) {
+
+                        existingStock.setUnitsAvailable(
+
+                                        existingStock.getUnitsAvailable()
+                                                        +
+                                                        request.getUnitsAvailable());
+
+                        bloodStockRepository.save(existingStock);
+
+                        return "Blood stock updated successfully!";
+                }
+
+                // NEW BLOOD GROUP
+                BloodStock stock = new BloodStock();
+
+                stock.setBloodGroup(
+                                request.getBloodGroup());
+
+                stock.setUnitsAvailable(
+                                request.getUnitsAvailable());
+
+                bloodStockRepository.save(stock);
+
+                return "Blood stock added successfully!";
+        }
+
+        public List<BloodStock> getAllBloodStock() {
+
+                return bloodStockRepository.findAll();
+        }
+
+        public String requestBlood(
+                        CreateBloodRequest request) {
+
+                // FIND PATIENT
+                User patient = userRepository
+                                .findById(request.getPatientId())
+                                .orElse(null);
+
+                if (patient == null ||
+                                !patient.getRole().equals("PATIENT")) {
+
+                        return "Patient not found!";
+                }
+
+                // FIND BLOOD STOCK
+                BloodStock stock = bloodStockRepository
+                                .findByBloodGroup(
+                                                request.getBloodGroup())
+                                .orElse(null);
+
+                if (stock == null) {
+                        return "Blood group not available!";
+                }
+
+                // CHECK AVAILABLE UNITS
+                if (stock.getUnitsAvailable() < request.getUnitsRequired()) {
+
+                        return "Insufficient blood units!";
+                }
+
+                // CREATE REQUEST
+                BloodRequest bloodRequest = new BloodRequest();
+
+                bloodRequest.setBloodGroup(
+                                request.getBloodGroup());
+
+                bloodRequest.setUnitsRequired(
+                                request.getUnitsRequired());
+
+                bloodRequest.setStatus("APPROVED");
+
+                bloodRequest.setRequestDate(
+                                LocalDate.now());
+
+                bloodRequest.setPatient(patient);
+
+                bloodRequestRepository.save(
+                                bloodRequest);
+
+                // REDUCE STOCK
+                stock.setUnitsAvailable(
+
+                                stock.getUnitsAvailable()
+                                                -
+                                                request.getUnitsRequired());
+
+                bloodStockRepository.save(stock);
+
+                return "Blood request approved!";
+        }
+
+        public List<BloodRequest> getAllBloodRequests() {
+
+                return bloodRequestRepository.findAll();
+        }
+
+        public BloodAvailabilityResponse checkBloodAvailability(
+                        String bloodGroup) {
+
+                BloodStock stock = bloodStockRepository
+                                .findByBloodGroup(bloodGroup)
+                                .orElse(null);
+
+                // IF BLOOD GROUP NOT FOUND
+                if (stock == null) {
+
+                        return new BloodAvailabilityResponse(
+
+                                        bloodGroup,
+
+                                        0,
+
+                                        false);
+                }
+
+                // CHECK AVAILABLE UNITS
+                boolean available = stock.getUnitsAvailable() > 0;
+
+                return new BloodAvailabilityResponse(
+
+                                stock.getBloodGroup(),
+
+                                stock.getUnitsAvailable(),
+
+                                available);
+        }
+
+        public String addDonor(
+                        AddDonorRequest request) {
+
+                Donor donor = new Donor();
+
+                donor.setDonorName(
+                                request.getDonorName());
+
+                donor.setBloodGroup(
+                                request.getBloodGroup());
+
+                donor.setMobile(
+                                request.getMobile());
+
+                donorRepository.save(donor);
+
+                return "Donor added successfully!";
+        }
+
+        public String donateBlood(
+                        DonateBloodRequest request) {
+
+                // FIND DONOR
+                Donor donor = donorRepository
+                                .findById(request.getDonorId())
+                                .orElse(null);
+
+                if (donor == null) {
+                        return "Donor not found!";
+                }
+
+                // CREATE DONATION HISTORY
+                Donation donation = new Donation();
+
+                donation.setUnitsDonated(
+                                request.getUnitsDonated());
+
+                donation.setDonationDate(
+                                LocalDate.now());
+
+                donation.setDonor(donor);
+
+                donationRepository.save(donation);
+
+                // FIND BLOOD STOCK
+                BloodStock stock = bloodStockRepository
+                                .findByBloodGroup(
+                                                donor.getBloodGroup())
+                                .orElse(null);
+
+                // IF BLOOD GROUP EXISTS
+                if (stock != null) {
+
+                        stock.setUnitsAvailable(
+
+                                        stock.getUnitsAvailable()
+                                                        +
+                                                        request.getUnitsDonated());
+
+                        bloodStockRepository.save(stock);
+
+                } else {
+
+                        // CREATE NEW STOCK
+                        BloodStock newStock = new BloodStock();
+
+                        newStock.setBloodGroup(
+                                        donor.getBloodGroup());
+
+                        newStock.setUnitsAvailable(
+                                        request.getUnitsDonated());
+
+                        bloodStockRepository.save(
+                                        newStock);
+                }
+
+                return "Blood donated successfully!";
+        }
+
 }
