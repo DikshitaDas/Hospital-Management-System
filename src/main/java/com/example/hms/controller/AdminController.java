@@ -1,6 +1,7 @@
 package com.example.hms.controller;
 
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
@@ -128,6 +129,14 @@ public class AdminController {
             @PathVariable Long id) {
 
         return adminService.approveAppointment(id);
+    }
+
+    @PostMapping("/wards")
+    public String addWard(
+
+            @Valid @RequestBody AddWardRequest request) {
+
+        return adminService.addWard(request);
     }
 
 }

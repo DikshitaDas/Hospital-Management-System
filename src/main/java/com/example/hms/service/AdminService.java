@@ -1,6 +1,7 @@
 package com.example.hms.service;
 
 import com.example.hms.dto.AddDoctorRequest;
+import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
@@ -8,9 +9,11 @@ import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
+import com.example.hms.entity.Ward;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.DoctorProfileRepository;
 import com.example.hms.repository.UserRepository;
+import com.example.hms.repository.WardRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +36,9 @@ public class AdminService {
 
         @Autowired
         private AppointmentRepository appointmentRepository;
+
+        @Autowired
+        private WardRepository wardRepository;
 
         // Get all patients
         public List<User> getAllPatients() {
@@ -320,7 +326,20 @@ public class AdminService {
                 return "Appointment approved successfully!";
         }
 
+        public String addWard(
+                        AddWardRequest request) {
 
-        
+                Ward ward = new Ward();
+
+                ward.setWardName(request.getWardName());
+
+                ward.setWardType(request.getWardType());
+
+                ward.setTotalBeds(request.getTotalBeds());
+
+                wardRepository.save(ward);
+
+                return "Ward added successfully!";
+        }
 
 }
