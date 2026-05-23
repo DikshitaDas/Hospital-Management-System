@@ -9,6 +9,7 @@ import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.dto.UpdateWardRequest;
 import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
@@ -552,6 +553,57 @@ public class AdminService {
                 admissionRepository.save(admission);
 
                 return "Patient transferred successfully!";
+        }
+
+        public List<Ward> getAllWards() {
+
+                return wardRepository.findAll();
+        }
+
+        public String updateWard(
+
+                        Long id,
+
+                        UpdateWardRequest request) {
+
+                Ward ward = wardRepository
+                                .findById(id)
+                                .orElse(null);
+
+                if (ward == null) {
+                        return "Ward not found!";
+                }
+
+                ward.setWardName(request.getWardName());
+
+                ward.setWardType(request.getWardType());
+
+                ward.setTotalBeds(request.getTotalBeds());
+
+                wardRepository.save(ward);
+
+                return "Ward updated successfully!";
+        }
+
+        public String deleteWard(Long id) {
+
+                Ward ward = wardRepository
+                                .findById(id)
+                                .orElse(null);
+
+                if (ward == null) {
+                        return "Ward not found!";
+                }
+
+                Long totalBeds = bedRepository.countByWardId(id);
+
+                if (totalBeds > 0) {
+                        return "Cannot delete ward with beds!";
+                }
+
+                wardRepository.delete(ward);
+
+                return "Ward deleted successfully!";
         }
 
 }

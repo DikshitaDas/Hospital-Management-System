@@ -15,4 +15,5 @@ public interface BedRepository
     Long countByWardIdAndStatus(
             Long wardId,
             String status);
+            
 }

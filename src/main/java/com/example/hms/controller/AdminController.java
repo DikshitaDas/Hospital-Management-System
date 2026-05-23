@@ -9,11 +9,13 @@ import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.dto.UpdateWardRequest;
 import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
+import com.example.hms.entity.Ward;
 import com.example.hms.service.AdminService;
 
 import jakarta.validation.Valid;
@@ -189,5 +191,27 @@ public class AdminController {
                 .transferPatient(request);
     }
 
+    @GetMapping("/wards")
+    public List<Ward> getAllWards() {
+
+        return adminService.getAllWards();
+    }
+
+    @PutMapping("/wards/{id}")
+    public String updateWard(
+
+            @PathVariable Long id,
+
+            @Valid @RequestBody UpdateWardRequest request) {
+
+        return adminService.updateWard(id, request);
+    }
+
+    @DeleteMapping("/wards/{id}")
+    public String deleteWard(
+            @PathVariable Long id) {
+
+        return adminService.deleteWard(id);
+    }
 
 }
