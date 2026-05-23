@@ -3,11 +3,13 @@ package com.example.hms.controller;
 import com.example.hms.dto.AddBedRequest;
 import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
+import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.Appointment;
+import com.example.hms.entity.Bed;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
 import com.example.hms.service.AdminService;
@@ -146,6 +148,28 @@ public class AdminController {
             @Valid @RequestBody AddBedRequest request) {
 
         return adminService.addBed(request);
+    }
+
+    @GetMapping("/beds/available")
+    public List<Bed> getAvailableBeds() {
+
+        return adminService.getAvailableBeds();
+    }
+
+    @PostMapping("/admissions")
+    public String admitPatient(
+
+            @Valid @RequestBody AdmitPatientRequest request) {
+
+        return adminService.admitPatient(request);
+    }
+
+    @PutMapping("/admissions/discharge/{patientId}")
+    public String dischargePatient(
+            @PathVariable Long patientId) {
+
+        return adminService
+                .dischargePatient(patientId);
     }
 
 }

@@ -3,15 +3,18 @@ package com.example.hms.service;
 import com.example.hms.dto.AddBedRequest;
 import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
+import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
+import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
 import com.example.hms.entity.Ward;
+import com.example.hms.repository.AdmissionRepository;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.BedRepository;
 import com.example.hms.repository.DoctorProfileRepository;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
@@ -45,6 +49,9 @@ public class AdminService {
 
         @Autowired
         private BedRepository bedRepository;
+
+        @Autowired
+        private AdmissionRepository admissionRepository;
 
         // Get all patients
         public List<User> getAllPatients() {
@@ -371,6 +378,90 @@ public class AdminService {
                 bedRepository.save(bed);
 
                 return "Bed added successfully!";
+        }
+
+        public List<Bed> getAvailableBeds() {
+
+                return bedRepository
+                                .findByStatus("AVAILABLE");
+        }
+
+        public String admitPatient(
+                        AdmitPatientRequest request) {
+
+                // FIND PATIENT
+                User patient = userRepository
+                                .findById(request.getPatientId())
+                                .orElse(null);
+
+                if (patient == null ||
+                                !patient.getRole().equals("PATIENT")) {
+
+                        return "Patient not found!";
+                }
+
+                // FIND BED
+                Bed bed = bedRepository
+                                .findById(request.getBedId())
+                                .orElse(null);
+
+                if (bed == null) {
+                        return "Bed not found!";
+                }
+
+                // CHECK BED STATUS
+                if (!bed.getStatus().equals("AVAILABLE")) {
+                        return "Bed is already occupied!";
+                }
+
+                // CREATE ADMISSION
+                Admission admission = new Admission();
+
+                admission.setAdmissionDate(LocalDate.now());
+
+                admission.setStatus("ADMITTED");
+
+                admission.setPatient(patient);
+
+                admission.setBed(bed);
+
+                admissionRepository.save(admission);
+
+                // UPDATE BED STATUS
+                bed.setStatus("OCCUPIED");
+
+                bedRepository.save(bed);
+
+                return "Patient admitted successfully!";
+        }
+
+        public String dischargePatient(Long patientId) {
+
+                Admission admission = admissionRepository
+                                .findByPatientIdAndStatus(
+                                                patientId,
+                                                "ADMITTED")
+                                .orElse(null);
+
+                if (admission == null) {
+                        return "No active admission found!";
+                }
+
+                // UPDATE ADMISSION
+                admission.setDischargeDate(LocalDate.now());
+
+                admission.setStatus("DISCHARGED");
+
+                admissionRepository.save(admission);
+
+                // FREE BED
+                Bed bed = admission.getBed();
+
+                bed.setStatus("AVAILABLE");
+
+                bedRepository.save(bed);
+
+                return "Patient discharged successfully!";
         }
 
 }
