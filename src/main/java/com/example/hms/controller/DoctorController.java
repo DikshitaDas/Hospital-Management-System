@@ -1,6 +1,7 @@
 package com.example.hms.controller;
 
 import com.example.hms.dto.ChangePasswordRequest;
+import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.doctor.DoctorDashboardResponse;
 import com.example.hms.dto.doctor.UpdateAppointmentStatusRequest;
 import com.example.hms.dto.doctor.UpdateAvailabilityRequest;
@@ -151,5 +152,30 @@ public class DoctorController {
 
                         request);
     }
+
+    @GetMapping("/blood-stock/{bloodGroup}")
+    public String checkBloodStock(
+
+            @PathVariable String bloodGroup) {
+
+        return doctorService
+                .checkBloodStock(bloodGroup);
+    }
+
+    @PostMapping("/blood-requests")
+    public String requestBlood(
+
+            @Valid @RequestBody CreateBloodRequest request) {
+
+        return doctorService
+                .requestBlood(request);
+    }
+
+
+    
+
+
+
+
 
 }

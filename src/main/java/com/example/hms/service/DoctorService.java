@@ -2,6 +2,8 @@ package com.example.hms.service;
 
 import com.example.hms.dto.ChangePasswordRequest;
 import com.example.hms.dto.UpdateProfileRequest;
+import com.example.hms.dto.admin.BloodAvailabilityResponse;
+import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.doctor.DoctorDashboardResponse;
 import com.example.hms.dto.doctor.UpdateAppointmentStatusRequest;
 import com.example.hms.dto.doctor.UpdateAvailabilityRequest;
@@ -39,6 +41,9 @@ public class DoctorService {
 
     @Autowired
     private DoctorProfileRepository doctorProfileRepository;
+
+    @Autowired
+    private AdminService adminService;
 
     public DoctorDashboardResponse getDoctorDashboard() {
 
@@ -279,6 +284,21 @@ public class DoctorService {
         doctorProfileRepository.save(profile);
 
         return "Availability updated successfully!";
+    }
+
+    public BloodAvailabilityResponse checkBloodAvailability(
+            String bloodGroup) {
+
+        return adminService
+                .checkBloodAvailability(
+                        bloodGroup);
+    }
+
+    public String requestBlood(
+            CreateBloodRequest request) {
+
+        return adminService
+                .requestBlood(request);
     }
 
 }
