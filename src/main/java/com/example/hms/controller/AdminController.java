@@ -1,5 +1,7 @@
 package com.example.hms.controller;
 
+import com.example.hms.dto.ChangePasswordRequest;
+import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.AddBedRequest;
 import com.example.hms.dto.admin.AddBloodStockRequest;
 import com.example.hms.dto.admin.AddDoctorRequest;
@@ -366,4 +368,40 @@ public class AdminController {
         return adminService
                 .getUsersByRole(role);
     }
+
+    @GetMapping("/profile/{adminId}")
+    public User getAdminProfile(
+
+            @PathVariable Long adminId) {
+
+        return adminService
+                .getAdminProfile(adminId);
+    }
+
+    @PutMapping("/profile/{adminId}")
+    public String updateAdminProfile(
+
+            @PathVariable Long adminId,
+
+            @Valid @RequestBody UpdateProfileRequest request) {
+
+        return adminService
+                .updateAdminProfile(
+                        adminId,
+                        request);
+    }
+
+    @PutMapping("/profile/{adminId}/password")
+    public String changePassword(
+
+            @PathVariable Long adminId,
+
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        return adminService
+                .changePassword(
+                        adminId,
+                        request);
+    }
+
 }

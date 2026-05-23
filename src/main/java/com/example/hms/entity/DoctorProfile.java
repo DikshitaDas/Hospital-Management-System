@@ -21,6 +21,8 @@ public class DoctorProfile {
 
     private String availability;
 
+    private String availabilityStatus;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

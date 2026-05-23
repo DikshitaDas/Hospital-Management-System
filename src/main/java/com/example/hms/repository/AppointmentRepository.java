@@ -6,10 +6,25 @@ import java.time.LocalDate;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AppointmentRepository
-        extends JpaRepository<Appointment, Long> {
+import java.util.List;
 
-    Long countByDoctorIdAndAppointmentDate(
-            Long doctorId,
-            LocalDate appointmentDate);
+public interface AppointmentRepository
+                extends JpaRepository<Appointment, Long> {
+
+        Long countByDoctorIdAndAppointmentDate(
+                        Long doctorId,
+                        LocalDate appointmentDate);
+
+        List<Appointment> findByAppointmentDate(LocalDate date);
+
+        List<Appointment> findByPatientNameContainingIgnoreCase(
+                        String name);
+
+        List<Appointment> findByDoctorId(Long doctorId);
+
+        List<Appointment> findByDoctorIdAndPatientNameContainingIgnoreCase(
+
+                        Long doctorId,
+
+                        String name);
 }

@@ -10,4 +10,6 @@ public interface DoctorProfileRepository
     Optional<DoctorProfile> findByUserId(Long userId);
 
     List<DoctorProfile> findByUserNameContainingIgnoreCase(String name);
+
+    
 }

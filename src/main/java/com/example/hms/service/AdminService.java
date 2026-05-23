@@ -1,5 +1,7 @@
 package com.example.hms.service;
 
+import com.example.hms.dto.ChangePasswordRequest;
+import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.AddBedRequest;
 import com.example.hms.dto.admin.AddBloodStockRequest;
 import com.example.hms.dto.admin.AddDoctorRequest;
@@ -1078,4 +1080,76 @@ public class AdminService {
                 return userRepository
                                 .findByRole(role);
         }
+
+        public User getAdminProfile(
+                        Long adminId) {
+
+                return userRepository
+                                .findById(adminId)
+                                .orElse(null);
+        }
+
+        public String updateAdminProfile(
+
+                        Long adminId,
+
+                        UpdateProfileRequest request) {
+
+                User user = userRepository
+                                .findById(adminId)
+                                .orElse(null);
+
+                if (user == null) {
+                        return "Admin not found!";
+                }
+
+                user.setName(request.getName());
+
+                user.setGender(request.getGender());
+
+                user.setAge(request.getAge());
+
+                user.setMobile(request.getMobile());
+
+                userRepository.save(user);
+
+                return "Profile updated successfully!";
+        }
+
+        public String changePassword(
+
+                        Long adminId,
+
+                        ChangePasswordRequest request) {
+
+                User user = userRepository
+                                .findById(adminId)
+                                .orElse(null);
+
+                if (user == null) {
+                        return "User not found!";
+                }
+
+                // CHECK OLD PASSWORD
+                boolean matched = passwordEncoder.matches(
+
+                                request.getOldPassword(),
+
+                                user.getPassword());
+
+                if (!matched) {
+                        return "Old password incorrect!";
+                }
+
+                // ENCRYPT NEW PASSWORD
+                user.setPassword(
+
+                                passwordEncoder.encode(
+                                                request.getNewPassword()));
+
+                userRepository.save(user);
+
+                return "Password changed successfully!";
+        }
+
 }
