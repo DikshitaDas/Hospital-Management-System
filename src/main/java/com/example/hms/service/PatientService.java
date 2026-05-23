@@ -1,9 +1,13 @@
 package com.example.hms.service;
 
+import com.example.hms.dto.admin.BloodAvailabilityResponse;
+import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.patient.PatientDashboardResponse;
+import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
 import com.example.hms.entity.Prescription;
+import com.example.hms.repository.AdmissionRepository;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.BillRepository;
 import com.example.hms.repository.PrescriptionRepository;
@@ -24,6 +28,12 @@ public class PatientService {
 
     @Autowired
     private BillRepository billRepository;
+
+    @Autowired
+    private AdmissionRepository admissionRepository;
+
+    @Autowired
+    private AdminService adminService;
 
     public PatientDashboardResponse getPatientDashboard(Long patientId) {
 
@@ -128,6 +138,28 @@ public class PatientService {
         billRepository.save(bill);
 
         return "Payment successful!";
+    }
+
+    public List<Admission> getPatientAdmissions(
+            Long patientId) {
+
+        return admissionRepository
+                .findByPatientId(patientId);
+    }
+
+    public BloodAvailabilityResponse checkBloodAvailability(
+            String bloodGroup) {
+
+        return adminService
+                .checkBloodAvailability(
+                        bloodGroup);
+    }
+
+    public String requestBlood(
+            CreateBloodRequest request) {
+
+        return adminService
+                .requestBlood(request);
     }
 
 }

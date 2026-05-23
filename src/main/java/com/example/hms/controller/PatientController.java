@@ -1,6 +1,9 @@
 package com.example.hms.controller;
 
+import com.example.hms.dto.admin.BloodAvailabilityResponse;
+import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.patient.PatientDashboardResponse;
+import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
 import com.example.hms.entity.Prescription;
@@ -91,4 +94,32 @@ public class PatientController {
                 .payBill(billId);
     }
 
+    @GetMapping("/{patientId}/admissions")
+    public List<Admission> getPatientAdmissions(
+
+            @PathVariable Long patientId) {
+
+        return patientService
+                .getPatientAdmissions(
+                        patientId);
+    }
+
+    @GetMapping("/blood-stock/{bloodGroup}")
+    public BloodAvailabilityResponse checkBloodAvailability(
+
+            @PathVariable String bloodGroup) {
+
+        return patientService
+                .checkBloodAvailability(
+                        bloodGroup);
+    }
+
+    @PostMapping("/blood-requests")
+    public String requestBlood(
+
+            @Valid @RequestBody CreateBloodRequest request) {
+
+        return patientService
+                .requestBlood(request);
+    }
 }
