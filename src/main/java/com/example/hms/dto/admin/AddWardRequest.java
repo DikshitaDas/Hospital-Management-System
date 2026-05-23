@@ -1,10 +1,10 @@
-package com.example.hms.dto;
+package com.example.hms.dto.admin;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class UpdateWardRequest {
+public class AddWardRequest {
 
     @NotBlank
     private String wardName;

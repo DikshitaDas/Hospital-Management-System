@@ -1,10 +1,10 @@
-package com.example.hms.dto;
+package com.example.hms.dto.admin;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class AddDoctorRequest {
+public class UpdateDoctorRequest {
 
     @NotBlank
     private String name;
@@ -17,9 +17,6 @@ public class AddDoctorRequest {
 
     @Pattern(regexp = "^[0-9]{10}$")
     private String mobile;
-
-    @Size(min = 8)
-    private String password;
 
     @NotBlank
     private String specialization;

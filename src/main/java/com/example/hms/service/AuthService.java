@@ -1,8 +1,8 @@
 package com.example.hms.service;
 
-import com.example.hms.dto.LoginRequest;
-import com.example.hms.dto.LoginResponse;
-import com.example.hms.dto.RegisterRequest;
+import com.example.hms.dto.admin.LoginRequest;
+import com.example.hms.dto.admin.LoginResponse;
+import com.example.hms.dto.admin.RegisterRequest;
 import com.example.hms.entity.User;
 import com.example.hms.repository.UserRepository;
 

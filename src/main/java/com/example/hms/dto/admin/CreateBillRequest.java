@@ -1,4 +1,4 @@
-package com.example.hms.dto;
+package com.example.hms.dto.admin;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

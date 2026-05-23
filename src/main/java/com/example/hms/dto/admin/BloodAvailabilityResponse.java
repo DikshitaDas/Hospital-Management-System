@@ -1,4 +1,4 @@
-package com.example.hms.dto;
+package com.example.hms.dto.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
