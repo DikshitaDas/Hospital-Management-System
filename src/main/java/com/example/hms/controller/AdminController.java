@@ -5,6 +5,7 @@ import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.CreateBillRequest;
 import com.example.hms.dto.CreatePrescriptionRequest;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
@@ -15,7 +16,9 @@ import com.example.hms.dto.UpdateWardRequest;
 import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
+import com.example.hms.entity.Bill;
 import com.example.hms.entity.DoctorProfile;
+import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
 import com.example.hms.entity.Ward;
 import com.example.hms.service.AdminService;
@@ -232,6 +235,35 @@ public class AdminController {
 
         return adminService
                 .createPrescription(request);
+    }
+
+    @GetMapping("/prescriptions")
+    public List<Prescription> getAllPrescriptions() {
+
+        return adminService.getAllPrescriptions();
+    }
+
+    @GetMapping("/patients/{id}/prescriptions")
+    public List<Prescription> getPatientPrescriptionHistory(
+
+            @PathVariable Long id) {
+
+        return adminService
+                .getPatientPrescriptionHistory(id);
+    }
+
+    @PostMapping("/bills")
+    public String createBill(
+
+            @Valid @RequestBody CreateBillRequest request) {
+
+        return adminService.createBill(request);
+    }
+
+    @GetMapping("/bills")
+    public List<Bill> getAllBills() {
+
+        return adminService.getAllBills();
     }
 
 }

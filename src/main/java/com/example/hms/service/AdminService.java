@@ -5,6 +5,7 @@ import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.CreateBillRequest;
 import com.example.hms.dto.CreatePrescriptionRequest;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
@@ -16,6 +17,7 @@ import com.example.hms.dto.WardOccupancyResponse;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
+import com.example.hms.entity.Bill;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
@@ -23,6 +25,7 @@ import com.example.hms.entity.Ward;
 import com.example.hms.repository.AdmissionRepository;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.BedRepository;
+import com.example.hms.repository.BillRepository;
 import com.example.hms.repository.DoctorProfileRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
@@ -69,6 +72,9 @@ public class AdminService {
 
                 return userRepository.findByRole("PATIENT");
         }
+
+        @Autowired
+        private BillRepository billRepository;
 
         public List<User> searchPatients(String name) {
 
@@ -698,6 +704,56 @@ public class AdminService {
                 prescriptionRepository.save(prescription);
 
                 return "Prescription created successfully!";
+        }
+
+        public List<Prescription> getAllPrescriptions() {
+
+                return prescriptionRepository.findAll();
+        }
+
+        public List<Prescription> getPatientPrescriptionHistory(
+                        Long patientId) {
+
+                return prescriptionRepository
+                                .findByAppointmentPatientId(patientId);
+        }
+
+        public String createBill(
+                        CreateBillRequest request) {
+
+                // FIND PATIENT
+                User patient = userRepository
+                                .findById(request.getPatientId())
+                                .orElse(null);
+
+                if (patient == null ||
+                                !patient.getRole().equals("PATIENT")) {
+
+                        return "Patient not found!";
+                }
+
+                // CREATE BILL
+                Bill bill = new Bill();
+
+                bill.setAmount(request.getAmount());
+
+                bill.setBillType(request.getBillType());
+
+                bill.setStatus("PENDING");
+
+                bill.setBillDate(LocalDate.now());
+
+                // RELATIONSHIP
+                bill.setPatient(patient);
+
+                billRepository.save(bill);
+
+                return "Bill generated successfully!";
+        }
+
+        public List<Bill> getAllBills() {
+
+                return billRepository.findAll();
         }
 
 }
