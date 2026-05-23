@@ -1,5 +1,6 @@
 package com.example.hms.service;
 
+import com.example.hms.dto.AddBedRequest;
 import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.BookAppointmentRequest;
@@ -7,10 +8,12 @@ import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.UpdateDoctorRequest;
 import com.example.hms.dto.UpdatePatientRequest;
 import com.example.hms.entity.Appointment;
+import com.example.hms.entity.Bed;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.User;
 import com.example.hms.entity.Ward;
 import com.example.hms.repository.AppointmentRepository;
+import com.example.hms.repository.BedRepository;
 import com.example.hms.repository.DoctorProfileRepository;
 import com.example.hms.repository.UserRepository;
 import com.example.hms.repository.WardRepository;
@@ -39,6 +42,9 @@ public class AdminService {
 
         @Autowired
         private WardRepository wardRepository;
+
+        @Autowired
+        private BedRepository bedRepository;
 
         // Get all patients
         public List<User> getAllPatients() {
@@ -340,6 +346,31 @@ public class AdminService {
                 wardRepository.save(ward);
 
                 return "Ward added successfully!";
+        }
+
+        public String addBed(
+                        AddBedRequest request) {
+
+                Ward ward = wardRepository
+                                .findById(request.getWardId())
+                                .orElse(null);
+
+                if (ward == null) {
+                        return "Ward not found!";
+                }
+
+                Bed bed = new Bed();
+
+                bed.setBedNumber(request.getBedNumber());
+
+                bed.setStatus("AVAILABLE");
+
+                // RELATIONSHIP
+                bed.setWard(ward);
+
+                bedRepository.save(bed);
+
+                return "Bed added successfully!";
         }
 
 }

@@ -1,5 +1,6 @@
 package com.example.hms.controller;
 
+import com.example.hms.dto.AddBedRequest;
 import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.BookAppointmentRequest;
@@ -137,6 +138,14 @@ public class AdminController {
             @Valid @RequestBody AddWardRequest request) {
 
         return adminService.addWard(request);
+    }
+
+    @PostMapping("/beds")
+    public String addBed(
+
+            @Valid @RequestBody AddBedRequest request) {
+
+        return adminService.addBed(request);
     }
 
 }
