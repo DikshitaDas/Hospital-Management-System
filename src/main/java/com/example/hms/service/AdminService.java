@@ -5,6 +5,7 @@ import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.CreatePrescriptionRequest;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
@@ -16,12 +17,14 @@ import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.DoctorProfile;
+import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
 import com.example.hms.entity.Ward;
 import com.example.hms.repository.AdmissionRepository;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.BedRepository;
 import com.example.hms.repository.DoctorProfileRepository;
+import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
 import com.example.hms.repository.WardRepository;
 
@@ -57,6 +60,9 @@ public class AdminService {
 
         @Autowired
         private AdmissionRepository admissionRepository;
+
+        @Autowired
+        private PrescriptionRepository prescriptionRepository;
 
         // Get all patients
         public List<User> getAllPatients() {
@@ -651,6 +657,47 @@ public class AdminService {
                 bedRepository.save(bed);
 
                 return "Emergency bed allocated successfully!";
+        }
+
+        public String createPrescription(
+                        CreatePrescriptionRequest request) {
+
+                // FIND APPOINTMENT
+                Appointment appointment = appointmentRepository
+                                .findById(request.getAppointmentId())
+                                .orElse(null);
+
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
+
+                // CHECK DUPLICATE PRESCRIPTION
+                boolean alreadyExists = prescriptionRepository
+                                .existsByAppointmentId(
+                                                request.getAppointmentId());
+
+                if (alreadyExists) {
+                        return "Prescription already exists!";
+                }
+
+                // CREATE PRESCRIPTION
+                Prescription prescription = new Prescription();
+
+                prescription.setDiagnosis(
+                                request.getDiagnosis());
+
+                prescription.setMedicines(
+                                request.getMedicines());
+
+                prescription.setDosageInstructions(
+                                request.getDosageInstructions());
+
+                // RELATIONSHIP
+                prescription.setAppointment(appointment);
+
+                prescriptionRepository.save(prescription);
+
+                return "Prescription created successfully!";
         }
 
 }

@@ -5,6 +5,7 @@ import com.example.hms.dto.AddDoctorRequest;
 import com.example.hms.dto.AddWardRequest;
 import com.example.hms.dto.AdmitPatientRequest;
 import com.example.hms.dto.BookAppointmentRequest;
+import com.example.hms.dto.CreatePrescriptionRequest;
 import com.example.hms.dto.EmergencyAdmissionRequest;
 import com.example.hms.dto.RescheduleAppointmentRequest;
 import com.example.hms.dto.TransferPatientRequest;
@@ -222,6 +223,15 @@ public class AdminController {
 
         return adminService
                 .emergencyAdmission(request);
+    }
+
+    @PostMapping("/prescriptions")
+    public String createPrescription(
+
+            @Valid @RequestBody CreatePrescriptionRequest request) {
+
+        return adminService
+                .createPrescription(request);
     }
 
 }
