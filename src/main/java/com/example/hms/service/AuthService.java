@@ -5,6 +5,7 @@ import com.example.hms.dto.admin.LoginResponse;
 import com.example.hms.dto.admin.RegisterRequest;
 import com.example.hms.entity.User;
 import com.example.hms.repository.UserRepository;
+import com.example.hms.security.JwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
 
     // REGISTER
     public String register(RegisterRequest request) {
@@ -60,6 +64,7 @@ public class AuthService {
                     "Invalid UHID!",
                     null,
                     null,
+                    null,
                     null);
         }
 
@@ -72,6 +77,7 @@ public class AuthService {
                     "Invalid Password!",
                     null,
                     null,
+                    null,
                     null);
         }
 
@@ -79,7 +85,8 @@ public class AuthService {
                 "Login Successful!",
                 user.getRole(),
                 user.getUhid(),
-                user.getName());
+                user.getName(),
+                jwtService.generateToken(user));
     }
 
     private String generateUHID() {
