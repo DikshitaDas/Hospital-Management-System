@@ -8,6 +8,7 @@ import com.example.hms.dto.patient.PatientDashboardResponse;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.User;
 import com.example.hms.repository.UserRepository;
+import com.example.hms.security.SecurityUtils;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
 import com.example.hms.entity.LabReport;
@@ -56,14 +57,21 @@ public class PatientService {
 
         public PatientDashboardResponse getPatientDashboard(Long patientId) {
 
-                Long totalAppointments = appointmentRepository.count();
+                Long totalAppointments = appointmentRepository
+                                .countByPatientId(patientId);
 
-                Long totalPrescriptions = prescriptionRepository.count();
+                Long totalPrescriptions = prescriptionRepository
+                                .countByAppointmentPatientId(patientId);
 
-                Long pendingBills = billRepository.countByStatus(
-                                "PENDING");
+                Long pendingBills = billRepository
+                                .countByPatientIdAndStatus(
+                                                patientId,
+                                                "PENDING");
 
-                Boolean admitted = false;
+                Boolean admitted = admissionRepository
+                                .existsByPatientIdAndStatus(
+                                                patientId,
+                                                "ADMITTED");
 
                 return new PatientDashboardResponse(
 
@@ -113,6 +121,15 @@ public class PatientService {
 
                 if (appointment == null) {
                         return "Appointment not found!";
+                }
+
+                if (appointmentRepository.existsActiveAppointment(
+                                appointment.getPatient().getId(),
+                                appointment.getDoctor().getId(),
+                                request.getAppointmentDate(),
+                                appointment.getId())) {
+
+                        return "Appointment already exists for this patient and doctor on this date!";
                 }
 
                 appointment.setAppointmentDate(
@@ -192,8 +209,13 @@ public class PatientService {
                                 .requestBlood(request);
         }
 
-        public User getPatientProfile(Long patientId) {
-                return userRepository.findById(patientId).orElse(null);
+        public User getPatientProfile() {
+
+                String uhid = SecurityUtils.getCurrentUhid();
+
+                return userRepository
+                                .findByUhid(uhid)
+                                .orElse(null);
         }
 
         public String updatePatientProfile(

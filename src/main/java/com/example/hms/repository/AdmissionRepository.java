@@ -11,5 +11,9 @@ public interface AdmissionRepository
                         Long patientId,
                         String status);
 
+        boolean existsByPatientIdAndStatus(
+                        Long patientId,
+                        String status);
+
         List<Admission> findByPatientId(Long patientId);
 }

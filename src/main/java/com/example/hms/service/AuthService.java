@@ -92,9 +92,13 @@ public class AuthService {
     private String generateUHID() {
 
         Random random = new Random();
+        String uhid;
 
-        int number = 100000 + random.nextInt(900000);
+        do {
+            int number = 100000 + random.nextInt(900000);
+            uhid = "HMS" + number;
+        } while (userRepository.existsByUhid(uhid));
 
-        return "HMS" + number;
+        return uhid;
     }
 }

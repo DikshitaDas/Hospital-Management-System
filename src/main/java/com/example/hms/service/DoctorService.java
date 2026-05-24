@@ -20,6 +20,7 @@ import com.example.hms.repository.LabReportRepository;
 import com.example.hms.repository.LabTestRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
+import com.example.hms.security.SecurityUtils;
 import com.example.hms.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +62,21 @@ public class DoctorService {
 
         public DoctorDashboardResponse getDoctorDashboard() {
 
-                Long todayAppointments = appointmentRepository.count();
+                User doctor = getCurrentDoctor();
 
-                Long totalPatients = 0L;
+                Long todayAppointments = appointmentRepository
+                                .countByDoctorIdAndAppointmentDate(
+                                                doctor.getId(),
+                                                LocalDate.now());
 
-                Long pendingReports = 0L;
+                Long totalPatients = appointmentRepository
+                                .countDistinctPatientsByDoctorId(
+                                                doctor.getId());
+
+                Long pendingReports = labReportRepository
+                                .countByAppointmentDoctorIdAndStatus(
+                                                doctor.getId(),
+                                                "PENDING");
 
                 return new DoctorDashboardResponse(
 
@@ -78,7 +89,11 @@ public class DoctorService {
 
         public List<Appointment> getAllAppointments() {
 
-                return appointmentRepository.findAll();
+                User doctor = getCurrentDoctor();
+
+                return appointmentRepository
+                                .findByDoctorId(
+                                                doctor.getId());
         }
 
         public String updateAppointmentStatus(
@@ -128,17 +143,25 @@ public class DoctorService {
                                                 LocalDate.now());
         }
 
-        public List<Appointment> searchAppointments(
-                        String patientName) {
+        public List<Appointment> searchAppointments(String name) {
+
+                User doctor = getCurrentDoctor();
 
                 return appointmentRepository
-                                .findByPatientNameContainingIgnoreCase(
-                                                patientName);
+
+                                .findByDoctorIdAndPatientNameContainingIgnoreCase(
+
+                                                doctor.getId(),
+
+                                                name);
         }
 
         public List<Prescription> getAllPrescriptions() {
 
-                return prescriptionRepository.findAll();
+                User doctor = getCurrentDoctor();
+
+                return prescriptionRepository.findByAppointmentDoctorId(
+                                                doctor.getId());
         }
 
         public String updatePrescription(
@@ -389,6 +412,15 @@ public class DoctorService {
                 labReportRepository.save(report);
 
                 return "Lab test requested successfully!";
+        }
+
+        private User getCurrentDoctor() {
+
+                String uhid = SecurityUtils.getCurrentUhid();
+
+                return userRepository
+                                .findByUhid(uhid)
+                                .orElse(null);
         }
 
 }

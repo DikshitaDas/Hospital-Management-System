@@ -9,4 +9,8 @@ public interface LabReportRepository
         extends JpaRepository<LabReport, Long> {
     List<LabReport> findByAppointmentPatientId(
             Long patientId);
+
+    Long countByAppointmentDoctorIdAndStatus(
+            Long doctorId,
+            String status);
 }

@@ -13,20 +13,13 @@ import java.util.List;
 
 public class NotificationController {
 
-    @Autowired
-    private NotificationService
-            notificationService;
+        @Autowired
+        private NotificationService notificationService;
 
-    @GetMapping("/{userId}")
-    public List<Notification>
-    getNotifications(
+        @GetMapping
+        public List<Notification> getNotifications() {
 
-            @PathVariable Long userId
-    ) {
-
-        return notificationService
-                .getUserNotifications(
-                        userId
-                );
-    }
+                return notificationService
+                                .getUserNotifications();
+        }
 }

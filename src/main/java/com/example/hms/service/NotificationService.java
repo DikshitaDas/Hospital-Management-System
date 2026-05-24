@@ -2,6 +2,9 @@ package com.example.hms.service;
 
 import com.example.hms.entity.Notification;
 import com.example.hms.repository.NotificationRepository;
+import com.example.hms.repository.UserRepository;
+import com.example.hms.security.SecurityUtils;
+import com.example.hms.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,46 +14,52 @@ import java.util.List;
 @Service
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepository
-            notificationRepository;
+        @Autowired
+        private NotificationRepository notificationRepository;
 
-    // CREATE NOTIFICATION
-    public void createNotification(
+        @Autowired
+        private UserRepository userRepository;
 
-            String title,
+        // CREATE NOTIFICATION
+        public void createNotification(
 
-            String message,
+                        String title,
 
-            String role,
+                        String message,
 
-            Long userId
-    ) {
+                        String role,
 
-        Notification notification =
-                new Notification();
+                        Long userId) {
 
-        notification.setTitle(title);
+                Notification notification = new Notification();
 
-        notification.setMessage(message);
+                notification.setTitle(title);
 
-        notification.setRole(role);
+                notification.setMessage(message);
 
-        notification.setUserId(userId);
+                notification.setRole(role);
 
-        notificationRepository.save(
-                notification
-        );
-    }
+                notification.setUserId(userId);
 
-    // GET USER NOTIFICATIONS
-    public List<Notification>
-    getUserNotifications(Long userId) {
+                notificationRepository.save(
+                                notification);
+        }
 
-        return notificationRepository
+        public List<Notification> getUserNotifications() {
 
-                .findByUserIdOrderByCreatedAtDesc(
-                        userId
-                );
-    }
+                String uhid = SecurityUtils.getCurrentUhid();
+
+                User user = userRepository
+                                .findByUhid(uhid)
+                                .orElse(null);
+
+                if (user == null) {
+                        return List.of();
+                }
+
+                return notificationRepository
+
+                                .findByUserIdOrderByCreatedAtDesc(
+                                                user.getId());
+        }
 }

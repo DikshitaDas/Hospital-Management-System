@@ -13,6 +13,10 @@ public interface BillRepository
 
     Long countByStatus(String status);
 
+    Long countByPatientIdAndStatus(
+            Long patientId,
+            String status);
+
     @Query("SELECT SUM(b.amount) FROM Bill b WHERE b.status='PAID'")
     Double getTotalRevenue();
 

@@ -15,10 +15,10 @@ import com.example.hms.dto.admin.BookAppointmentRequest;
 import com.example.hms.dto.admin.CreateBillRequest;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.admin.CreatePrescriptionRequest;
+import com.example.hms.dto.admin.CreateUserRequest;
 import com.example.hms.dto.admin.DashboardStatsResponse;
 import com.example.hms.dto.admin.DonateBloodRequest;
 import com.example.hms.dto.admin.EmergencyAdmissionRequest;
-import com.example.hms.dto.admin.RegisterRequest;
 import com.example.hms.dto.admin.RescheduleAppointmentRequest;
 import com.example.hms.dto.admin.TransferPatientRequest;
 import com.example.hms.dto.admin.UpdateDoctorRequest;
@@ -137,6 +137,10 @@ public class AdminService {
                         return "Patient not found!";
                 }
 
+                if (!"PATIENT".equals(user.getRole())) {
+                        return "Patient not found!";
+                }
+
                 userRepository.delete(user);
 
                 return "Patient deleted successfully!";
@@ -150,6 +154,10 @@ public class AdminService {
                                 .orElse(null);
 
                 if (user == null) {
+                        return "Patient not found!";
+                }
+
+                if (!"PATIENT".equals(user.getRole())) {
                         return "Patient not found!";
                 }
 
@@ -211,10 +219,14 @@ public class AdminService {
         private String generateUHID() {
 
                 Random random = new Random();
+                String uhid;
 
-                int number = 100000 + random.nextInt(900000);
+                do {
+                        int number = 100000 + random.nextInt(900000);
+                        uhid = "HMS" + number;
+                } while (userRepository.existsByUhid(uhid));
 
-                return "HMS" + number;
+                return uhid;
         }
 
         public List<DoctorProfile> getAllDoctors() {
@@ -310,6 +322,15 @@ public class AdminService {
                         return "Doctor not found!";
                 }
 
+                if (appointmentRepository.existsActiveAppointment(
+                                patient.getId(),
+                                doctor.getId(),
+                                request.getAppointmentDate(),
+                                null)) {
+
+                        return "Appointment already exists for this patient and doctor on this date!";
+                }
+
                 // CREATE APPOINTMENT
                 Appointment appointment = new Appointment();
 
@@ -373,6 +394,15 @@ public class AdminService {
                         return "Appointment not found!";
                 }
 
+                if (appointmentRepository.existsActiveAppointment(
+                                appointment.getPatient().getId(),
+                                appointment.getDoctor().getId(),
+                                request.getAppointmentDate(),
+                                appointment.getId())) {
+
+                        return "Appointment already exists for this patient and doctor on this date!";
+                }
+
                 appointment.setAppointmentDate(
                                 request.getAppointmentDate());
 
@@ -425,6 +455,13 @@ public class AdminService {
 
                 if (ward == null) {
                         return "Ward not found!";
+                }
+
+                Long existingBeds = bedRepository
+                                .countByWardId(ward.getId());
+
+                if (existingBeds >= ward.getTotalBeds()) {
+                        return "Ward bed capacity reached!";
                 }
 
                 Bed bed = new Bed();
@@ -1247,7 +1284,7 @@ public class AdminService {
 
         public String createUserByAdmin(
 
-                        RegisterRequest request) {
+                        CreateUserRequest request) {
 
                 if (userRepository
                                 .findByMobile(

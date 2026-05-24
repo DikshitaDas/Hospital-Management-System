@@ -15,10 +15,10 @@ import com.example.hms.dto.admin.BookAppointmentRequest;
 import com.example.hms.dto.admin.CreateBillRequest;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.admin.CreatePrescriptionRequest;
+import com.example.hms.dto.admin.CreateUserRequest;
 import com.example.hms.dto.admin.DashboardStatsResponse;
 import com.example.hms.dto.admin.DonateBloodRequest;
 import com.example.hms.dto.admin.EmergencyAdmissionRequest;
-import com.example.hms.dto.admin.RegisterRequest;
 import com.example.hms.dto.admin.RescheduleAppointmentRequest;
 import com.example.hms.dto.admin.TransferPatientRequest;
 import com.example.hms.dto.admin.UpdateDoctorRequest;
@@ -440,7 +440,7 @@ public class AdminController {
     @PostMapping("/users")
     public String createUserByAdmin(
 
-            @Valid @RequestBody RegisterRequest request) {
+            @Valid @RequestBody CreateUserRequest request) {
 
         return adminService
                 .createUserByAdmin(

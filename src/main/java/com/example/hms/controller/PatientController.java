@@ -127,13 +127,11 @@ public class PatientController {
                                 .requestBlood(request);
         }
 
-        @GetMapping("/profile/{patientId}")
-        public User getPatientProfile(
+        @GetMapping("/profile")
+        public User getPatientProfile() {
 
-                        @PathVariable Long patientId) {
-
-                return patientService.getPatientProfile(
-                                patientId);
+                return patientService
+                                .getPatientProfile();
         }
 
         @PutMapping("/profile/{patientId}")
