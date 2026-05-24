@@ -18,6 +18,7 @@ import com.example.hms.dto.admin.CreatePrescriptionRequest;
 import com.example.hms.dto.admin.DashboardStatsResponse;
 import com.example.hms.dto.admin.DonateBloodRequest;
 import com.example.hms.dto.admin.EmergencyAdmissionRequest;
+import com.example.hms.dto.admin.RegisterRequest;
 import com.example.hms.dto.admin.RescheduleAppointmentRequest;
 import com.example.hms.dto.admin.TransferPatientRequest;
 import com.example.hms.dto.admin.UpdateDoctorRequest;
@@ -433,6 +434,16 @@ public class AdminController {
         return adminService
                 .updateLabReport(
                         id,
+                        request);
+    }
+
+    @PostMapping("/users")
+    public String createUserByAdmin(
+
+            @Valid @RequestBody RegisterRequest request) {
+
+        return adminService
+                .createUserByAdmin(
                         request);
     }
 

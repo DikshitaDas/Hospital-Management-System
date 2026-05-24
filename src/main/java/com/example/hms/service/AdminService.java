@@ -18,6 +18,7 @@ import com.example.hms.dto.admin.CreatePrescriptionRequest;
 import com.example.hms.dto.admin.DashboardStatsResponse;
 import com.example.hms.dto.admin.DonateBloodRequest;
 import com.example.hms.dto.admin.EmergencyAdmissionRequest;
+import com.example.hms.dto.admin.RegisterRequest;
 import com.example.hms.dto.admin.RescheduleAppointmentRequest;
 import com.example.hms.dto.admin.TransferPatientRequest;
 import com.example.hms.dto.admin.UpdateDoctorRequest;
@@ -1244,6 +1245,48 @@ public class AdminService {
                 return "Lab report updated successfully!";
         }
 
+        public String createUserByAdmin(
 
-        
+                        RegisterRequest request) {
+
+                if (userRepository
+                                .findByMobile(
+                                                request.getMobile())
+                                .isPresent()) {
+
+                        return "Mobile already exists!";
+                }
+
+                User user = new User();
+
+                user.setUhid(
+                                generateUHID());
+
+                user.setName(
+                                request.getName());
+
+                user.setGender(
+                                request.getGender());
+
+                user.setAge(
+                                request.getAge());
+
+                user.setMobile(
+                                request.getMobile());
+
+                user.setPassword(
+
+                                passwordEncoder.encode(
+                                                request.getPassword()));
+
+                // ADMIN CHOOSES ROLE
+                user.setRole(
+                                request.getRole());
+
+                userRepository.save(user);
+
+                return request.getRole()
+                                + " created successfully!";
+        }
+
 }

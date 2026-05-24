@@ -46,7 +46,7 @@ public class AuthService {
         // Encrypt password
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        user.setRole("ADMIN");
+        user.setRole("PATIENT");
 
         userRepository.save(user);
 
