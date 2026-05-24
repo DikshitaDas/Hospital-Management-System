@@ -1,6 +1,7 @@
 package com.example.hms.controller;
 
 import com.example.hms.dto.ChangePasswordRequest;
+import com.example.hms.dto.Lab.CreateLabReportRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.doctor.DoctorDashboardResponse;
@@ -177,6 +178,16 @@ public class DoctorController {
 
                 return doctorService
                                 .getPendingAppointments();
+        }
+
+        @PostMapping("/lab-reports")
+        public String requestLabTest(
+
+                        @Valid @RequestBody CreateLabReportRequest request) {
+
+                return doctorService
+                                .requestLabTest(
+                                                request);
         }
 
 }

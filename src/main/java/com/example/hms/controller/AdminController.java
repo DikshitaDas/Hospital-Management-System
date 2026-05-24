@@ -2,6 +2,8 @@ package com.example.hms.controller;
 
 import com.example.hms.dto.ChangePasswordRequest;
 import com.example.hms.dto.UpdateProfileRequest;
+import com.example.hms.dto.Lab.CreateLabTestRequest;
+import com.example.hms.dto.Lab.UpdateLabReportRequest;
 import com.example.hms.dto.admin.AddBedRequest;
 import com.example.hms.dto.admin.AddBloodStockRequest;
 import com.example.hms.dto.admin.AddDoctorRequest;
@@ -29,6 +31,7 @@ import com.example.hms.entity.Bill;
 import com.example.hms.entity.BloodRequest;
 import com.example.hms.entity.BloodStock;
 import com.example.hms.entity.DoctorProfile;
+import com.example.hms.entity.LabTest;
 import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
 import com.example.hms.entity.Ward;
@@ -401,6 +404,35 @@ public class AdminController {
         return adminService
                 .changePassword(
                         adminId,
+                        request);
+    }
+
+    @PostMapping("/lab-tests")
+    public String createLabTest(
+
+            @Valid @RequestBody CreateLabTestRequest request) {
+
+        return adminService
+                .createLabTest(request);
+    }
+
+    @GetMapping("/lab-tests")
+    public List<LabTest> getAllLabTests() {
+
+        return adminService
+                .getAllLabTests();
+    }
+
+    @PutMapping("/lab-reports/{id}")
+    public String updateLabReport(
+
+            @PathVariable Long id,
+
+            @Valid @RequestBody UpdateLabReportRequest request) {
+
+        return adminService
+                .updateLabReport(
+                        id,
                         request);
     }
 

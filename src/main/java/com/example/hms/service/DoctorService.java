@@ -2,6 +2,7 @@ package com.example.hms.service;
 
 import com.example.hms.dto.ChangePasswordRequest;
 import com.example.hms.dto.UpdateProfileRequest;
+import com.example.hms.dto.Lab.CreateLabReportRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.doctor.DoctorDashboardResponse;
@@ -10,9 +11,13 @@ import com.example.hms.dto.doctor.UpdateAvailabilityRequest;
 import com.example.hms.dto.doctor.UpdatePrescriptionRequest;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.DoctorProfile;
+import com.example.hms.entity.LabReport;
+import com.example.hms.entity.LabTest;
 import com.example.hms.entity.Prescription;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.DoctorProfileRepository;
+import com.example.hms.repository.LabReportRepository;
+import com.example.hms.repository.LabTestRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
 import com.example.hms.entity.User;
@@ -47,6 +52,12 @@ public class DoctorService {
 
         @Autowired
         private NotificationService notificationService;
+
+        @Autowired
+        private LabReportRepository labReportRepository;
+
+        @Autowired
+        private LabTestRepository labTestRepository;
 
         public DoctorDashboardResponse getDoctorDashboard() {
 
@@ -339,6 +350,45 @@ public class DoctorService {
 
                 return appointmentRepository
                                 .findByStatus("PENDING");
+        }
+
+        public String requestLabTest(
+
+                        CreateLabReportRequest request) {
+
+                LabTest test = labTestRepository
+                                .findById(
+                                                request.getLabTestId())
+                                .orElse(null);
+
+                Appointment appointment = appointmentRepository
+                                .findById(
+                                                request.getAppointmentId())
+                                .orElse(null);
+
+                if (test == null) {
+                        return "Lab test not found!";
+                }
+
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
+
+                LabReport report = new LabReport();
+
+                report.setLabTest(test);
+
+                report.setAppointment(
+                                appointment);
+
+                // RESULT NOT READY YET
+                report.setResult(null);
+
+                report.setStatus("PENDING");
+
+                labReportRepository.save(report);
+
+                return "Lab test requested successfully!";
         }
 
 }

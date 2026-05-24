@@ -8,6 +8,7 @@ import com.example.hms.dto.patient.PatientDashboardResponse;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
+import com.example.hms.entity.LabReport;
 import com.example.hms.entity.Prescription;
 import com.example.hms.service.PatientService;
 import com.example.hms.entity.User;
@@ -23,145 +24,156 @@ import java.util.List;
 
 public class PatientController {
 
-    @Autowired
-    private PatientService patientService;
+        @Autowired
+        private PatientService patientService;
 
-    @GetMapping("/dashboard/{patientId}")
-    public PatientDashboardResponse getPatientDashboard(
+        @GetMapping("/dashboard/{patientId}")
+        public PatientDashboardResponse getPatientDashboard(
 
-            @PathVariable Long patientId) {
+                        @PathVariable Long patientId) {
 
-        return patientService
-                .getPatientDashboard(
-                        patientId);
-    }
+                return patientService
+                                .getPatientDashboard(
+                                                patientId);
+        }
 
-    @GetMapping("/{patientId}/appointments")
-    public List<Appointment> getPatientAppointments(
+        @GetMapping("/{patientId}/appointments")
+        public List<Appointment> getPatientAppointments(
 
-            @PathVariable Long patientId) {
+                        @PathVariable Long patientId) {
 
-        return patientService
-                .getPatientAppointments(
-                        patientId);
-    }
+                return patientService
+                                .getPatientAppointments(
+                                                patientId);
+        }
 
-    @PutMapping("/appointments/{id}/cancel")
-    public String cancelAppointment(
+        @PutMapping("/appointments/{id}/cancel")
+        public String cancelAppointment(
 
-            @PathVariable Long id) {
+                        @PathVariable Long id) {
 
-        return patientService
-                .cancelAppointment(id);
-    }
+                return patientService
+                                .cancelAppointment(id);
+        }
 
-    @PutMapping("/appointments/{id}/reschedule")
-    public String rescheduleAppointment(
+        @PutMapping("/appointments/{id}/reschedule")
+        public String rescheduleAppointment(
 
-            @PathVariable Long id,
+                        @PathVariable Long id,
 
-            @Valid @RequestBody RescheduleAppointmentRequest request) {
+                        @Valid @RequestBody RescheduleAppointmentRequest request) {
 
-        return patientService
-                .rescheduleAppointment(
-                        id,
-                        request);
-    }
+                return patientService
+                                .rescheduleAppointment(
+                                                id,
+                                                request);
+        }
 
-    @GetMapping("/{patientId}/prescriptions")
-    public List<Prescription> getPatientPrescriptions(
+        @GetMapping("/{patientId}/prescriptions")
+        public List<Prescription> getPatientPrescriptions(
 
-            @PathVariable Long patientId) {
+                        @PathVariable Long patientId) {
 
-        return patientService
-                .getPatientPrescriptions(
-                        patientId);
-    }
+                return patientService
+                                .getPatientPrescriptions(
+                                                patientId);
+        }
 
-    @GetMapping("/{patientId}/bills")
-    public List<Bill> getPatientBills(
+        @GetMapping("/{patientId}/bills")
+        public List<Bill> getPatientBills(
 
-            @PathVariable Long patientId) {
+                        @PathVariable Long patientId) {
 
-        return patientService
-                .getPatientBills(
-                        patientId);
-    }
+                return patientService
+                                .getPatientBills(
+                                                patientId);
+        }
 
-    @PutMapping("/bills/{billId}/pay")
-    public String payBill(
+        @PutMapping("/bills/{billId}/pay")
+        public String payBill(
 
-            @PathVariable Long billId) {
+                        @PathVariable Long billId) {
 
-        return patientService
-                .payBill(billId);
-    }
+                return patientService
+                                .payBill(billId);
+        }
 
-    @GetMapping("/{patientId}/admissions")
-    public List<Admission> getPatientAdmissions(
+        @GetMapping("/{patientId}/admissions")
+        public List<Admission> getPatientAdmissions(
 
-            @PathVariable Long patientId) {
+                        @PathVariable Long patientId) {
 
-        return patientService
-                .getPatientAdmissions(
-                        patientId);
-    }
+                return patientService
+                                .getPatientAdmissions(
+                                                patientId);
+        }
 
-    @GetMapping("/blood-stock/{bloodGroup}")
-    public BloodAvailabilityResponse checkBloodAvailability(
+        @GetMapping("/blood-stock/{bloodGroup}")
+        public BloodAvailabilityResponse checkBloodAvailability(
 
-            @PathVariable String bloodGroup) {
+                        @PathVariable String bloodGroup) {
 
-        return patientService
-                .checkBloodAvailability(
-                        bloodGroup);
-    }
+                return patientService
+                                .checkBloodAvailability(
+                                                bloodGroup);
+        }
 
-    @PostMapping("/blood-requests")
-    public String requestBlood(
+        @PostMapping("/blood-requests")
+        public String requestBlood(
 
-            @Valid @RequestBody CreateBloodRequest request) {
+                        @Valid @RequestBody CreateBloodRequest request) {
 
-        return patientService
-                .requestBlood(request);
-    }
+                return patientService
+                                .requestBlood(request);
+        }
 
-    @GetMapping("/profile/{patientId}")
-    public User getPatientProfile(
+        @GetMapping("/profile/{patientId}")
+        public User getPatientProfile(
 
-            @PathVariable Long patientId) {
+                        @PathVariable Long patientId) {
 
-        return patientService.getPatientProfile(
-                patientId);
-    }
+                return patientService.getPatientProfile(
+                                patientId);
+        }
 
-    @PutMapping("/profile/{patientId}")
-    public String updatePatientProfile(
+        @PutMapping("/profile/{patientId}")
+        public String updatePatientProfile(
 
-            @PathVariable Long patientId,
+                        @PathVariable Long patientId,
 
-            @Valid @RequestBody UpdateProfileRequest request) {
+                        @Valid @RequestBody UpdateProfileRequest request) {
 
-        return patientService
-                .updatePatientProfile(
+                return patientService
+                                .updatePatientProfile(
 
-                        patientId,
+                                                patientId,
 
-                        request);
-    }
+                                                request);
+        }
 
-    @PutMapping("/profile/{patientId}/password")
-    public String changePatientPassword(
+        @PutMapping("/profile/{patientId}/password")
+        public String changePatientPassword(
 
-            @PathVariable Long patientId,
+                        @PathVariable Long patientId,
 
-            @Valid @RequestBody ChangePasswordRequest request) {
+                        @Valid @RequestBody ChangePasswordRequest request) {
 
-        return patientService
-                .changePatientPassword(
+                return patientService
+                                .changePatientPassword(
 
-                        patientId,
+                                                patientId,
 
-                        request);
-    }
+                                                request);
+        }
+
+        @GetMapping("/{patientId}/lab-reports")
+        public List<LabReport> getPatientLabReports(
+
+                        @PathVariable Long patientId) {
+
+                return patientService
+                                .getPatientLabReports(
+                                                patientId);
+        }
+
 }

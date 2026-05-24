@@ -10,10 +10,12 @@ import com.example.hms.entity.User;
 import com.example.hms.repository.UserRepository;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
+import com.example.hms.entity.LabReport;
 import com.example.hms.entity.Prescription;
 import com.example.hms.repository.AdmissionRepository;
 import com.example.hms.repository.AppointmentRepository;
 import com.example.hms.repository.BillRepository;
+import com.example.hms.repository.LabReportRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.dto.patient.RescheduleAppointmentRequest;
 import java.util.List;
@@ -45,6 +47,9 @@ public class PatientService {
 
         @Autowired
         private PasswordEncoder passwordEncoder;
+
+        @Autowired
+        private LabReportRepository labReportRepository;
 
         @Autowired
         private NotificationService notificationService;
@@ -250,6 +255,15 @@ public class PatientService {
                 userRepository.save(patient);
 
                 return "Password changed successfully!";
+        }
+
+        public List<LabReport> getPatientLabReports(
+                        Long patientId) {
+
+                return labReportRepository
+
+                                .findByAppointmentPatientId(
+                                                patientId);
         }
 
 }

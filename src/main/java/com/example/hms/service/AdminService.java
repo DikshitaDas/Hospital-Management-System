@@ -2,6 +2,8 @@ package com.example.hms.service;
 
 import com.example.hms.dto.ChangePasswordRequest;
 import com.example.hms.dto.UpdateProfileRequest;
+import com.example.hms.dto.Lab.CreateLabTestRequest;
+import com.example.hms.dto.Lab.UpdateLabReportRequest;
 import com.example.hms.dto.admin.AddBedRequest;
 import com.example.hms.dto.admin.AddBloodStockRequest;
 import com.example.hms.dto.admin.AddDoctorRequest;
@@ -32,6 +34,8 @@ import com.example.hms.entity.BloodStock;
 import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.Donation;
 import com.example.hms.entity.Donor;
+import com.example.hms.entity.LabReport;
+import com.example.hms.entity.LabTest;
 import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
 import com.example.hms.entity.Ward;
@@ -44,6 +48,8 @@ import com.example.hms.repository.BloodStockRepository;
 import com.example.hms.repository.DoctorProfileRepository;
 import com.example.hms.repository.DonationRepository;
 import com.example.hms.repository.DonorRepository;
+import com.example.hms.repository.LabReportRepository;
+import com.example.hms.repository.LabTestRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
 import com.example.hms.repository.WardRepository;
@@ -92,6 +98,12 @@ public class AdminService {
 
         @Autowired
         private DonationRepository donationRepository;
+
+        @Autowired
+        private LabTestRepository labTestRepository;
+
+        @Autowired
+        private LabReportRepository labReportRepository;
 
         // Get all patients
         public List<User> getAllPatients() {
@@ -1165,4 +1177,73 @@ public class AdminService {
                 return "Password changed successfully!";
         }
 
+        public String createLabTest(
+                        CreateLabTestRequest request) {
+
+                LabTest test = new LabTest();
+
+                test.setTestName(
+                                request.getTestName());
+
+                test.setCategory(
+                                request.getCategory());
+
+                test.setPrice(
+                                request.getPrice());
+
+                test.setDescription(
+                                request.getDescription());
+
+                labTestRepository.save(test);
+
+                return "Lab test created successfully!";
+        }
+
+        public List<LabTest> getAllLabTests() {
+
+                return labTestRepository.findAll();
+        }
+
+        public String updateLabReport(
+
+                        Long reportId,
+
+                        UpdateLabReportRequest request) {
+
+                LabReport report = labReportRepository
+                                .findById(reportId)
+                                .orElse(null);
+
+                if (report == null) {
+                        return "Lab report not found!";
+                }
+
+                // UPLOAD RESULT
+                report.setResult(
+                                request.getResult());
+
+                // MARK COMPLETED
+                report.setStatus(
+                                "COMPLETED");
+
+                labReportRepository.save(report);
+
+                notificationService
+                                .createNotification(
+
+                                                "Lab Report Ready",
+
+                                                "Your lab report is now available.",
+
+                                                "PATIENT",
+
+                                                report.getAppointment()
+                                                                .getPatient()
+                                                                .getId());
+
+                return "Lab report updated successfully!";
+        }
+
+
+        
 }
