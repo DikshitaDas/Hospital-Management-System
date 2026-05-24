@@ -45,6 +45,9 @@ public class DoctorService {
         @Autowired
         private AdminService adminService;
 
+        @Autowired
+        private NotificationService notificationService;
+
         public DoctorDashboardResponse getDoctorDashboard() {
 
                 Long todayAppointments = appointmentRepository.count();
@@ -86,6 +89,23 @@ public class DoctorService {
 
                 appointmentRepository.save(
                                 appointment);
+
+                if (request.getStatus()
+                                .equals("APPROVED")) {
+
+                        notificationService
+                                        .createNotification(
+
+                                                        "Appointment Approved",
+
+                                                        "Your appointment has been approved.",
+
+                                                        "PATIENT",
+
+                                                        appointment
+                                                                        .getPatient()
+                                                                        .getId());
+                }
 
                 return "Appointment status updated successfully!";
         }
@@ -136,6 +156,20 @@ public class DoctorService {
 
                 prescriptionRepository.save(
                                 prescription);
+
+                notificationService
+                                .createNotification(
+
+                                                "Prescription Updated",
+
+                                                "Doctor updated your prescription.",
+
+                                                "PATIENT",
+
+                                                prescription
+                                                                .getAppointment()
+                                                                .getPatient()
+                                                                .getId());
 
                 return "Prescription updated successfully!";
         }

@@ -104,6 +104,9 @@ public class AdminService {
         @Autowired
         private BloodStockRepository bloodStockRepository;
 
+        @Autowired
+        private NotificationService notificationService;
+
         public List<User> searchPatients(String name) {
 
                 return userRepository
@@ -804,6 +807,16 @@ public class AdminService {
 
                 billRepository.save(bill);
 
+                notificationService
+                                .createNotification(
+
+                                                "Payment Successful",
+
+                                                "Your payment was successful.",
+
+                                                "PATIENT",
+
+                                                bill.getPatient().getId());
                 return "Payment successful!";
         }
 

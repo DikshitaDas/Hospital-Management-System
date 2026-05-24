@@ -25,217 +25,231 @@ import org.springframework.stereotype.Service;
 @Service
 public class PatientService {
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
+        @Autowired
+        private AppointmentRepository appointmentRepository;
 
-    @Autowired
-    private PrescriptionRepository prescriptionRepository;
+        @Autowired
+        private PrescriptionRepository prescriptionRepository;
 
-    @Autowired
-    private BillRepository billRepository;
+        @Autowired
+        private BillRepository billRepository;
 
-    @Autowired
-    private AdmissionRepository admissionRepository;
+        @Autowired
+        private AdmissionRepository admissionRepository;
 
-    @Autowired
-    private AdminService adminService;
+        @Autowired
+        private AdminService adminService;
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
-    public PatientDashboardResponse getPatientDashboard(Long patientId) {
+        @Autowired
+        private NotificationService notificationService;
 
-        Long totalAppointments = appointmentRepository.count();
+        public PatientDashboardResponse getPatientDashboard(Long patientId) {
 
-        Long totalPrescriptions = prescriptionRepository.count();
+                Long totalAppointments = appointmentRepository.count();
 
-        Long pendingBills = billRepository.countByStatus(
-                "PENDING");
+                Long totalPrescriptions = prescriptionRepository.count();
 
-        Boolean admitted = false;
+                Long pendingBills = billRepository.countByStatus(
+                                "PENDING");
 
-        return new PatientDashboardResponse(
+                Boolean admitted = false;
 
-                totalAppointments,
+                return new PatientDashboardResponse(
 
-                totalPrescriptions,
+                                totalAppointments,
 
-                pendingBills,
+                                totalPrescriptions,
 
-                admitted);
-    }
+                                pendingBills,
 
-    public List<Appointment> getPatientAppointments(
-            Long patientId) {
-
-        return appointmentRepository
-                .findByPatientId(patientId);
-    }
-
-    public String cancelAppointment(
-            Long appointmentId) {
-
-        Appointment appointment = appointmentRepository
-                .findById(appointmentId)
-                .orElse(null);
-
-        if (appointment == null) {
-            return "Appointment not found!";
+                                admitted);
         }
 
-        appointment.setStatus("CANCELLED");
+        public List<Appointment> getPatientAppointments(
+                        Long patientId) {
 
-        appointmentRepository.save(appointment);
-
-        return "Appointment cancelled successfully!";
-    }
-
-    public String rescheduleAppointment(
-
-            Long appointmentId,
-
-            RescheduleAppointmentRequest request) {
-
-        Appointment appointment = appointmentRepository
-                .findById(appointmentId)
-                .orElse(null);
-
-        if (appointment == null) {
-            return "Appointment not found!";
+                return appointmentRepository
+                                .findByPatientId(patientId);
         }
 
-        appointment.setAppointmentDate(
+        public String cancelAppointment(
+                        Long appointmentId) {
 
-                request.getAppointmentDate());
+                Appointment appointment = appointmentRepository
+                                .findById(appointmentId)
+                                .orElse(null);
 
-        appointment.setStatus("PENDING");
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
 
-        appointmentRepository.save(appointment);
+                appointment.setStatus("CANCELLED");
 
-        return "Appointment rescheduled successfully!";
-    }
+                appointmentRepository.save(appointment);
 
-    public List<Prescription> getPatientPrescriptions(
-            Long patientId) {
-
-        return prescriptionRepository
-                .findByAppointmentPatientId(
-                        patientId);
-    }
-
-    public List<Bill> getPatientBills(
-            Long patientId) {
-
-        return billRepository
-                .findByPatientId(patientId);
-    }
-
-    public String payBill(
-            Long billId) {
-
-        Bill bill = billRepository
-                .findById(billId)
-                .orElse(null);
-
-        if (bill == null) {
-            return "Bill not found!";
+                return "Appointment cancelled successfully!";
         }
 
-        bill.setStatus("PAID");
+        public String rescheduleAppointment(
 
-        billRepository.save(bill);
+                        Long appointmentId,
 
-        return "Payment successful!";
-    }
+                        RescheduleAppointmentRequest request) {
 
-    public List<Admission> getPatientAdmissions(
-            Long patientId) {
+                Appointment appointment = appointmentRepository
+                                .findById(appointmentId)
+                                .orElse(null);
 
-        return admissionRepository
-                .findByPatientId(patientId);
-    }
+                if (appointment == null) {
+                        return "Appointment not found!";
+                }
 
-    public BloodAvailabilityResponse checkBloodAvailability(
-            String bloodGroup) {
+                appointment.setAppointmentDate(
 
-        return adminService
-                .checkBloodAvailability(
-                        bloodGroup);
-    }
+                                request.getAppointmentDate());
 
-    public String requestBlood(
-            CreateBloodRequest request) {
+                appointment.setStatus("PENDING");
 
-        return adminService
-                .requestBlood(request);
-    }
+                appointmentRepository.save(appointment);
 
-    public User getPatientProfile(Long patientId) {
-        return userRepository.findById(patientId).orElse(null);
-    }
-
-    public String updatePatientProfile(
-
-            Long patientId,
-
-            UpdateProfileRequest request) {
-
-        User patient = userRepository
-                .findById(patientId)
-                .orElse(null);
-
-        if (patient == null) {
-            return "Patient not found!";
+                return "Appointment rescheduled successfully!";
         }
 
-        patient.setName(request.getName());
+        public List<Prescription> getPatientPrescriptions(
+                        Long patientId) {
 
-        patient.setGender(request.getGender());
-
-        patient.setAge(request.getAge());
-
-        patient.setMobile(request.getMobile());
-
-        userRepository.save(patient);
-
-        return "Patient profile updated successfully!";
-    }
-
-    public String changePatientPassword(
-
-            Long patientId,
-
-            ChangePasswordRequest request) {
-
-        User patient = userRepository
-                .findById(patientId)
-                .orElse(null);
-
-        if (patient == null) {
-            return "Patient not found!";
+                return prescriptionRepository
+                                .findByAppointmentPatientId(
+                                                patientId);
         }
 
-        boolean matched = passwordEncoder.matches(
+        public List<Bill> getPatientBills(
+                        Long patientId) {
 
-                request.getOldPassword(),
-
-                patient.getPassword());
-
-        if (!matched) {
-            return "Old password incorrect!";
+                return billRepository
+                                .findByPatientId(patientId);
         }
 
-        patient.setPassword(
+        public String payBill(
+                        Long billId) {
 
-                passwordEncoder.encode(
-                        request.getNewPassword()));
+                Bill bill = billRepository
+                                .findById(billId)
+                                .orElse(null);
 
-        userRepository.save(patient);
+                if (bill == null) {
+                        return "Bill not found!";
+                }
 
-        return "Password changed successfully!";
-    }
+                bill.setStatus("PAID");
+
+                billRepository.save(bill);
+
+                notificationService
+                                .createNotification(
+
+                                                "Payment Successful",
+
+                                                "Your payment was successful.",
+
+                                                "PATIENT",
+
+                                                bill.getPatient().getId());
+
+                return "Payment successful!";
+        }
+
+        public List<Admission> getPatientAdmissions(
+                        Long patientId) {
+
+                return admissionRepository
+                                .findByPatientId(patientId);
+        }
+
+        public BloodAvailabilityResponse checkBloodAvailability(
+                        String bloodGroup) {
+
+                return adminService
+                                .checkBloodAvailability(
+                                                bloodGroup);
+        }
+
+        public String requestBlood(
+                        CreateBloodRequest request) {
+
+                return adminService
+                                .requestBlood(request);
+        }
+
+        public User getPatientProfile(Long patientId) {
+                return userRepository.findById(patientId).orElse(null);
+        }
+
+        public String updatePatientProfile(
+
+                        Long patientId,
+
+                        UpdateProfileRequest request) {
+
+                User patient = userRepository
+                                .findById(patientId)
+                                .orElse(null);
+
+                if (patient == null) {
+                        return "Patient not found!";
+                }
+
+                patient.setName(request.getName());
+
+                patient.setGender(request.getGender());
+
+                patient.setAge(request.getAge());
+
+                patient.setMobile(request.getMobile());
+
+                userRepository.save(patient);
+
+                return "Patient profile updated successfully!";
+        }
+
+        public String changePatientPassword(
+
+                        Long patientId,
+
+                        ChangePasswordRequest request) {
+
+                User patient = userRepository
+                                .findById(patientId)
+                                .orElse(null);
+
+                if (patient == null) {
+                        return "Patient not found!";
+                }
+
+                boolean matched = passwordEncoder.matches(
+
+                                request.getOldPassword(),
+
+                                patient.getPassword());
+
+                if (!matched) {
+                        return "Old password incorrect!";
+                }
+
+                patient.setPassword(
+
+                                passwordEncoder.encode(
+                                                request.getNewPassword()));
+
+                userRepository.save(patient);
+
+                return "Password changed successfully!";
+        }
 
 }
