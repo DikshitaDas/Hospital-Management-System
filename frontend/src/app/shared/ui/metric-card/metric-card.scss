@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.metric {
+  min-height: 156px;
+  border-radius: var(--radius);
+  padding: 18px;
+  display: grid;
+  align-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric::after {
+  content: "";
+  position: absolute;
+  inset: auto -32px -46px auto;
+  width: 126px;
+  height: 126px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.1;
+}
+
+.marker {
+  width: 38px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+span,
+small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+strong {
+  font-size: 30px;
+  letter-spacing: 0;
+}
+
+.mint {
+  color: var(--primary);
+}
+
+.sky {
+  color: var(--accent);
+}
+
+.rose {
+  color: #d95773;
+}
+
+.warning {
+  color: #c78316;
+}

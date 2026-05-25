@@ -1,0 +1,24 @@
+.snackbar {
+  position: fixed;
+  z-index: 50;
+  right: 18px;
+  bottom: 18px;
+  min-width: min(360px, calc(100vw - 36px));
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 8px 8px 8px 18px;
+  border-radius: var(--radius);
+  color: var(--ink);
+}
+
+span {
+  font-weight: 800;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+}

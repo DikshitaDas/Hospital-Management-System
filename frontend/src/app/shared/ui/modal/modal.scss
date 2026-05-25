@@ -1,0 +1,46 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(12, 36, 48, 0.32);
+  backdrop-filter: blur(10px);
+}
+
+.modal {
+  width: min(560px, 100%);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: 0;
+}
+
+::ng-deep .form-grid {
+  display: grid;
+  gap: 12px;
+}
+
+::ng-deep .form-grid input,
+::ng-deep .form-grid select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  outline: 0;
+}

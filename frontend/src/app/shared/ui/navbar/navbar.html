@@ -1,0 +1,29 @@
+<header class="navbar glass">
+  <button class="icon-button mobile-menu" type="button" aria-label="Open menu" (click)="openDrawer.emit()">
+    <svg lucideMenu size="20"></svg>
+  </button>
+
+  <div class="headline">
+    <span>Operations center</span>
+    <h1>MediCare Hub</h1>
+  </div>
+
+  <label class="search">
+    <span class="sr-only">Search</span>
+    <svg lucideSearch size="18"></svg>
+    <input type="search" placeholder="Search patients, doctors, wards" />
+  </label>
+
+  <div class="actions">
+    <button class="icon-button" type="button" aria-label="Open drawer" title="Open drawer" (click)="openDrawer.emit()">
+      <svg lucidePanelLeft size="20"></svg>
+    </button>
+    <button class="icon-button" type="button" aria-label="Notifications" title="Notifications" (click)="showSnackbar.emit()">
+      <svg lucideBell size="20"></svg>
+    </button>
+    <button class="primary-button" type="button" (click)="openModal.emit()">
+      <svg lucidePlus size="18"></svg>
+      <span>New Patient</span>
+    </button>
+  </div>
+</header>

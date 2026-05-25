@@ -1,0 +1,120 @@
+<main class="shell">
+  <app-sidebar />
+
+  <section class="workspace">
+    <app-navbar
+      (openDrawer)="drawerOpen.set(true)"
+      (openModal)="modalOpen.set(true)"
+      (showSnackbar)="openSnackbar()"
+    />
+
+    <section class="hero-grid">
+      <app-carousel [slides]="slides" />
+
+      <div class="today glass">
+        <span>Today</span>
+        <strong>128</strong>
+        <p>Patients moving through appointments, billing, labs, and admissions.</p>
+        <div class="bar">
+          <i style="width: 68%"></i>
+        </div>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <app-metric-card title="Appointments" value="42" detail="18 waiting approval" tone="mint" />
+      <app-metric-card title="Doctors Active" value="17" detail="6 departments covered" tone="sky" />
+      <app-metric-card title="Beds Occupied" value="73%" detail="12 critical care beds open" tone="warning" />
+      <app-metric-card title="Pending Bills" value="31" detail="Rs. 2.8L receivable" tone="rose" />
+    </section>
+
+    <section class="content-grid">
+      <article class="panel glass">
+        <header>
+          <div>
+            <span>Reusable cards</span>
+            <h2>Patient queue</h2>
+          </div>
+          <button class="ghost-button" type="button" (click)="openSnackbar()">Refresh</button>
+        </header>
+
+        <div class="queue">
+          <div>
+            <strong>Ananya Sharma</strong>
+            <span>Cardiology / 09:30 AM</span>
+          </div>
+          <b>Approved</b>
+        </div>
+        <div class="queue">
+          <div>
+            <strong>Rahul Mehta</strong>
+            <span>Lab report pending</span>
+          </div>
+          <b class="warm">Pending</b>
+        </div>
+        <div class="queue">
+          <div>
+            <strong>Priya Nair</strong>
+            <span>Ward transfer request</span>
+          </div>
+          <b class="cool">Review</b>
+        </div>
+      </article>
+
+      <article class="panel glass">
+        <header>
+          <div>
+            <span>Glassmorphism</span>
+            <h2>Component status</h2>
+          </div>
+        </header>
+
+        <div class="component-list">
+          <span>Navbar</span>
+          <span>Sidebar</span>
+          <span>Cards</span>
+          <span>Carousel</span>
+          <span>Modal</span>
+          <span>Drawer</span>
+          <span>Snackbar</span>
+        </div>
+      </article>
+    </section>
+  </section>
+</main>
+
+<app-modal [open]="modalOpen()" title="Create patient" (closed)="modalOpen.set(false)">
+  <div class="form-grid">
+    <input placeholder="Full name" />
+    <input placeholder="Mobile number" />
+    <select>
+      <option>General consultation</option>
+      <option>Emergency admission</option>
+      <option>Lab test request</option>
+    </select>
+    <button class="primary-button" type="button" (click)="modalOpen.set(false); openSnackbar()">Save patient</button>
+  </div>
+</app-modal>
+
+<app-drawer [open]="drawerOpen()" title="Care activity" (closed)="drawerOpen.set(false)">
+  <div class="drawer-list">
+    <article>
+      <strong>New lab report ready</strong>
+      <span>Patient UHID HMS102348 has a completed CBC report.</span>
+    </article>
+    <article>
+      <strong>Bed capacity alert</strong>
+      <span>ICU has crossed 70% occupancy.</span>
+    </article>
+    <article>
+      <strong>Doctor availability updated</strong>
+      <span>Orthopedics schedule refreshed for the afternoon shift.</span>
+    </article>
+  </div>
+</app-drawer>
+
+<app-snackbar
+  [open]="snackbarOpen()"
+  message="MediCare Hub UI component is working."
+  (closed)="snackbarOpen.set(false)"
+/>

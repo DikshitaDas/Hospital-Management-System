@@ -1,0 +1,46 @@
+<aside class="sidebar glass">
+  <div class="brand">
+    <img src="/assets/images/hms logo.png" alt="MediCare Hub logo" />
+    <div>
+      <strong>MediCare Hub</strong>
+      <span>Hospital CRM</span>
+    </div>
+  </div>
+
+  <nav aria-label="Main navigation">
+    @for (link of links; track link.label) {
+      <a href="#" [class.active]="link.active">
+        @switch (link.icon) {
+          @case ('dashboard') {
+            <svg lucideLayoutDashboard size="19"></svg>
+          }
+          @case ('patients') {
+            <svg lucideUsers size="19"></svg>
+          }
+          @case ('doctors') {
+            <svg lucideStethoscope size="19"></svg>
+          }
+          @case ('appointments') {
+            <svg lucideCalendar size="19"></svg>
+          }
+          @case ('wards') {
+            <svg lucideBed size="19"></svg>
+          }
+          @case ('reports') {
+            <svg lucideHeartPulse size="19"></svg>
+          }
+          @case ('settings') {
+            <svg lucideSettings size="19"></svg>
+          }
+        }
+        <span>{{ link.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="support">
+    <svg lucideHospital size="22"></svg>
+    <strong>Emergency desk</strong>
+    <span>24/7 triage queue</span>
+  </div>
+</aside>

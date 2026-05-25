@@ -1,0 +1,25 @@
+<section class="carousel glass">
+  @if (active(); as slide) {
+    <img [src]="slide.image" [alt]="slide.title" />
+    <div class="content">
+      <span>{{ slide.eyebrow }}</span>
+      <h2>{{ slide.title }}</h2>
+      <p>{{ slide.description }}</p>
+    </div>
+  }
+
+  <div class="controls">
+    <button class="icon-button" type="button" aria-label="Previous slide" (click)="previous()">
+      <svg lucideChevronLeft size="18"></svg>
+    </button>
+    <button class="icon-button" type="button" aria-label="Next slide" (click)="next()">
+      <svg lucideChevronRight size="18"></svg>
+    </button>
+  </div>
+
+  <div class="dots" aria-label="Carousel slides">
+    @for (slide of slides(); track slide.title; let i = $index) {
+      <button type="button" [class.active]="i === index()" [attr.aria-label]="'Show ' + slide.title" (click)="setSlide(i)"></button>
+    }
+  </div>
+</section>

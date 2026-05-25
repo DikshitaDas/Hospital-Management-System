@@ -1,0 +1,13 @@
+@if (open()) {
+  <div class="backdrop" (click)="closed.emit()">
+    <section class="modal glass" role="dialog" aria-modal="true" [attr.aria-label]="title()" (click)="$event.stopPropagation()">
+      <header>
+        <h2>{{ title() }}</h2>
+        <button class="icon-button" type="button" aria-label="Close modal" (click)="closed.emit()">
+          <svg lucideX size="18"></svg>
+        </button>
+      </header>
+      <ng-content />
+    </section>
+  </div>
+}

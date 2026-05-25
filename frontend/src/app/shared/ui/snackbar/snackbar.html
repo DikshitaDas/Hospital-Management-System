@@ -1,0 +1,8 @@
+@if (open()) {
+  <div class="snackbar glass" role="status">
+    <span>{{ message() }}</span>
+    <button class="icon-button" type="button" aria-label="Dismiss message" (click)="closed.emit()">
+      <svg lucideX size="16"></svg>
+    </button>
+  </div>
+}
