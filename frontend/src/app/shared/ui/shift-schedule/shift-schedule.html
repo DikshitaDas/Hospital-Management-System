@@ -1,0 +1,20 @@
+<div class="shift-schedule">
+  <span class="field-label">Shift days &amp; timing</span>
+  <div class="day-row">
+    @for (day of days; track day) {
+      <button
+        type="button"
+        class="day-chip"
+        [class.active]="isSelected(day)"
+        (click)="toggleDay(day)"
+      >
+        {{ day }}
+      </button>
+    }
+  </div>
+  <div class="time-row">
+    <label>From <input type="time" [(ngModel)]="fromTime" (ngModelChange)="onTimeChange()" /></label>
+    <label>To <input type="time" [(ngModel)]="toTime" (ngModelChange)="onTimeChange()" /></label>
+  </div>
+  <small class="preview">Preview: {{ value || '—' }}</small>
+</div>

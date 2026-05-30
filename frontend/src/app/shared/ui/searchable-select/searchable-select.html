@@ -1,0 +1,21 @@
+<label class="searchable-select">
+  <span class="field-label">{{ label }}@if (required) { <em>*</em> }</span>
+  <input
+    type="text"
+    [placeholder]="placeholder"
+    [ngModel]="query()"
+    (ngModelChange)="onQueryInput($event)"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    autocomplete="off"
+  />
+  @if (open() && results().length) {
+    <ul class="dropdown glass" role="listbox">
+      @for (item of results(); track item[valueKey]) {
+        <li role="option" (mousedown)="pick(item)">{{ displayWith(item) }}</li>
+      }
+    </ul>
+  } @else if (open() && query().length >= minSearchLength && !results().length) {
+    <ul class="dropdown glass"><li class="muted">No matches</li></ul>
+  }
+</label>

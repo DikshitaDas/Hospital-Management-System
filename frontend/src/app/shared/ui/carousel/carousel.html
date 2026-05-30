@@ -1,6 +1,8 @@
 <section class="carousel glass">
   @if (active(); as slide) {
-    <img [src]="slide.image" [alt]="slide.title" />
+    @if (slide.image) {
+      <img [src]="slide.image" [alt]="slide.title" />
+    }
     <div class="content">
       <span>{{ slide.eyebrow }}</span>
       <h2>{{ slide.title }}</h2>

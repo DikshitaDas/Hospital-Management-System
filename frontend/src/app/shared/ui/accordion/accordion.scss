@@ -1,0 +1,39 @@
+.accordion {
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.accordion-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.accordion-head span {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.accordion-head i {
+  color: var(--primary-strong);
+  font-style: normal;
+  font-size: 11px;
+}
+
+.accordion-body {
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--line);
+}

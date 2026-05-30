@@ -3,6 +3,7 @@ import { forkJoin } from 'rxjs';
 import { AdminApiService } from '../../../services/admin-api.service';
 import { Notification, NotificationApiService } from '../../../services/notification-api.service';
 import { Appointment, Bill, DashboardStats, Prescription } from '../../models/admin.models';
+import { CarouselComponent, CarouselSlide } from '../../../shared/ui/carousel/carousel';
 import { MetricCardComponent } from '../../../shared/ui/metric-card/metric-card';
 import { SnackbarComponent } from '../../../shared/ui/snackbar/snackbar';
 import { DrawerComponent } from '../../../shared/ui/drawer/drawer';
@@ -18,7 +19,7 @@ interface ActivityItem {
 @Component({
   selector: 'app-admin-dashboard-page',
   standalone: true,
-  imports: [MetricCardComponent, SnackbarComponent, DrawerComponent],
+  imports: [CarouselComponent, MetricCardComponent, SnackbarComponent, DrawerComponent],
   templateUrl: './admin-dashboard-page.html',
   styleUrl: './admin-dashboard-page.scss'
 })
@@ -35,8 +36,30 @@ export class AdminDashboardPage implements OnInit {
   protected readonly activities = signal<ActivityItem[]>([]);
   protected readonly notifications = signal<Notification[]>([]);
 
+  protected readonly slides: CarouselSlide[] = [
+    {
+      image: '',
+      eyebrow: 'Operations',
+      title: 'Unified hospital control',
+      description: 'Patients, doctors, wards, billing, and lab — connected to Spring Boot + MySQL.'
+    },
+    {
+      image: '',
+      eyebrow: 'Admissions',
+      title: 'Beds drive admissions',
+      description: 'Create wards, add beds (Bed Allocation), then admit patients to AVAILABLE beds.'
+    },
+    {
+      image: '',
+      eyebrow: 'Live data',
+      title: 'Real-time dashboards',
+      description: 'Stats from GET /api/admin/dashboard/stats and related endpoints.'
+    }
+  ];
+
   protected readonly String = String;
   protected readonly badgeClass = statusBadgeClass;
+  protected readonly Math = Math;
 
   constructor(
     private adminApi: AdminApiService,

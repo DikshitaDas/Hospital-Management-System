@@ -1,0 +1,85 @@
+<header class="page-header">
+  <div>
+    <span>Doctors</span>
+    <h1>{{ pageTitle }}</h1>
+    <p>Full CRUD via doctor profile APIs — grouped by {{ fieldLabel }}.</p>
+  </div>
+  <div class="page-actions">
+    <button class="primary-button btn-sm" type="button" (click)="openAdd()">+ Add Doctor</button>
+  </div>
+</header>
+
+<div class="toolbar glass data-panel">
+  <input type="search" placeholder="Search doctor name..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="load()" />
+  <button class="ghost-button btn-sm" type="button" (click)="load()">Search</button>
+</div>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  @for (key of groupKeys(); track key) {
+    <section class="glass data-panel ui-card">
+      <header class="page-header" style="margin-bottom:8px">
+        <h2 style="margin:0;font-size:15px">{{ key }}</h2>
+        <button class="ghost-button btn-sm" type="button" (click)="openAdd(key)">+ Add to {{ key }}</button>
+      </header>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Doctor</th><th>Department</th><th>Specialization</th><th>Availability</th><th>Fee</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of grouped()[key]; track d.id) {
+              <tr>
+                <td>{{ d.user.name }}<br /><small>{{ d.user.uhid }}</small></td>
+                <td>{{ d.department }}</td>
+                <td>{{ d.specialization }}</td>
+                <td>{{ d.availability }}</td>
+                <td>Rs. {{ d.consultationFee }}</td>
+                <td class="row-actions">
+                  <button class="ghost-button btn-sm" type="button" appTooltip="Update doctor profile" (click)="openEdit(d)">Edit</button>
+                  <button class="ghost-button btn-sm" type="button" appTooltip="DELETE /api/admin/doctors/{userId}" (click)="deleteDoctor(d.user.id)">Del</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  } @empty {
+    <div class="empty-box glass data-panel">No doctors found.</div>
+  }
+}
+
+<app-modal [open]="addOpen()" title="Add doctor" (closed)="addOpen.set(false)">
+  <form class="form-grid two-col" (ngSubmit)="submitAdd()">
+    <label>Name<input [(ngModel)]="addForm.name" name="n" required /></label>
+    <label>Mobile<input [(ngModel)]="addForm.mobile" name="m" required /></label>
+    <label>Password<input type="password" [(ngModel)]="addForm.password" name="p" required /></label>
+    <label>Gender<select [(ngModel)]="addForm.gender" name="g"><option value="MALE">Male</option><option value="FEMALE">Female</option></select></label>
+    <label>Age<input type="number" [(ngModel)]="addForm.age" name="a" required /></label>
+    <label>Department<input [(ngModel)]="addForm.department" name="dep" required /></label>
+    <label>Specialization<input [(ngModel)]="addForm.specialization" name="spec" required /></label>
+    <label>Availability<input [(ngModel)]="addForm.availability" name="avail" required /></label>
+    <label>Fee<input type="number" [(ngModel)]="addForm.consultationFee" name="fee" required /></label>
+    <button class="primary-button btn-sm" type="submit">Create doctor</button>
+  </form>
+</app-modal>
+
+<app-modal [open]="editOpen()" title="Edit doctor" (closed)="editOpen.set(false)">
+  <form class="form-grid two-col" (ngSubmit)="submitEdit()">
+    <label>Name<input [(ngModel)]="editForm.name" name="en" required /></label>
+    <label>Mobile<input [(ngModel)]="editForm.mobile" name="em" required /></label>
+    <label>Department<input [(ngModel)]="editForm.department" name="edep" required /></label>
+    <label>Specialization<input [(ngModel)]="editForm.specialization" name="espec" required /></label>
+    <label>Availability<input [(ngModel)]="editForm.availability" name="eavail" required /></label>
+    <label>Fee<input type="number" [(ngModel)]="editForm.consultationFee" name="efee" required /></label>
+    <button class="primary-button btn-sm" type="submit">Save changes</button>
+  </form>
+</app-modal>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

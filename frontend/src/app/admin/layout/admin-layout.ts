@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { NotificationApiService, Notification } from '../../services/notification-api.service';
 import { DrawerComponent } from '../../shared/ui/drawer/drawer';
@@ -19,10 +20,8 @@ interface NavItem {
   templateUrl: './admin-sidebar.html',
   styleUrl: './admin-sidebar.scss'
 })
-export class AdminSidebarComponent {
-  protected readonly expanded = signal<Record<string, boolean>>({
-    patients: true
-  });
+export class AdminSidebarComponent implements OnInit {
+  protected readonly expanded = signal<Record<string, boolean>>({});
 
   protected readonly nav: NavItem[] = [
     { label: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard' },
@@ -112,12 +111,31 @@ export class AdminSidebarComponent {
     }
   ];
 
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    this.syncExpanded(this.router.url);
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => {
+      this.syncExpanded((e as NavigationEnd).urlAfterRedirects);
+    });
+  }
+
   protected toggleGroup(key: string): void {
     this.expanded.update(state => ({ ...state, [key]: !state[key] }));
   }
 
   protected groupKey(label: string): string {
     return label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  }
+
+  private syncExpanded(url: string): void {
+    const next: Record<string, boolean> = {};
+    for (const item of this.nav) {
+      if (!item.children) continue;
+      const key = this.groupKey(item.label);
+      next[key] = item.children.some(c => url.startsWith(c.route));
+    }
+    this.expanded.set(next);
   }
 }
 
@@ -134,7 +152,6 @@ export class AdminNavbarComponent implements OnInit {
   protected readonly snackbarMessage = signal('');
   protected readonly notifications = signal<Notification[]>([]);
   protected readonly profileOpen = signal(false);
-  protected readonly searchQuery = signal('');
 
   protected readonly userName: string;
   protected readonly userUhid: string;
@@ -170,7 +187,6 @@ export class AdminNavbarComponent implements OnInit {
 
   protected onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement).value.trim();
-    this.searchQuery.set(value);
     if (value.length >= 2) {
       this.router.navigate(['/admin/patients'], { queryParams: { search: value } });
     }
@@ -179,12 +195,6 @@ export class AdminNavbarComponent implements OnInit {
   protected logout(): void {
     this.auth.logout();
     this.router.navigate(['/login']);
-  }
-
-  protected toast(message: string): void {
-    this.snackbarMessage.set(message);
-    this.snackbarOpen.set(true);
-    window.setTimeout(() => this.snackbarOpen.set(false), 3000);
   }
 }
 

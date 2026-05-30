@@ -24,9 +24,13 @@ import com.example.hms.dto.admin.TransferPatientRequest;
 import com.example.hms.dto.admin.UpdateDoctorRequest;
 import com.example.hms.dto.admin.UpdatePatientRequest;
 import com.example.hms.dto.admin.UpdateRoleRequest;
+import com.example.hms.dto.admin.DepartmentRequest;
+import com.example.hms.dto.admin.SpecializationRequest;
 import com.example.hms.dto.admin.UpdateWardRequest;
 import com.example.hms.dto.admin.WardOccupancyResponse;
 import com.example.hms.entity.Admission;
+import com.example.hms.entity.Department;
+import com.example.hms.entity.Specialization;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.Bill;
@@ -53,6 +57,8 @@ import com.example.hms.repository.LabReportRepository;
 import com.example.hms.repository.LabTestRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
+import com.example.hms.repository.DepartmentRepository;
+import com.example.hms.repository.SpecializationRepository;
 import com.example.hms.repository.WardRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +125,12 @@ public class AdminService {
 
         @Autowired
         private NotificationService notificationService;
+
+        @Autowired
+        private DepartmentRepository departmentRepository;
+
+        @Autowired
+        private SpecializationRepository specializationRepository;
 
         public List<User> searchPatients(String name) {
 
@@ -213,7 +225,8 @@ public class AdminService {
 
                 doctorProfileRepository.save(doctorProfile);
 
-                return "Doctor added successfully!";
+                return "Doctor added successfully! Login UHID: "
+                                + savedUser.getUhid();
         }
 
         private String generateUHID() {
@@ -484,6 +497,11 @@ public class AdminService {
                                 .findByStatus("AVAILABLE");
         }
 
+        public List<Bed> getAllBeds() {
+
+                return bedRepository.findAll();
+        }
+
         public String admitPatient(
                         AdmitPatientRequest request) {
 
@@ -570,7 +588,9 @@ public class AdminService {
 
                 for (Ward ward : wards) {
 
-                        Long totalBeds = bedRepository.countByWardId(
+                        Long plannedCapacity = ward.getTotalBeds().longValue();
+
+                        Long bedsRegistered = bedRepository.countByWardId(
                                         ward.getId());
 
                         Long occupiedBeds = bedRepository
@@ -578,7 +598,10 @@ public class AdminService {
                                                         ward.getId(),
                                                         "OCCUPIED");
 
-                        Long availableBeds = totalBeds - occupiedBeds;
+                        Long availableBeds = bedRepository
+                                        .countByWardIdAndStatus(
+                                                        ward.getId(),
+                                                        "AVAILABLE");
 
                         WardOccupancyResponse wardResponse = new WardOccupancyResponse(
 
@@ -586,7 +609,9 @@ public class AdminService {
 
                                         ward.getWardType(),
 
-                                        totalBeds,
+                                        plannedCapacity,
+
+                                        bedsRegistered,
 
                                         occupiedBeds,
 
@@ -1056,6 +1081,11 @@ public class AdminService {
                 return "Donor added successfully!";
         }
 
+        public List<Donor> getAllDonors() {
+
+                return donorRepository.findAll();
+        }
+
         public String donateBlood(
                         DonateBloodRequest request) {
 
@@ -1114,6 +1144,11 @@ public class AdminService {
                 }
 
                 return "Blood donated successfully!";
+        }
+
+        public List<Donation> getAllDonations() {
+
+                return donationRepository.findAll();
         }
 
         public String updateUserRole(
@@ -1324,6 +1359,106 @@ public class AdminService {
 
                 return request.getRole()
                                 + " created successfully!";
+        }
+
+        // ── Departments (master data) ─────────────────────────────
+
+        public List<Department> getAllDepartments() {
+                return departmentRepository.findAll();
+        }
+
+        public String addDepartment(DepartmentRequest request) {
+                if (departmentRepository.existsByNameIgnoreCase(request.getName())) {
+                        return "Department already exists!";
+                }
+                Department department = new Department();
+                department.setName(request.getName().trim());
+                department.setDescription(request.getDescription());
+                departmentRepository.save(department);
+                return "Department added successfully!";
+        }
+
+        public String updateDepartment(Long id, DepartmentRequest request) {
+                Department department = departmentRepository.findById(id).orElse(null);
+                if (department == null) {
+                        return "Department not found!";
+                }
+                if (!department.getName().equalsIgnoreCase(request.getName())
+                                && departmentRepository.existsByNameIgnoreCase(request.getName())) {
+                        return "Department name already in use!";
+                }
+                department.setName(request.getName().trim());
+                department.setDescription(request.getDescription());
+                departmentRepository.save(department);
+                return "Department updated successfully!";
+        }
+
+        public String deleteDepartment(Long id) {
+                Department department = departmentRepository.findById(id).orElse(null);
+                if (department == null) {
+                        return "Department not found!";
+                }
+                departmentRepository.delete(department);
+                return "Department deleted successfully!";
+        }
+
+        // ── Specializations (master data) ─────────────────────────
+
+        public List<Specialization> getAllSpecializations() {
+                return specializationRepository.findAll();
+        }
+
+        public String addSpecialization(SpecializationRequest request) {
+                if (specializationRepository.existsByNameIgnoreCase(request.getName())) {
+                        return "Specialization already exists!";
+                }
+                Specialization specialization = new Specialization();
+                specialization.setName(request.getName().trim());
+                if (request.getDepartmentId() != null) {
+                        Department department = departmentRepository
+                                        .findById(request.getDepartmentId())
+                                        .orElse(null);
+                        if (department == null) {
+                                return "Department not found!";
+                        }
+                        specialization.setDepartment(department);
+                }
+                specializationRepository.save(specialization);
+                return "Specialization added successfully!";
+        }
+
+        public String updateSpecialization(Long id, SpecializationRequest request) {
+                Specialization specialization = specializationRepository.findById(id).orElse(null);
+                if (specialization == null) {
+                        return "Specialization not found!";
+                }
+                if (!specialization.getName().equalsIgnoreCase(request.getName())
+                                && specializationRepository.existsByNameIgnoreCase(request.getName())) {
+                        return "Specialization name already in use!";
+                }
+                specialization.setName(request.getName().trim());
+                if (request.getDepartmentId() != null) {
+                        Department department = departmentRepository
+                                        .findById(request.getDepartmentId())
+                                        .orElse(null);
+                        if (department == null) {
+                                return "Department not found!";
+                        }
+                        specialization.setDepartment(department);
+                } else {
+                        specialization.setDepartment(null);
+                }
+                specializationRepository.save(specialization);
+                return "Specialization updated successfully!";
+        }
+
+        public String deleteSpecialization(Long id) {
+                Specialization specialization = specializationRepository.findById(id).orElse(null);
+                if (specialization == null) {
+                        return "Specialization not found!";
+                }
+                specializationRepository.delete(specialization);
+                return "Specialization deleted successfully!";
         }
 
 }

@@ -2,7 +2,12 @@
   <div>
     <span>Patients</span>
     <h1>Medical Records</h1>
-    <p>View prescriptions and create new prescription records.</p>
+    <p>Prescriptions linked to appointments via POST /api/admin/prescriptions.</p>
+  </div>
+  <div class="page-actions">
+    @if (selectedPatientId()) {
+      <button class="primary-button btn-sm" type="button" appTooltip="Create prescription for selected patient" (click)="openRxModal()">+ Prescription</button>
+    }
   </div>
 </header>
 
@@ -10,11 +15,12 @@
   <div class="alert error glass data-panel">{{ errorMsg() }}</div>
 }
 
-<section class="glass data-panel">
+<section class="glass data-panel ui-card">
   <div class="toolbar">
-    <select [ngModel]="selectedPatientId()" (ngModelChange)="selectedPatientId.set($event); loadPrescriptions()">
+    <input type="search" placeholder="Search patient name, UHID, mobile..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+    <select [ngModel]="selectedPatientId()" (ngModelChange)="onPatientChange($event)">
       <option [ngValue]="0">Select patient</option>
-      @for (p of patients(); track p.id) {
+      @for (p of filteredPatients(); track p.id) {
         <option [ngValue]="p.id">{{ p.name }} ({{ p.uhid }})</option>
       }
     </select>
@@ -23,6 +29,9 @@
   @if (loading()) {
     <div class="loading-box">Loading...</div>
   } @else if (selectedPatientId()) {
+    @if (patientAppointments().length === 0) {
+      <div class="alert info">No appointments for this patient. <a routerLink="/admin/appointments">Book appointment</a> before adding prescriptions.</div>
+    }
     <div class="data-table-wrap">
       <table class="data-table">
         <thead><tr><th>Diagnosis</th><th>Medicines</th><th>Dosage</th><th>Appointment</th></tr></thead>
@@ -32,26 +41,34 @@
               <td>{{ rx.diagnosis }}</td>
               <td>{{ rx.medicines }}</td>
               <td>{{ rx.dosageInstructions }}</td>
-              <td>{{ rx.appointment?.appointmentDate }}</td>
+              <td>{{ rx.appointment.appointmentDate }} (ID {{ rx.appointment.id }})</td>
             </tr>
           } @empty {
-            <tr><td colspan="4" class="empty-box">No prescriptions for this patient.</td></tr>
+            <tr><td colspan="4" class="empty-box">No prescriptions yet.</td></tr>
           }
         </tbody>
       </table>
     </div>
+  } @else {
+    <div class="empty-box">Select a patient to view medical records.</div>
   }
 </section>
 
-<section class="glass data-panel" style="margin-top:16px">
-  <h2 style="margin:0 0 12px;font-size:16px">Create Prescription</h2>
-  <form class="form-grid two-col" (ngSubmit)="submitPrescription()">
-    <input [(ngModel)]="rxForm.appointmentId" name="apptId" type="number" placeholder="Appointment ID" required />
-    <input [(ngModel)]="rxForm.diagnosis" name="diagnosis" placeholder="Diagnosis" required />
-    <input [(ngModel)]="rxForm.medicines" name="medicines" placeholder="Medicines" required />
-    <textarea [(ngModel)]="rxForm.dosageInstructions" name="dosage" placeholder="Dosage instructions" required></textarea>
-    <button class="primary-button" type="submit">Create Prescription</button>
+<app-modal [open]="rxOpen()" title="Create prescription" (closed)="rxOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitPrescription()">
+    <label>Appointment
+      <select [(ngModel)]="rxForm.appointmentId" name="apptId" required>
+        <option [ngValue]="0" disabled>Select appointment</option>
+        @for (a of patientAppointments(); track a.id) {
+          <option [ngValue]="a.id">{{ appointmentLabel(a) }}</option>
+        }
+      </select>
+    </label>
+    <label>Diagnosis<input [(ngModel)]="rxForm.diagnosis" name="diagnosis" required /></label>
+    <label>Medicines<input [(ngModel)]="rxForm.medicines" name="medicines" required /></label>
+    <label>Dosage<textarea [(ngModel)]="rxForm.dosageInstructions" name="dosage" required></textarea></label>
+    <button class="primary-button btn-sm" type="submit">Save prescription</button>
   </form>
-</section>
+</app-modal>
 
 <app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

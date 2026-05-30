@@ -1,0 +1,56 @@
+<header class="page-header">
+  <div>
+    <span>Doctors</span>
+    <h1>Departments</h1>
+    <p>Master list used in doctor forms. Add departments here before assigning doctors.</p>
+  </div>
+  <button class="primary-button btn-sm" type="button" (click)="openAdd()">+ Department</button>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Description</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @for (d of items(); track d.id) {
+            <tr>
+              <td>{{ d.name }}</td>
+              <td>{{ d.description || '—' }}</td>
+              <td class="row-actions">
+                <button class="ghost-button btn-sm" type="button" (click)="openEdit(d)">Edit</button>
+                <button class="ghost-button btn-sm danger-hover" type="button" (click)="deleteItem(d.id)">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="3" class="empty-box">No departments yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-modal [open]="addOpen()" title="Add department" (closed)="addOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitAdd()">
+    <label>Name<input [(ngModel)]="addForm.name" name="n" required /></label>
+    <label>Description<textarea [(ngModel)]="addForm.description" name="d" rows="2"></textarea></label>
+    <button class="primary-button btn-sm" type="submit">Save</button>
+  </form>
+</app-modal>
+
+<app-modal [open]="editOpen()" title="Edit department" (closed)="editOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitEdit()">
+    <label>Name<input [(ngModel)]="editForm.name" name="en" required /></label>
+    <label>Description<textarea [(ngModel)]="editForm.description" name="ed" rows="2"></textarea></label>
+    <button class="primary-button btn-sm" type="submit">Update</button>
+  </form>
+</app-modal>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

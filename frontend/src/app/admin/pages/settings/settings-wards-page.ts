@@ -17,13 +17,19 @@ export class SettingsWardsPage implements OnInit {
 
   ngOnInit(): void {
     this.adminApi.getWardOccupancy().subscribe({
-      next: list => { this.occupancy.set(list); this.loading.set(false); },
-      error: () => { this.errorMsg.set('Failed to load ward overview.'); this.loading.set(false); }
+      next: list => {
+        this.occupancy.set(list);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.errorMsg.set('Failed to load ward overview.');
+        this.loading.set(false);
+      }
     });
   }
 
   protected occupancyPercent(w: WardOccupancy): number {
-    if (!w.totalBeds) return 0;
-    return Math.round((w.occupiedBeds / w.totalBeds) * 100);
+    if (!w.bedsRegistered) return 0;
+    return Math.round((w.occupiedBeds / w.bedsRegistered) * 100);
   }
 }

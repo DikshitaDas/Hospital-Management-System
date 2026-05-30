@@ -7,9 +7,9 @@ import { PatientsListPage } from './pages/patients/patients-list-page';
 import { PatientsAdmittedPage } from './pages/patients/patients-admitted-page';
 import { PatientsRecordsPage } from './pages/patients/patients-records-page';
 import { DoctorsListPage } from './pages/doctors/doctors-list-page';
-import { DoctorsDepartmentsPage } from './pages/doctors/doctors-departments-page';
-import { DoctorsSchedulePage } from './pages/doctors/doctors-schedule-page';
-import { DoctorsSpecializationPage } from './pages/doctors/doctors-specialization-page';
+import { DoctorsSubCrudPage } from './pages/doctors/doctors-sub-crud-page';
+import { DepartmentsMasterPage } from './pages/doctors/departments-master-page';
+import { SpecializationMasterPage } from './pages/doctors/specialization-master-page';
 import { AppointmentsListPage } from './pages/appointments/appointments-list-page';
 import { AppointmentsCalendarPage } from './pages/appointments/appointments-calendar-page';
 import { AppointmentsRequestsPage } from './pages/appointments/appointments-requests-page';
@@ -46,9 +46,9 @@ export const adminRoutes: Routes = [
       { path: 'patients/admitted', component: PatientsAdmittedPage },
       { path: 'patients/records', component: PatientsRecordsPage },
       { path: 'doctors', component: DoctorsListPage },
-      { path: 'doctors/departments', component: DoctorsDepartmentsPage },
-      { path: 'doctors/schedule', component: DoctorsSchedulePage },
-      { path: 'doctors/specialization', component: DoctorsSpecializationPage },
+      { path: 'doctors/departments', component: DepartmentsMasterPage },
+      { path: 'doctors/schedule', component: DoctorsSubCrudPage, data: { mode: 'schedule' } },
+      { path: 'doctors/specialization', component: SpecializationMasterPage },
       { path: 'appointments', component: AppointmentsListPage },
       { path: 'appointments/calendar', component: AppointmentsCalendarPage },
       { path: 'appointments/requests', component: AppointmentsRequestsPage },

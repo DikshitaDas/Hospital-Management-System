@@ -1,39 +1,42 @@
-<header class="page-header"><div><span>Wards</span><h1>Admission &amp; Discharge</h1></div><button class="ghost-button" type="button" (click)="loadAll()">Refresh</button></header>
+<header class="page-header">
+  <div><span>Wards</span><h1>Admission &amp; Discharge</h1></div>
+  <button class="ghost-button btn-sm" type="button" (click)="loadAll()">Refresh</button>
+</header>
 @if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
 @else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
 @else {
-<section class="glass data-panel" style="margin-bottom:14px">
-  <h2 style="margin:0 0 10px;font-size:16px">Currently Admitted ({{ admitted().length }})</h2>
+<section class="glass data-panel" style="margin-bottom:12px">
+  <h2 class="section-title">Currently admitted ({{ admitted().length }})</h2>
   @for (row of admitted(); track row.admission.id) {
     <article class="activity-list"><strong>{{ row.patient.name }}</strong><span>Bed {{ row.admission.bed?.bedNumber }} · {{ row.admission.bed?.ward?.wardName }}</span></article>
   } @empty { <div class="empty-box">No admitted patients.</div> }
 </section>
-<section class="glass data-panel">
-  <form class="form-grid two-col" (ngSubmit)="submitAdmit()">
-    <strong>Admit</strong>
-    <select [(ngModel)]="admitForm.patientId" name="waP" required><option [ngValue]="0" disabled>Patient</option>@for (p of patients(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }</select>
-    <select [(ngModel)]="admitForm.bedId" name="waB" required><option [ngValue]="0" disabled>Bed</option>@for (b of beds(); track b.id) { <option [ngValue]="b.id">{{ b.bedNumber }}</option> }</select>
-    <button class="primary-button" type="submit">Admit</button>
+<section class="glass data-panel form-sections">
+  <form class="form-grid" (ngSubmit)="submitAdmit()">
+    <h3>Admit</h3>
+    <app-searchable-select label="Patient" placeholder="Search patient…" [displayWith]="patientLabel" valueKey="id" [searchFn]="searchPatients" [selectedId]="admitForm.patientId || null" (selectedIdChange)="admitForm.patientId = $event ?? 0" />
+    <app-searchable-select label="Bed" placeholder="Search bed…" [displayWith]="bedLabel" valueKey="id" [staticItems]="beds()" [minSearchLength]="1" [selectedId]="admitForm.bedId || null" (selectedIdChange)="admitForm.bedId = $event ?? 0" />
+    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Admit</button></div>
   </form>
-  <hr />
-  <form class="form-grid two-col" (ngSubmit)="submitDischarge()">
-    <strong>Discharge</strong>
-    <select [(ngModel)]="dischargeId" name="wdP"><option [ngValue]="0" disabled>Patient</option>@for (row of admitted(); track row.admission.id) { <option [ngValue]="row.patient.id">{{ row.patient.name }}</option> }</select>
-    <button class="primary-button" type="submit">Discharge</button>
+  <hr class="compact" />
+  <form class="form-grid" (ngSubmit)="submitDischarge()">
+    <h3>Discharge</h3>
+    <app-searchable-select label="Admitted patient" placeholder="Search…" [displayWith]="admittedPatientLabel" valueKey="id" [staticItems]="admitted().map(r => r.patient)" [minSearchLength]="1" [selectedId]="dischargeId || null" (selectedIdChange)="dischargeId = $event ?? 0" />
+    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Discharge</button></div>
   </form>
-  <hr />
-  <form class="form-grid two-col" (ngSubmit)="submitTransfer()">
-    <strong>Transfer</strong>
-    <select [(ngModel)]="transferForm.patientId" name="wtP"><option [ngValue]="0" disabled>Patient</option>@for (row of admitted(); track row.admission.id) { <option [ngValue]="row.patient.id">{{ row.patient.name }}</option> }</select>
-    <select [(ngModel)]="transferForm.newBedId" name="wtB"><option [ngValue]="0" disabled>Bed</option>@for (b of beds(); track b.id) { <option [ngValue]="b.id">{{ b.bedNumber }}</option> }</select>
-    <button class="primary-button" type="submit">Transfer</button>
+  <hr class="compact" />
+  <form class="form-grid" (ngSubmit)="submitTransfer()">
+    <h3>Transfer</h3>
+    <app-searchable-select label="Patient" placeholder="Search admitted…" [displayWith]="admittedPatientLabel" valueKey="id" [staticItems]="admitted().map(r => r.patient)" [minSearchLength]="1" [selectedId]="transferForm.patientId || null" (selectedIdChange)="transferForm.patientId = $event ?? 0" />
+    <app-searchable-select label="New bed" placeholder="Search bed…" [displayWith]="bedLabel" valueKey="id" [staticItems]="beds()" [minSearchLength]="1" [selectedId]="transferForm.newBedId || null" (selectedIdChange)="transferForm.newBedId = $event ?? 0" />
+    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Transfer</button></div>
   </form>
-  <hr />
-  <form class="form-grid two-col" (ngSubmit)="submitEmergency()">
-    <strong>Emergency</strong>
-    <select [(ngModel)]="emergencyForm.patientId" name="weP"><option [ngValue]="0" disabled>Patient</option>@for (p of patients(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }</select>
-    <select [(ngModel)]="emergencyForm.wardType" name="weW"><option value="ICU">ICU</option><option value="GENERAL">General</option></select>
-    <button class="primary-button" type="submit">Emergency Admit</button>
+  <hr class="compact" />
+  <form class="form-grid" (ngSubmit)="submitEmergency()">
+    <h3>Emergency</h3>
+    <app-searchable-select label="Patient" placeholder="Search patient…" [displayWith]="patientLabel" valueKey="id" [searchFn]="searchPatients" [selectedId]="emergencyForm.patientId || null" (selectedIdChange)="emergencyForm.patientId = $event ?? 0" />
+    <label>Ward type<select [(ngModel)]="emergencyForm.wardType" name="weW"><option value="ICU">ICU</option><option value="GENERAL">General</option><option value="PRIVATE">Private</option></select></label>
+    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Emergency admit</button></div>
   </form>
 </section>
 }

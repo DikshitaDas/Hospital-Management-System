@@ -24,14 +24,20 @@ import com.example.hms.dto.admin.TransferPatientRequest;
 import com.example.hms.dto.admin.UpdateDoctorRequest;
 import com.example.hms.dto.admin.UpdatePatientRequest;
 import com.example.hms.dto.admin.UpdateRoleRequest;
+import com.example.hms.dto.admin.DepartmentRequest;
+import com.example.hms.dto.admin.SpecializationRequest;
 import com.example.hms.dto.admin.UpdateWardRequest;
 import com.example.hms.dto.admin.WardOccupancyResponse;
+import com.example.hms.entity.Department;
+import com.example.hms.entity.Specialization;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.Bill;
 import com.example.hms.entity.BloodRequest;
 import com.example.hms.entity.BloodStock;
+import com.example.hms.entity.Donation;
 import com.example.hms.entity.DoctorProfile;
+import com.example.hms.entity.Donor;
 import com.example.hms.entity.LabTest;
 import com.example.hms.entity.Prescription;
 import com.example.hms.entity.User;
@@ -178,6 +184,12 @@ public class AdminController {
     public List<Bed> getAvailableBeds() {
 
         return adminService.getAvailableBeds();
+    }
+
+    @GetMapping("/beds")
+    public List<Bed> getAllBeds() {
+
+        return adminService.getAllBeds();
     }
 
     @PostMapping("/admissions")
@@ -344,6 +356,12 @@ public class AdminController {
         return adminService.addDonor(request);
     }
 
+    @GetMapping("/donors")
+    public List<Donor> getAllDonors() {
+
+        return adminService.getAllDonors();
+    }
+
     @PostMapping("/donations")
     public String donateBlood(
 
@@ -351,6 +369,12 @@ public class AdminController {
 
         return adminService
                 .donateBlood(request);
+    }
+
+    @GetMapping("/donations")
+    public List<Donation> getAllDonations() {
+
+        return adminService.getAllDonations();
     }
 
     @PutMapping("/users/{id}/role")
@@ -445,6 +469,50 @@ public class AdminController {
         return adminService
                 .createUserByAdmin(
                         request);
+    }
+
+    @GetMapping("/departments")
+    public List<Department> getAllDepartments() {
+        return adminService.getAllDepartments();
+    }
+
+    @PostMapping("/departments")
+    public String addDepartment(@Valid @RequestBody DepartmentRequest request) {
+        return adminService.addDepartment(request);
+    }
+
+    @PutMapping("/departments/{id}")
+    public String updateDepartment(
+            @PathVariable Long id,
+            @Valid @RequestBody DepartmentRequest request) {
+        return adminService.updateDepartment(id, request);
+    }
+
+    @DeleteMapping("/departments/{id}")
+    public String deleteDepartment(@PathVariable Long id) {
+        return adminService.deleteDepartment(id);
+    }
+
+    @GetMapping("/specializations")
+    public List<Specialization> getAllSpecializations() {
+        return adminService.getAllSpecializations();
+    }
+
+    @PostMapping("/specializations")
+    public String addSpecialization(@Valid @RequestBody SpecializationRequest request) {
+        return adminService.addSpecialization(request);
+    }
+
+    @PutMapping("/specializations/{id}")
+    public String updateSpecialization(
+            @PathVariable Long id,
+            @Valid @RequestBody SpecializationRequest request) {
+        return adminService.updateSpecialization(id, request);
+    }
+
+    @DeleteMapping("/specializations/{id}")
+    public String deleteSpecialization(@PathVariable Long id) {
+        return adminService.deleteSpecialization(id);
     }
 
 }

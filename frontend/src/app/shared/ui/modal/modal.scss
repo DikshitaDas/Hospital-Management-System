@@ -25,7 +25,7 @@ header {
 
 h2 {
   margin: 0;
-  font-size: 21px;
+  font-size: 17px;
   letter-spacing: 0;
 }
 
@@ -37,10 +37,11 @@ h2 {
 ::ng-deep .form-grid input,
 ::ng-deep .form-grid select {
   width: 100%;
-  min-height: 44px;
-  padding: 0 12px;
-  border-radius: var(--radius);
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 6px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.72);
   outline: 0;
+  font-size: 13px;
 }

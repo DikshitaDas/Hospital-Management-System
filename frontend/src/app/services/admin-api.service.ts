@@ -25,6 +25,8 @@ import {
   DashboardStats,
   DoctorProfile,
   DonateBloodRequest,
+  Donation,
+  Donor,
   EmergencyAdmissionRequest,
   LabTest,
   Prescription,
@@ -39,7 +41,11 @@ import {
   User,
   Ward,
   WardOccupancy,
-  Admission
+  Admission,
+  Department,
+  DepartmentRequest,
+  Specialization,
+  SpecializationRequest
 } from '../admin/models/admin.models';
 
 @Injectable({ providedIn: 'root' })
@@ -154,6 +160,10 @@ export class AdminApiService {
     return this.http.get<Bed[]>(`${this.base}/beds/available`);
   }
 
+  getAllBeds(): Observable<Bed[]> {
+    return this.http.get<Bed[]>(`${this.base}/beds`);
+  }
+
   // Admissions
   admitPatient(body: AdmitPatientRequest): Observable<string> {
     return this.http.post(`${this.base}/admissions`, body, { responseType: 'text' });
@@ -218,8 +228,16 @@ export class AdminApiService {
     return this.http.post(`${this.base}/donors`, body, { responseType: 'text' });
   }
 
+  getAllDonors(): Observable<Donor[]> {
+    return this.http.get<Donor[]>(`${this.base}/donors`);
+  }
+
   donateBlood(body: DonateBloodRequest): Observable<string> {
     return this.http.post(`${this.base}/donations`, body, { responseType: 'text' });
+  }
+
+  getAllDonations(): Observable<Donation[]> {
+    return this.http.get<Donation[]>(`${this.base}/donations`);
   }
 
   // Users & roles
@@ -255,5 +273,38 @@ export class AdminApiService {
 
   updateLabReport(id: number, body: UpdateLabReportRequest): Observable<string> {
     return this.http.put(`${this.base}/lab-reports/${id}`, body, { responseType: 'text' });
+  }
+
+  // Departments & specializations (master data)
+  getAllDepartments(): Observable<Department[]> {
+    return this.http.get<Department[]>(`${this.base}/departments`);
+  }
+
+  addDepartment(body: DepartmentRequest): Observable<string> {
+    return this.http.post(`${this.base}/departments`, body, { responseType: 'text' });
+  }
+
+  updateDepartment(id: number, body: DepartmentRequest): Observable<string> {
+    return this.http.put(`${this.base}/departments/${id}`, body, { responseType: 'text' });
+  }
+
+  deleteDepartment(id: number): Observable<string> {
+    return this.http.delete(`${this.base}/departments/${id}`, { responseType: 'text' });
+  }
+
+  getAllSpecializations(): Observable<Specialization[]> {
+    return this.http.get<Specialization[]>(`${this.base}/specializations`);
+  }
+
+  addSpecialization(body: SpecializationRequest): Observable<string> {
+    return this.http.post(`${this.base}/specializations`, body, { responseType: 'text' });
+  }
+
+  updateSpecialization(id: number, body: SpecializationRequest): Observable<string> {
+    return this.http.put(`${this.base}/specializations/${id}`, body, { responseType: 'text' });
+  }
+
+  deleteSpecialization(id: number): Observable<string> {
+    return this.http.delete(`${this.base}/specializations/${id}`, { responseType: 'text' });
   }
 }

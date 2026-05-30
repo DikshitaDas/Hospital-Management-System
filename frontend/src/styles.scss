@@ -56,14 +56,16 @@ button {
 }
 
 .icon-button {
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
   display: inline-grid;
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.68);
   color: var(--ink);
+  font-size: 14px;
   transition:
     transform 160ms ease,
     border-color 160ms ease,
@@ -78,26 +80,80 @@ button {
 
 .primary-button,
 .ghost-button {
-  min-height: 42px;
+  min-height: 32px;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  border-radius: var(--radius);
-  padding: 0 16px;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 6px;
+  padding: 0 12px;
   border: 1px solid transparent;
   font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
 }
 
 .primary-button {
   background: linear-gradient(135deg, var(--primary), var(--primary-strong));
   color: white;
-  box-shadow: 0 14px 26px rgba(15, 159, 154, 0.25);
+  box-shadow: 0 8px 18px rgba(15, 159, 154, 0.2);
 }
 
 .ghost-button {
   background: rgba(255, 255, 255, 0.66);
   border-color: var(--line);
   color: var(--ink);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.ghost-button:hover:not(:disabled) {
+  background: rgba(15, 159, 154, 0.12);
+  border-color: rgba(15, 159, 154, 0.38);
+  color: var(--primary-strong);
+  transform: translateY(-1px);
+}
+
+.ghost-button.danger-hover:hover:not(:disabled) {
+  background: rgba(229, 83, 83, 0.12);
+  border-color: rgba(229, 83, 83, 0.4);
+  color: #b42318;
+}
+
+.logout-button:hover:not(:disabled) {
+  background: rgba(229, 83, 83, 0.14);
+  border-color: rgba(229, 83, 83, 0.45);
+  color: #b42318;
+}
+
+/* Admin portal: extra-compact controls */
+.admin-shell .primary-button,
+.admin-shell .ghost-button,
+.admin-shell .btn-sm {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.admin-shell .icon-button {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+}
+
+.admin-shell .profile-button {
+  min-height: 32px;
+  padding: 2px 8px 2px 2px;
+}
+
+.admin-shell .profile-button .avatar {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
 }
 
 .sr-only {

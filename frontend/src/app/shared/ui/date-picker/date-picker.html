@@ -1,0 +1,16 @@
+<label class="date-picker">
+  <span class="field-label">{{ label }}@if (required) { <em>*</em> }</span>
+  <input
+    type="date"
+    [ngModel]="displayValue()"
+    (ngModelChange)="onChange($event)"
+    [min]="minDate"
+    [required]="required"
+  />
+  @if (hint) {
+    <small class="hint">{{ hint }}</small>
+  }
+  @if (error()) {
+    <small class="error">{{ error() }}</small>
+  }
+</label>

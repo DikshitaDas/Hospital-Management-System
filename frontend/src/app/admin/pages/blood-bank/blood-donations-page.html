@@ -1,10 +1,45 @@
-<header class="page-header"><div><span>Blood Bank</span><h1>Donation History</h1></div></header>
-<div class="alert info glass data-panel">No GET donations API. Record donations via POST /admin/donations using donor ID.</div>
-<section class="glass data-panel">
-  <form class="form-grid two-col" (ngSubmit)="submit()">
-    <input [(ngModel)]="form.donorId" name="donorId" type="number" placeholder="Donor ID" required />
-    <input [(ngModel)]="form.unitsDonated" name="units" type="number" min="1" placeholder="Units donated" required />
-    <button class="primary-button" type="submit">Record Donation</button>
+<header class="page-header">
+  <div><span>Blood Bank</span><h1>Donation History</h1><p>GET /api/admin/donations · POST /api/admin/donations</p></div>
+  <button class="primary-button btn-sm" type="button" (click)="addOpen.set(true)">+ Record Donation</button>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading...</div>
+} @else {
+  <section class="glass data-panel ui-card">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Date</th><th>Donor</th><th>Group</th><th>Units</th></tr></thead>
+        <tbody>
+          @for (d of donations(); track d.id) {
+            <tr>
+              <td>{{ d.donationDate }}</td>
+              <td>{{ d.donor.donorName }}</td>
+              <td><span class="badge rose">{{ d.donor.bloodGroup }}</span></td>
+              <td>{{ d.unitsDonated }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="empty-box">No donations recorded.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-modal [open]="addOpen()" title="Record donation" (closed)="addOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submit()">
+    <label>Donor
+      <select [(ngModel)]="form.donorId" name="did" required>
+        <option [ngValue]="0" disabled>Select donor</option>
+        @for (d of donors(); track d.id) {
+          <option [ngValue]="d.id">{{ d.donorName }} ({{ d.bloodGroup }})</option>
+        }
+      </select>
+    </label>
+    <label>Units donated<input type="number" min="1" [(ngModel)]="form.unitsDonated" name="units" required /></label>
+    <button class="primary-button btn-sm" type="submit">Save donation</button>
   </form>
-</section>
+</app-modal>
+
 <app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

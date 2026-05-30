@@ -1,13 +1,17 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AdminApiService } from '../../../services/admin-api.service';
-import { CreatePrescriptionRequest, Prescription, User } from '../../models/admin.models';
+import { Appointment, CreatePrescriptionRequest, Prescription, User } from '../../models/admin.models';
+import { ModalComponent } from '../../../shared/ui/modal/modal';
 import { SnackbarComponent } from '../../../shared/ui/snackbar/snackbar';
+import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
+import { showSnackbar } from '../page.util';
 
 @Component({
   selector: 'app-patients-records-page',
   standalone: true,
-  imports: [FormsModule, SnackbarComponent],
+  imports: [FormsModule, RouterLink, ModalComponent, SnackbarComponent, TooltipDirective],
   templateUrl: './patients-records-page.html',
   styleUrl: './patients-records-page.scss'
 })
@@ -16,7 +20,10 @@ export class PatientsRecordsPage implements OnInit {
   protected readonly errorMsg = signal('');
   protected readonly patients = signal<User[]>([]);
   protected readonly prescriptions = signal<Prescription[]>([]);
+  protected readonly appointments = signal<Appointment[]>([]);
   protected readonly selectedPatientId = signal(0);
+  protected readonly searchTerm = signal('');
+  protected readonly rxOpen = signal(false);
   protected readonly snackbarOpen = signal(false);
   protected readonly snackbarMessage = signal('');
 
@@ -40,6 +47,29 @@ export class PatientsRecordsPage implements OnInit {
         this.loading.set(false);
       }
     });
+    this.adminApi.getAllAppointments().subscribe({
+      next: list => this.appointments.set(list),
+      error: () => this.appointments.set([])
+    });
+  }
+
+  protected filteredPatients(): User[] {
+    const q = this.searchTerm().trim().toLowerCase();
+    if (!q) return this.patients();
+    return this.patients().filter(
+      p => p.name.toLowerCase().includes(q) || p.uhid.toLowerCase().includes(q) || p.mobile.includes(q)
+    );
+  }
+
+  protected patientAppointments(): Appointment[] {
+    const pid = this.selectedPatientId();
+    if (!pid) return [];
+    return this.appointments().filter(a => a.patient?.id === pid);
+  }
+
+  protected onPatientChange(id: number): void {
+    this.selectedPatientId.set(id);
+    this.loadPrescriptions();
   }
 
   protected loadPrescriptions(): void {
@@ -58,19 +88,37 @@ export class PatientsRecordsPage implements OnInit {
     });
   }
 
+  protected openRxModal(): void {
+    const appts = this.patientAppointments();
+    if (!appts.length) {
+      showSnackbar(this.snackbarOpen, this.snackbarMessage, 'No appointments for this patient. Book one first.');
+      return;
+    }
+    this.rxForm = {
+      appointmentId: appts[0].id,
+      diagnosis: '',
+      medicines: '',
+      dosageInstructions: ''
+    };
+    this.rxOpen.set(true);
+  }
+
   protected submitPrescription(): void {
+    if (!this.rxForm.appointmentId) {
+      showSnackbar(this.snackbarOpen, this.snackbarMessage, 'Select an appointment.');
+      return;
+    }
     this.adminApi.createPrescription(this.rxForm).subscribe({
       next: msg => {
-        this.showSnackbar(msg || 'Prescription created.');
+        this.rxOpen.set(false);
+        showSnackbar(this.snackbarOpen, this.snackbarMessage, msg || 'Prescription created.');
         this.loadPrescriptions();
       },
-      error: err => this.showSnackbar(err?.error ?? 'Failed to create prescription.')
+      error: err => showSnackbar(this.snackbarOpen, this.snackbarMessage, String(err?.error ?? 'Failed to create prescription.'))
     });
   }
 
-  protected showSnackbar(message: string): void {
-    this.snackbarMessage.set(message);
-    this.snackbarOpen.set(true);
-    window.setTimeout(() => this.snackbarOpen.set(false), 3000);
+  protected appointmentLabel(a: Appointment): string {
+    return `#${a.id} — ${a.appointmentDate} — Dr. ${a.doctor?.name ?? 'N/A'} — ${a.status}`;
   }
 }

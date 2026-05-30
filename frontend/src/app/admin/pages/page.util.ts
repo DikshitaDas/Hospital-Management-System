@@ -23,3 +23,25 @@ export function isFutureDate(dateStr: string): boolean {
   const d = new Date(dateStr);
   return !Number.isNaN(d.getTime()) && d >= new Date(new Date().toDateString());
 }
+
+/** Backend emergency admission matches wardType exactly (GENERAL, ICU, PRIVATE). */
+export function normalizeWardType(value: string): string {
+  const v = value.trim().toUpperCase();
+  if (v.includes('ICU')) return 'ICU';
+  if (v.includes('PRIVATE')) return 'PRIVATE';
+  return 'GENERAL';
+}
+
+export function wardTypeMatches(wardType: string, filter: 'ICU' | 'GENERAL' | 'PRIVATE'): boolean {
+  return normalizeWardType(wardType) === filter;
+}
+
+export function showSnackbar(
+  open: { set: (v: boolean) => void },
+  message: { set: (v: string) => void },
+  text: string
+): void {
+  message.set(text);
+  open.set(true);
+  window.setTimeout(() => open.set(false), 3200);
+}

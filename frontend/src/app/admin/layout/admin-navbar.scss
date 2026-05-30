@@ -138,6 +138,11 @@
   color: var(--primary-strong);
 }
 
+.profile-dropdown button.logout-item:hover {
+  background: rgba(229, 83, 83, 0.12);
+  color: #b42318;
+}
+
 .drawer-list article {
   padding: 12px 0;
   border-top: 1px solid var(--line);
@@ -155,7 +160,7 @@
 }
 
 .logout-button {
-  min-height: 42px;
+  min-height: 28px;
 }
 
 @media (max-width: 820px) {

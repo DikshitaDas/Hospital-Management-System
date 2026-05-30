@@ -1,1 +1,11 @@
-@use '../../styles/admin-shared';
+.section-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.form-sections h3 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+}

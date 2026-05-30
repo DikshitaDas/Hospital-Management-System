@@ -1,20 +1,38 @@
-<header class="page-header"><div><span>Wards</span><h1>ICU / General Ward</h1></div></header>
+<header class="page-header">
+  <div>
+    <span>Wards</span>
+    <h1>ICU / General / Private</h1>
+    <p>Filtered by normalized ward type. Emergency admission matches <code>wardType</code> exactly (GENERAL, ICU, PRIVATE).</p>
+  </div>
+</header>
+
+<div class="tab-bar">
+  @for (t of ['ALL','GENERAL','ICU','PRIVATE']; track t) {
+    <button type="button" [class.active]="filter() === t" (click)="filter.set($any(t))">{{ t }}</button>
+  }
+</div>
+
 @if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
 @else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
 @else {
-<div class="tab-bar">
-  <button type="button" [class.active]="filter() === 'ALL'" (click)="filter.set('ALL')">All</button>
-  <button type="button" [class.active]="filter() === 'ICU'" (click)="filter.set('ICU')">ICU</button>
-  <button type="button" [class.active]="filter() === 'GENERAL'" (click)="filter.set('GENERAL')">General</button>
-</div>
-@if (filter() === 'ALL' || filter() === 'ICU') {
-<section class="glass data-panel" style="margin-bottom:12px"><h2 style="margin:0 0 10px;font-size:16px">ICU <span class="badge rose">{{ icu().length }}</span></h2>
-  @for (w of icu(); track w.id) { <article class="activity-list"><strong>{{ w.wardName }}</strong><span>{{ w.totalBeds }} beds</span></article> }
-</section>
-}
-@if (filter() === 'ALL' || filter() === 'GENERAL') {
-<section class="glass data-panel"><h2 style="margin:0 0 10px;font-size:16px">General <span class="badge sky">{{ general().length }}</span></h2>
-  @for (w of general(); track w.id) { <article class="activity-list"><strong>{{ w.wardName }}</strong><span>{{ w.totalBeds }} beds</span></article> }
-</section>
-}
+  @for (w of filteredWards(); track w.id) {
+    <section class="glass data-panel ui-card">
+      <h2>{{ w.wardName }} <span class="badge sky">{{ w.wardType }}</span></h2>
+      <p style="margin:0 0 8px;color:var(--muted);font-size:12px">Capacity {{ w.totalBeds }} · Beds in DB: {{ bedsFor(w.id).length }}</p>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Bed #</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (b of bedsFor(w.id); track b.id) {
+              <tr><td>{{ b.bedNumber }}</td><td><span class="badge" [class]="b.status === 'AVAILABLE' ? 'mint' : 'warm'">{{ b.status }}</span></td></tr>
+            } @empty {
+              <tr><td colspan="2" class="empty-box">No beds — add at Bed Allocation.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  } @empty {
+    <div class="empty-box glass data-panel">No wards for this filter.</div>
+  }
 }

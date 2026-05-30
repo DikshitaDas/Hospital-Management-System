@@ -1,29 +1,75 @@
-<header class="page-header"><div><span>Wards</span><h1>Bed Availability</h1></div></header>
-@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
-@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
-@else {
-<section class="content-grid-2">
-  <article class="glass data-panel">
-    <h2 style="margin:0 0 10px;font-size:16px">Available Beds</h2>
-    <div class="data-table-wrap">
-      <table class="data-table">
-        <thead><tr><th>Bed</th><th>Ward</th><th>Status</th></tr></thead>
-        <tbody>@for (b of beds(); track b.id) {
-          <tr><td>{{ b.bedNumber }}</td><td>{{ b.ward?.wardName }}</td><td><span class="badge mint">{{ b.status }}</span></td></tr>
-        }</tbody>
-      </table>
-    </div>
-  </article>
-  <article class="glass data-panel">
-    <h2 style="margin:0 0 10px;font-size:16px">Ward Occupancy</h2>
-    <div class="data-table-wrap">
-      <table class="data-table">
-        <thead><tr><th>Ward</th><th>Occupied</th><th>Available</th><th>Total</th></tr></thead>
-        <tbody>@for (w of occupancy(); track w.wardName) {
-          <tr><td>{{ w.wardName }}</td><td>{{ w.occupiedBeds }}</td><td>{{ w.availableBeds }}</td><td>{{ w.totalBeds }}</td></tr>
-        }</tbody>
-      </table>
-    </div>
-  </article>
-</section>
+<header class="page-header">
+  <div>
+    <span>Wards</span>
+    <h1>Bed Availability</h1>
+    <p>
+      <strong>Occupied</strong> = beds with status OCCUPIED (patient admitted).
+      <strong>Available</strong> = beds with status AVAILABLE (can admit now).
+      <strong>Capacity</strong> = planned slots on the ward; create more beds under Bed Allocation.
+    </p>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="content-grid-2">
+    <article class="glass data-panel ui-card">
+      <h2>Ready for admission (AVAILABLE)</h2>
+      @if (beds().length === 0) {
+        <div class="alert warn">
+          No AVAILABLE beds. Your ward may have capacity left, but you must add bed records (or discharge patients to free beds).
+        </div>
+      }
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Bed</th><th>Ward</th><th>Type</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (b of beds(); track b.id) {
+              <tr>
+                <td>{{ b.bedNumber }}</td>
+                <td>{{ b.ward.wardName }}</td>
+                <td>{{ b.ward.wardType }}</td>
+                <td><span class="badge mint">{{ b.status }}</span></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="empty-box">No available beds.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="glass data-panel ui-card">
+      <h2>Ward occupancy summary</h2>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Ward</th>
+              <th>Capacity</th>
+              <th>Beds in DB</th>
+              <th>Occupied</th>
+              <th>Available</th>
+              <th>Slots to add</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (w of occupancy(); track w.wardName) {
+              <tr>
+                <td>{{ w.wardName }} <span class="badge sky">{{ w.wardType }}</span></td>
+                <td>{{ w.plannedCapacity }}</td>
+                <td>{{ w.bedsRegistered }}</td>
+                <td><span class="badge warm">{{ w.occupiedBeds }}</span></td>
+                <td><span class="badge mint">{{ w.availableBeds }}</span></td>
+                <td>{{ w.plannedCapacity - w.bedsRegistered }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
 }

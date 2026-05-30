@@ -1,6 +1,10 @@
 <header class="page-header">
-  <div><span>Doctors</span><h1>All Doctors</h1><p>Full CRUD for doctor profiles.</p></div>
-  <button class="primary-button" type="button" (click)="openAdd()">Add Doctor</button>
+  <div>
+    <span>Doctors</span>
+    <h1>All Doctors</h1>
+    <p>Full CRUD. UHID is auto-generated on save; password is set by you for doctor login.</p>
+  </div>
+  <button class="primary-button btn-sm" type="button" (click)="openAdd()">+ Add Doctor</button>
 </header>
 @if (loading()) { <div class="loading-box glass data-panel">Loading doctors...</div> }
 @else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
@@ -8,19 +12,20 @@
 <section class="glass data-panel">
   <div class="toolbar">
     <input type="search" placeholder="Search doctors..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="onSearch()" />
-    <button class="ghost-button" type="button" (click)="onSearch()">Search</button>
+    <button class="ghost-button btn-sm" type="button" (click)="onSearch()">Search</button>
   </div>
   <div class="data-table-wrap">
     <table class="data-table">
-      <thead><tr><th>Name</th><th>Department</th><th>Specialization</th><th>Fee</th><th>Availability</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Name / UHID</th><th>Department</th><th>Specialization</th><th>Fee</th><th>Shift</th><th>Actions</th></tr></thead>
       <tbody>
         @for (d of doctors(); track d.id) {
           <tr>
-            <td>{{ d.user.name }}</td><td>{{ d.department }}</td><td>{{ d.specialization }}</td>
+            <td>{{ d.user.name }}<br /><small>{{ d.user.uhid }}</small></td>
+            <td>{{ d.department }}</td><td>{{ d.specialization }}</td>
             <td>Rs. {{ d.consultationFee }}</td><td>{{ d.availability }}</td>
             <td class="row-actions">
-              <button class="ghost-button" type="button" (click)="openEdit(d)">Edit</button>
-              <button class="ghost-button" type="button" (click)="deleteDoctor(d.user.id)">Delete</button>
+              <button class="ghost-button btn-sm" type="button" (click)="openEdit(d)">Edit</button>
+              <button class="ghost-button btn-sm danger-hover" type="button" (click)="deleteDoctor(d.user.id)">Delete</button>
             </td>
           </tr>
         } @empty { <tr><td colspan="6" class="empty-box">No doctors found.</td></tr> }
@@ -31,29 +36,60 @@
 }
 <app-modal [open]="addOpen()" title="Add Doctor" (closed)="addOpen.set(false)">
   <form class="form-grid two-col" (ngSubmit)="submitAdd()">
-    <input [(ngModel)]="addForm.name" name="dname" placeholder="Name" required />
+    <p class="form-note">UHID is generated automatically after save (shown in success message). Enter a login password for the doctor — it is not pre-filled.</p>
+    <label>Name<input [(ngModel)]="addForm.name" name="dname" required /></label>
     <select [(ngModel)]="addForm.gender" name="dgender"><option value="MALE">Male</option><option value="FEMALE">Female</option></select>
-    <input [(ngModel)]="addForm.age" name="dage" type="number" placeholder="Age" required />
-    <input [(ngModel)]="addForm.mobile" name="dmobile" placeholder="Mobile" required />
-    <input [(ngModel)]="addForm.password" name="dpass" type="password" placeholder="Password" required />
-    <input [(ngModel)]="addForm.specialization" name="dspec" placeholder="Specialization" required />
-    <input [(ngModel)]="addForm.department" name="ddept" placeholder="Department" required />
-    <input [(ngModel)]="addForm.consultationFee" name="dfee" type="number" placeholder="Fee" required />
-    <input [(ngModel)]="addForm.availability" name="davail" placeholder="Availability" required />
-    <button class="primary-button" type="submit">Add Doctor</button>
+    <label>Age<input [(ngModel)]="addForm.age" name="dage" type="number" required /></label>
+    <label>Mobile<input [(ngModel)]="addForm.mobile" name="dmobile" required /></label>
+    <label>Login password<input [(ngModel)]="addForm.password" name="dpass" type="password" required autocomplete="new-password" /></label>
+    <label>Department
+      <select [(ngModel)]="addForm.department" name="ddept" required>
+        @if (!departments().length) {
+          <option value="" disabled>Add departments first</option>
+        }
+        @for (dep of departments(); track dep.id) {
+          <option [value]="dep.name">{{ dep.name }}</option>
+        }
+      </select>
+    </label>
+    <label>Specialization
+      <select [(ngModel)]="addForm.specialization" name="dspec" required>
+        @if (!specializations().length) {
+          <option value="" disabled>Add specializations first</option>
+        }
+        @for (s of specializations(); track s.id) {
+          <option [value]="s.name">{{ s.name }}</option>
+        }
+      </select>
+    </label>
+    <label>Consultation fee<input [(ngModel)]="addForm.consultationFee" name="dfee" type="number" required /></label>
+    <app-shift-schedule [(value)]="addForm.availability" />
+    <button class="primary-button btn-sm" type="submit">Add Doctor</button>
   </form>
 </app-modal>
 <app-modal [open]="editOpen()" title="Edit Doctor" (closed)="editOpen.set(false)">
   <form class="form-grid two-col" (ngSubmit)="submitEdit()">
-    <input [(ngModel)]="editForm.name" name="ename" placeholder="Name" required />
+    <label>Name<input [(ngModel)]="editForm.name" name="ename" required /></label>
     <select [(ngModel)]="editForm.gender" name="egender"><option value="MALE">Male</option><option value="FEMALE">Female</option></select>
-    <input [(ngModel)]="editForm.age" name="eage" type="number" placeholder="Age" required />
-    <input [(ngModel)]="editForm.mobile" name="emobile" placeholder="Mobile" required />
-    <input [(ngModel)]="editForm.specialization" name="espec" placeholder="Specialization" required />
-    <input [(ngModel)]="editForm.department" name="edept" placeholder="Department" required />
-    <input [(ngModel)]="editForm.consultationFee" name="efee" type="number" placeholder="Fee" required />
-    <input [(ngModel)]="editForm.availability" name="eavail" placeholder="Availability" required />
-    <button class="primary-button" type="submit">Save</button>
+    <label>Age<input [(ngModel)]="editForm.age" name="eage" type="number" required /></label>
+    <label>Mobile<input [(ngModel)]="editForm.mobile" name="emobile" required /></label>
+    <label>Department
+      <select [(ngModel)]="editForm.department" name="edept" required>
+        @for (dep of departments(); track dep.id) {
+          <option [value]="dep.name">{{ dep.name }}</option>
+        }
+      </select>
+    </label>
+    <label>Specialization
+      <select [(ngModel)]="editForm.specialization" name="espec" required>
+        @for (s of specializations(); track s.id) {
+          <option [value]="s.name">{{ s.name }}</option>
+        }
+      </select>
+    </label>
+    <label>Fee<input [(ngModel)]="editForm.consultationFee" name="efee" type="number" required /></label>
+    <app-shift-schedule [(value)]="editForm.availability" />
+    <button class="primary-button btn-sm" type="submit">Save</button>
   </form>
 </app-modal>
 <app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

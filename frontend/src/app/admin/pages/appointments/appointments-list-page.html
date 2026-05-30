@@ -1,6 +1,6 @@
 <header class="page-header">
   <div><span>Appointments</span><h1>All Appointments</h1></div>
-  <button class="primary-button" type="button" (click)="openBook()">Book Appointment</button>
+  <button class="primary-button btn-sm" type="button" (click)="openBook()">Book Appointment</button>
 </header>
 @if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
 @else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
@@ -16,9 +16,9 @@
             <td>{{ a.patient?.name }}</td><td>{{ a.doctor?.name }}</td><td>{{ a.tokenNumber }}</td>
             <td><span class="badge" [class]="badgeClass(a.status)">{{ a.status }}</span></td>
             <td class="row-actions">
-              <button class="ghost-button" type="button" (click)="approve(a.id)">Approve</button>
-              <button class="ghost-button" type="button" (click)="openReschedule(a)">Reschedule</button>
-              <button class="ghost-button" type="button" (click)="cancel(a.id)">Cancel</button>
+              <button class="ghost-button btn-sm" type="button" (click)="approve(a.id)">Approve</button>
+              <button class="ghost-button btn-sm" type="button" (click)="openReschedule(a)">Reschedule</button>
+              <button class="ghost-button btn-sm danger-hover" type="button" (click)="cancel(a.id)">Cancel</button>
             </td>
           </tr>
         }
@@ -29,16 +29,46 @@
 }
 <app-modal [open]="bookOpen()" title="Book Appointment" (closed)="bookOpen.set(false)">
   <form class="form-grid" (ngSubmit)="submitBook()">
-    <select [(ngModel)]="bookForm.patientId" name="bp" required><option [ngValue]="0" disabled>Patient</option>@for (p of patients(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }</select>
-    <select [(ngModel)]="bookForm.doctorId" name="bd" required><option [ngValue]="0" disabled>Doctor</option>@for (d of doctors(); track d.id) { <option [ngValue]="d.id">{{ d.name }}</option> }</select>
-    <input [(ngModel)]="bookForm.appointmentDate" name="bdate" type="datetime-local" required />
-    <button class="primary-button" type="submit">Book</button>
+    <app-searchable-select
+      label="Patient"
+      placeholder="Type name, UHID, or mobile (min 2 chars)…"
+      [required]="true"
+      [displayWith]="patientLabel"
+      valueKey="id"
+      [searchFn]="searchPatients"
+      [selectedId]="bookForm.patientId || null"
+      (selectedIdChange)="bookForm.patientId = $event ?? 0"
+    />
+    <app-searchable-select
+      label="Doctor"
+      placeholder="Type doctor name (min 2 chars)…"
+      [required]="true"
+      [displayWith]="doctorLabel"
+      valueKey="id"
+      [searchFn]="searchDoctors"
+      [selectedId]="bookForm.doctorId || null"
+      (selectedIdChange)="bookForm.doctorId = $event ?? 0"
+    />
+    <app-date-picker
+      label="Appointment date"
+      [required]="true"
+      [disallowPast]="true"
+      [(value)]="bookForm.appointmentDate"
+    />
+    @if (dateError()) { <p class="form-error">{{ dateError() }}</p> }
+    <button class="primary-button btn-sm" type="submit">Book</button>
   </form>
 </app-modal>
 <app-modal [open]="rescheduleOpen()" title="Reschedule" (closed)="rescheduleOpen.set(false)">
   <form class="form-grid" (ngSubmit)="submitReschedule()">
-    <input [(ngModel)]="rescheduleForm.appointmentDate" name="rdate" type="datetime-local" required />
-    <button class="primary-button" type="submit">Save</button>
+    <app-date-picker
+      label="New appointment date"
+      [required]="true"
+      [disallowPast]="true"
+      [(value)]="rescheduleForm.appointmentDate"
+    />
+    @if (dateError()) { <p class="form-error">{{ dateError() }}</p> }
+    <button class="primary-button btn-sm" type="submit">Save</button>
   </form>
 </app-modal>
 <app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

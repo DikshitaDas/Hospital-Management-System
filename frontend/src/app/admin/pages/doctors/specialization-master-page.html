@@ -1,0 +1,70 @@
+<header class="page-header">
+  <div>
+    <span>Doctors</span>
+    <h1>Specializations</h1>
+    <p>Master list for doctor profiles. Link optional department.</p>
+  </div>
+  <button class="primary-button btn-sm" type="button" (click)="openAdd()">+ Specialization</button>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Department</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @for (s of items(); track s.id) {
+            <tr>
+              <td>{{ s.name }}</td>
+              <td>{{ deptName(s) }}</td>
+              <td class="row-actions">
+                <button class="ghost-button btn-sm" type="button" (click)="openEdit(s)">Edit</button>
+                <button class="ghost-button btn-sm danger-hover" type="button" (click)="deleteItem(s.id)">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="3" class="empty-box">No specializations yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-modal [open]="addOpen()" title="Add specialization" (closed)="addOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitAdd()">
+    <label>Name<input [(ngModel)]="addForm.name" name="n" required /></label>
+    <label>Department (optional)
+      <select [(ngModel)]="addForm.departmentId" name="dep">
+        <option [ngValue]="undefined">None</option>
+        @for (d of departments(); track d.id) {
+          <option [ngValue]="d.id">{{ d.name }}</option>
+        }
+      </select>
+    </label>
+    <button class="primary-button btn-sm" type="submit">Save</button>
+  </form>
+</app-modal>
+
+<app-modal [open]="editOpen()" title="Edit specialization" (closed)="editOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitEdit()">
+    <label>Name<input [(ngModel)]="editForm.name" name="en" required /></label>
+    <label>Department (optional)
+      <select [(ngModel)]="editForm.departmentId" name="edep">
+        <option [ngValue]="undefined">None</option>
+        @for (d of departments(); track d.id) {
+          <option [ngValue]="d.id">{{ d.name }}</option>
+        }
+      </select>
+    </label>
+    <button class="primary-button btn-sm" type="submit">Update</button>
+  </form>
+</app-modal>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

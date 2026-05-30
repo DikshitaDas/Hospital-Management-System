@@ -1,15 +1,15 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
 import { AdminApiService } from '../../../services/admin-api.service';
 import { Bill, CreateBillRequest, User } from '../../models/admin.models';
 import { SnackbarComponent } from '../../../shared/ui/snackbar/snackbar';
+import { SearchableSelectComponent } from '../../../shared/ui/searchable-select/searchable-select';
 import { statusBadgeClass } from '../page.util';
 
 @Component({
   selector: 'app-billing-invoices-page',
   standalone: true,
-  imports: [FormsModule, SnackbarComponent],
+  imports: [FormsModule, SnackbarComponent, SearchableSelectComponent],
   templateUrl: './billing-invoices-page.html',
   styleUrl: './billing-invoices-page.scss'
 })
@@ -17,7 +17,6 @@ export class BillingInvoicesPage implements OnInit {
   protected readonly loading = signal(true);
   protected readonly errorMsg = signal('');
   protected readonly bills = signal<Bill[]>([]);
-  protected readonly patients = signal<User[]>([]);
   protected readonly showPendingOnly = signal(false);
   protected readonly snackbarOpen = signal(false);
   protected readonly snackbarMessage = signal('');
@@ -26,23 +25,43 @@ export class BillingInvoicesPage implements OnInit {
 
   constructor(private adminApi: AdminApiService) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
   protected load(): void {
     this.loading.set(true);
-    forkJoin({ bills: this.adminApi.getAllBills(), patients: this.adminApi.getAllPatients() }).subscribe({
-      next: ({ bills, patients }) => { this.bills.set(bills); this.patients.set(patients); this.loading.set(false); },
-      error: () => { this.errorMsg.set('Failed to load bills.'); this.loading.set(false); }
+    this.adminApi.getAllBills().subscribe({
+      next: bills => {
+        this.bills.set(bills);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.errorMsg.set('Failed to load bills.');
+        this.loading.set(false);
+      }
     });
   }
 
   protected filteredBills(): Bill[] {
-    return this.showPendingOnly() ? this.bills().filter(b => b.status.toUpperCase() === 'PENDING') : this.bills();
+    return this.showPendingOnly()
+      ? this.bills().filter(b => b.status.toUpperCase() === 'PENDING')
+      : this.bills();
   }
 
+  protected searchPatients = (term: string) => this.adminApi.searchPatients(term);
+  protected patientLabel = (p: User) => `${p.name} · ${p.uhid}`;
+
   protected submit(): void {
+    if (!this.form.patientId) {
+      this.showSnackbar('Select a patient from search.');
+      return;
+    }
     this.adminApi.createBill(this.form).subscribe({
-      next: msg => { this.showSnackbar(msg || 'Bill created.'); this.load(); },
+      next: msg => {
+        this.showSnackbar(msg || 'Bill created.');
+        this.load();
+      },
       error: err => this.showSnackbar(err?.error ?? 'Create failed.')
     });
   }

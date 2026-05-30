@@ -1,0 +1,16 @@
+<section class="accordion glass" [class.open]="isOpen()">
+  <button type="button" class="accordion-head" (click)="toggle()">
+    <div>
+      <strong>{{ title() }}</strong>
+      @if (subtitle()) {
+        <span>{{ subtitle() }}</span>
+      }
+    </div>
+    <i>{{ isOpen() ? '▾' : '▸' }}</i>
+  </button>
+  @if (isOpen()) {
+    <div class="accordion-body">
+      <ng-content />
+    </div>
+  }
+</section>

@@ -100,9 +100,24 @@ export interface DashboardStats {
 export interface WardOccupancy {
   wardName: string;
   wardType: string;
-  totalBeds: number;
+  plannedCapacity: number;
+  bedsRegistered: number;
   occupiedBeds: number;
   availableBeds: number;
+}
+
+export interface Donor {
+  id: number;
+  donorName: string;
+  bloodGroup: string;
+  mobile: string;
+}
+
+export interface Donation {
+  id: number;
+  unitsDonated: number;
+  donationDate: string;
+  donor: Donor;
 }
 
 export interface BloodAvailability {
@@ -252,4 +267,26 @@ export interface UpdateProfileRequest {
 export interface ChangePasswordRequest {
   oldPassword: string;
   newPassword: string;
+}
+
+export interface Department {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface Specialization {
+  id: number;
+  name: string;
+  department?: Department | null;
+}
+
+export interface DepartmentRequest {
+  name: string;
+  description?: string;
+}
+
+export interface SpecializationRequest {
+  name: string;
+  departmentId?: number;
 }

@@ -12,9 +12,15 @@ public class WardOccupancyResponse {
 
     private String wardType;
 
-    private Long totalBeds;
+    /** Planned capacity configured on the ward (totalBeds field). */
+    private Long plannedCapacity;
 
+    /** Physical bed records created in the beds table. */
+    private Long bedsRegistered;
+
+    /** Beds with status OCCUPIED (patient admitted). */
     private Long occupiedBeds;
 
+    /** Beds with status AVAILABLE (ready for new admission). */
     private Long availableBeds;
 }

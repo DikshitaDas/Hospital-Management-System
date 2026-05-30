@@ -1,0 +1,57 @@
+.searchable-select {
+  display: grid;
+  gap: 4px;
+  position: relative;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.field-label em {
+  color: #c0183a;
+  font-style: normal;
+}
+
+.searchable-select input {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: 6px;
+  z-index: 30;
+}
+
+.dropdown li {
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dropdown li:hover:not(.muted) {
+  background: rgba(15, 159, 154, 0.1);
+  color: var(--primary-strong);
+}
+
+.dropdown li.muted {
+  cursor: default;
+  color: var(--muted);
+}
