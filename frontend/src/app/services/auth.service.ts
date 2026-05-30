@@ -36,6 +36,14 @@ export class AuthService {
     return this.http.post(`${this.API}/register`, payload, { responseType: 'text' });
   }
 
+  forgotPassword(payload: {
+    uhid: string;
+    mobile: string;
+    newPassword: string;
+  }): Observable<string> {
+    return this.http.post(`${this.API}/forgot-password`, payload, { responseType: 'text' });
+  }
+
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API}/login`, payload).pipe(
       tap(res => {

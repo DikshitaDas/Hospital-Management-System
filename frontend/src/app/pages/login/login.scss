@@ -308,6 +308,22 @@
 }
 
 /* ── Footer link ──────────────────────────────────────────── */
+.forgot-row {
+  margin-bottom: 4px;
+  text-align: right;
+}
+
+.forgot-row a {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-strong);
+  text-decoration: none;
+}
+
+.forgot-row a:hover {
+  text-decoration: underline;
+}
+
 .form-footer {
   text-align: center;
   margin: 20px 0 0;

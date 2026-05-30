@@ -9,7 +9,12 @@
 
   <label class="search">
     <span class="sr-only">Search</span>
-    <input type="search" placeholder="Search patients by name..." (keyup.enter)="onSearch($event)" />
+    <input
+      type="search"
+      placeholder="Search name, UHID or mobile…"
+      #searchBox
+      (keyup.enter)="onSearchInput(searchBox.value)"
+    />
   </label>
 
   <div class="actions">
@@ -21,22 +26,29 @@
     </button>
 
     <div class="profile-menu">
-      <button class="profile-button" type="button" (click)="toggleProfile()">
-        <span class="avatar">{{ userName.charAt(0) }}</span>
-        <span>
+      <button class="profile-button" type="button" (click)="toggleProfile(); $event.stopPropagation()">
+        @if (avatarUrl) {
+          <img class="avatar-img" [src]="avatarUrl" alt="" />
+        } @else {
+          <span class="avatar">{{ userName.charAt(0) }}</span>
+        }
+        <span class="profile-text">
           <strong>{{ userName }}</strong>
           <small>{{ userUhid }}</small>
         </span>
+        <span class="chevron">{{ profileOpen() ? '▴' : '▾' }}</span>
       </button>
       @if (profileOpen()) {
-        <div class="profile-dropdown glass">
-          <button type="button" (click)="goProfile()">Admin Profile</button>
-          <button type="button" class="logout-item" (click)="logout()">Logout</button>
+        <div class="profile-dropdown glass" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <strong>{{ userName }}</strong>
+            <small>{{ userUhid }}</small>
+          </div>
+          <button type="button" (click)="goProfile()">My account</button>
+          <button type="button" class="logout-item" (click)="logout()">Sign out</button>
         </div>
       }
     </div>
-
-    <button class="ghost-button logout-button" type="button" (click)="logout()">Logout</button>
   </div>
 </header>
 

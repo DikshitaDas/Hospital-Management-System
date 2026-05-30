@@ -1,0 +1,45 @@
+<header class="page-header">
+  <div>
+    <span>Settings</span>
+    <h1>Hospital profile</h1>
+    <p>Branding and contact details shown on reports and invoices — not your personal admin login.</p>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="hospital-hero glass">
+    @if (form.logoDataUrl) {
+      <img class="hospital-logo" [src]="form.logoDataUrl" alt="Hospital logo" />
+    } @else {
+      <div class="logo-placeholder">MH</div>
+    }
+    <div>
+      <h2>{{ form.hospitalName || 'Hospital name' }}</h2>
+      <p>{{ form.address || 'Add address' }}</p>
+    </div>
+  </section>
+
+  <article class="glass data-panel ui-card">
+    <form class="form-grid two-col" (ngSubmit)="save()">
+      <app-file-upload
+        label="Hospital logo"
+        accept="image/*"
+        [previewUrl]="form.logoDataUrl || null"
+        (fileSelected)="onLogo($event)"
+      />
+      <label>Hospital name<input [(ngModel)]="form.hospitalName" name="hn" required /></label>
+      <label>Phone<input [(ngModel)]="form.phone" name="hp" /></label>
+      <label>Email<input [(ngModel)]="form.email" name="he" type="email" /></label>
+      <label class="full-width">Address<textarea [(ngModel)]="form.address" name="ha" rows="3"></textarea></label>
+      <div class="page-actions full-width">
+        <button class="primary-button btn-sm" type="submit">Save hospital profile</button>
+      </div>
+    </form>
+  </article>
+}
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

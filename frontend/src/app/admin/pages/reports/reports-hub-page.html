@@ -1,0 +1,66 @@
+<header class="page-header">
+  <div><span>Reports</span><h1>Reports centre</h1><p>All hospital reports in one place — export as CSV.</p></div>
+  <button class="primary-button btn-sm" type="button" (click)="exportCurrent()">Export CSV</button>
+</header>
+
+<div class="tab-bar">
+  <button type="button" [class.active]="tab() === 'patients'" (click)="setTab('patients')">Patients</button>
+  <button type="button" [class.active]="tab() === 'appointments'" (click)="setTab('appointments')">Appointments</button>
+  <button type="button" [class.active]="tab() === 'blood'" (click)="setTab('blood')">Blood bank</button>
+  <button type="button" [class.active]="tab() === 'doctors'" (click)="setTab('doctors')">Doctors</button>
+</div>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading reports…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  @if (tab() === 'appointments') {
+    <div class="toolbar glass data-panel">
+      <label>From <input type="date" [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event)" /></label>
+      <label>To <input type="date" [ngModel]="toDate()" (ngModelChange)="toDate.set($event)" /></label>
+    </div>
+  }
+
+  <section class="glass data-panel">
+  @if (tab() === 'patients') {
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>UHID</th><th>Name</th><th>Gender</th><th>Age</th><th>Mobile</th></tr></thead>
+        <tbody>@for (p of patients(); track p.id) {
+          <tr><td>{{ p.uhid }}</td><td>{{ p.name }}</td><td>{{ p.gender }}</td><td>{{ p.age }}</td><td>{{ p.mobile }}</td></tr>
+        }</tbody>
+      </table>
+    </div>
+  } @else if (tab() === 'appointments') {
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Date</th><th>Patient</th><th>Doctor</th><th>Status</th><th>Token</th></tr></thead>
+        <tbody>@for (a of filteredAppointments(); track a.id) {
+          <tr><td>{{ a.appointmentDate }}</td><td>{{ a.patient.name }}</td><td>{{ a.doctor.name }}</td><td>{{ a.status }}</td><td>{{ a.tokenNumber }}</td></tr>
+        }</tbody>
+      </table>
+    </div>
+  } @else if (tab() === 'blood') {
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Blood group</th><th>Units available</th></tr></thead>
+        <tbody>@for (b of bloodStock(); track b.bloodGroup) {
+          <tr><td>{{ b.bloodGroup }}</td><td>{{ b.unitsAvailable }}</td></tr>
+        }</tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>UHID</th><th>Department</th><th>Specialization</th><th>Fee</th></tr></thead>
+        <tbody>@for (d of doctors(); track d.id) {
+          <tr><td>{{ d.user.name }}</td><td>{{ d.user.uhid }}</td><td>{{ d.department }}</td><td>{{ d.specialization }}</td><td>Rs. {{ d.consultationFee }}</td></tr>
+        }</tbody>
+      </table>
+    </div>
+  }
+  </section>
+}
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

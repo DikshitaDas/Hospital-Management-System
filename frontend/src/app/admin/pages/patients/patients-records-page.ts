@@ -6,12 +6,22 @@ import { Appointment, CreatePrescriptionRequest, Prescription, User } from '../.
 import { ModalComponent } from '../../../shared/ui/modal/modal';
 import { SnackbarComponent } from '../../../shared/ui/snackbar/snackbar';
 import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
-import { showSnackbar } from '../page.util';
+import { SearchableSelectComponent } from '../../../shared/ui/searchable-select/searchable-select';
+import { FileUploadComponent } from '../../../shared/ui/file-upload/file-upload';
+import { downloadMedicalRecordPdf, showSnackbar } from '../page.util';
 
 @Component({
   selector: 'app-patients-records-page',
   standalone: true,
-  imports: [FormsModule, RouterLink, ModalComponent, SnackbarComponent, TooltipDirective],
+  imports: [
+    FormsModule,
+    RouterLink,
+    ModalComponent,
+    SnackbarComponent,
+    TooltipDirective,
+    SearchableSelectComponent,
+    FileUploadComponent
+  ],
   templateUrl: './patients-records-page.html',
   styleUrl: './patients-records-page.scss'
 })
@@ -53,12 +63,24 @@ export class PatientsRecordsPage implements OnInit {
     });
   }
 
-  protected filteredPatients(): User[] {
-    const q = this.searchTerm().trim().toLowerCase();
-    if (!q) return this.patients();
-    return this.patients().filter(
-      p => p.name.toLowerCase().includes(q) || p.uhid.toLowerCase().includes(q) || p.mobile.includes(q)
-    );
+  protected searchPatients = (term: string) => this.adminApi.searchPatients(term);
+  protected patientLabel = (p: User) => `${p.name} · ${p.uhid} · ${p.mobile}`;
+  protected documentNote = '';
+
+  protected onDocumentUpload(file: { name: string; dataUrl: string }): void {
+    const id = this.selectedPatientId();
+    if (!id) return;
+    localStorage.setItem(`hms_doc_${id}_${Date.now()}`, JSON.stringify({ name: file.name, dataUrl: file.dataUrl }));
+    showSnackbar(this.snackbarOpen, this.snackbarMessage, `Document "${file.name}" saved for patient.`);
+  }
+
+  protected downloadRecords(): void {
+    const p = this.patients().find(x => x.id === this.selectedPatientId());
+    if (!p) {
+      showSnackbar(this.snackbarOpen, this.snackbarMessage, 'Select a patient first.');
+      return;
+    }
+    downloadMedicalRecordPdf(p, this.prescriptions());
   }
 
   protected patientAppointments(): Appointment[] {
@@ -69,7 +91,13 @@ export class PatientsRecordsPage implements OnInit {
 
   protected onPatientChange(id: number): void {
     this.selectedPatientId.set(id);
-    this.loadPrescriptions();
+    if (id) this.loadPrescriptions();
+  }
+
+  protected onPatientSelected(p: User | null): void {
+    if (p && !this.patients().some(x => x.id === p.id)) {
+      this.patients.update(list => [...list, p]);
+    }
   }
 
   protected loadPrescriptions(): void {

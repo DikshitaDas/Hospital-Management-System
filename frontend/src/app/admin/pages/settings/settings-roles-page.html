@@ -2,6 +2,9 @@
 @if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
 @else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
 @else {
+<div class="toolbar glass data-panel">
+  <input type="search" placeholder="Search name, UHID, mobile…" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+</div>
 <div class="tab-bar">
   <button type="button" [class.active]="roleFilter() === 'ALL'" (click)="roleFilter.set('ALL')">All</button>
   <button type="button" [class.active]="roleFilter() === 'ADMIN'" (click)="roleFilter.set('ADMIN')">Admin</button>

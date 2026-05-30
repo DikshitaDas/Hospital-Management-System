@@ -6,7 +6,8 @@
   </div>
   <div class="page-actions">
     @if (selectedPatientId()) {
-      <button class="primary-button btn-sm" type="button" appTooltip="Create prescription for selected patient" (click)="openRxModal()">+ Prescription</button>
+      <button class="ghost-button btn-sm" type="button" (click)="downloadRecords()">Download records</button>
+      <button class="primary-button btn-sm" type="button" appTooltip="Create prescription" (click)="openRxModal()">+ Prescription</button>
     }
   </div>
 </header>
@@ -16,14 +17,18 @@
 }
 
 <section class="glass data-panel ui-card">
-  <div class="toolbar">
-    <input type="search" placeholder="Search patient name, UHID, mobile..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
-    <select [ngModel]="selectedPatientId()" (ngModelChange)="onPatientChange($event)">
-      <option [ngValue]="0">Select patient</option>
-      @for (p of filteredPatients(); track p.id) {
-        <option [ngValue]="p.id">{{ p.name }} ({{ p.uhid }})</option>
-      }
-    </select>
+  <div class="toolbar records-toolbar">
+    <app-searchable-select
+      label="Patient"
+      placeholder="Type name, UHID or mobile (min 2 chars)…"
+      [displayWith]="patientLabel"
+      valueKey="id"
+      [searchFn]="searchPatients"
+      [selectedId]="selectedPatientId() || null"
+      (selectedIdChange)="onPatientChange($event ?? 0)"
+      (selectedItemChange)="onPatientSelected($event)"
+    />
+    <app-file-upload label="Medical document upload" accept="image/*,.pdf" hint="Attach reports, scans, or PDFs" (fileSelected)="onDocumentUpload($event)" />
   </div>
 
   @if (loading()) {

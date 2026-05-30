@@ -1,13 +1,14 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AdminApiService } from '../../../services/admin-api.service';
 import { Bill } from '../../models/admin.models';
 import { SnackbarComponent } from '../../../shared/ui/snackbar/snackbar';
-import { statusBadgeClass } from '../page.util';
+import { downloadBillInvoice, statusBadgeClass } from '../page.util';
 
 @Component({
   selector: 'app-billing-payments-page',
   standalone: true,
-  imports: [SnackbarComponent],
+  imports: [FormsModule, SnackbarComponent],
   templateUrl: './billing-payments-page.html',
   styleUrl: './billing-payments-page.scss'
 })
@@ -16,13 +17,16 @@ export class BillingPaymentsPage implements OnInit {
   protected readonly errorMsg = signal('');
   protected readonly paidBills = signal<Bill[]>([]);
   protected readonly pendingBills = signal<Bill[]>([]);
+  protected readonly searchTerm = signal('');
   protected readonly snackbarOpen = signal(false);
   protected readonly snackbarMessage = signal('');
   protected readonly badgeClass = statusBadgeClass;
 
   constructor(private adminApi: AdminApiService) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
   protected load(): void {
     this.loading.set(true);
@@ -32,15 +36,37 @@ export class BillingPaymentsPage implements OnInit {
         this.pendingBills.set(list.filter(b => b.status.toUpperCase() === 'PENDING'));
         this.loading.set(false);
       },
-      error: () => { this.errorMsg.set('Failed to load payments.'); this.loading.set(false); }
+      error: () => {
+        this.errorMsg.set('Failed to load payments.');
+        this.loading.set(false);
+      }
     });
+  }
+
+  protected filterBills(list: Bill[]): Bill[] {
+    const q = this.searchTerm().trim().toLowerCase();
+    if (!q) return list;
+    return list.filter(
+      b =>
+        String(b.id).includes(q) ||
+        (b.patient?.name?.toLowerCase().includes(q) ?? false) ||
+        (b.patient?.uhid?.toLowerCase().includes(q) ?? false) ||
+        (b.patient?.mobile?.includes(q) ?? false)
+    );
   }
 
   protected pay(id: number): void {
     this.adminApi.payBill(id).subscribe({
-      next: msg => { this.showSnackbar(msg || 'Payment recorded.'); this.load(); },
+      next: msg => {
+        this.showSnackbar(msg || 'Payment recorded.');
+        this.load();
+      },
       error: err => this.showSnackbar(err?.error ?? 'Payment failed.')
     });
+  }
+
+  protected downloadInvoice(b: Bill): void {
+    downloadBillInvoice(b);
   }
 
   protected showSnackbar(message: string): void {

@@ -17,6 +17,7 @@ export class SettingsRolesPage implements OnInit {
   protected readonly errorMsg = signal('');
   protected readonly users = signal<User[]>([]);
   protected readonly roleFilter = signal('ALL');
+  protected readonly searchTerm = signal('');
   protected readonly snackbarOpen = signal(false);
   protected readonly snackbarMessage = signal('');
 
@@ -41,7 +42,15 @@ export class SettingsRolesPage implements OnInit {
 
   protected filtered(): User[] {
     const f = this.roleFilter();
-    return f === 'ALL' ? this.users() : this.users().filter(u => u.role.toUpperCase() === f);
+    const q = this.searchTerm().trim().toLowerCase();
+    let list = f === 'ALL' ? this.users() : this.users().filter(u => u.role.toUpperCase() === f);
+    if (!q) return list;
+    return list.filter(
+      u =>
+        u.name.toLowerCase().includes(q) ||
+        u.uhid.toLowerCase().includes(q) ||
+        u.mobile.includes(q)
+    );
   }
 
   protected updateRole(user: User, role: string): void {

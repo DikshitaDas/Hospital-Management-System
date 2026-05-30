@@ -3,13 +3,13 @@
 }
 
 .navbar {
-  min-height: 72px;
+  min-height: 56px;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 16px;
-  margin: 12px 20px 0;
-  padding: 12px 16px;
+  gap: 12px;
+  margin: 10px 16px 0;
+  padding: 8px 12px;
   border-radius: var(--radius);
 }
 
@@ -20,58 +20,45 @@
 }
 
 .brand-mark {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   border-radius: var(--radius);
   background: linear-gradient(145deg, #fff, var(--mint));
   color: var(--primary-strong);
   font-weight: 900;
+  font-size: 12px;
 }
 
 .brand-row span {
   display: block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .brand-row strong {
   display: block;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .search input {
   width: 100%;
-  min-width: 220px;
-  height: 42px;
-  padding: 0 14px;
+  min-width: 200px;
+  height: 34px;
+  padding: 0 12px;
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.86);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 10px;
-  position: relative;
-}
-
-.icon-button {
-  position: relative;
-}
-
-.dot {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #e55353;
+  gap: 8px;
 }
 
 .profile-menu {
@@ -81,56 +68,99 @@
 .profile-button {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 42px;
+  gap: 8px;
+  min-height: 36px;
   padding: 4px 10px 4px 4px;
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.86);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.profile-button:hover {
+  border-color: rgba(15, 159, 154, 0.4);
+  box-shadow: 0 4px 12px rgba(15, 159, 154, 0.12);
+}
+
+.avatar,
+.avatar-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
   display: grid;
   place-items: center;
-  border-radius: var(--radius);
   background: var(--mint);
   color: var(--primary-strong);
   font-weight: 900;
+  font-size: 12px;
 }
 
-.profile-button strong,
-.profile-button small {
-  display: block;
+.avatar-img {
+  object-fit: cover;
+}
+
+.profile-text {
   text-align: left;
+  line-height: 1.2;
 }
 
-.profile-button small {
+.profile-text strong {
+  display: block;
+  font-size: 12px;
+}
+
+.profile-text small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
+}
+
+.chevron {
+  color: var(--muted);
+  font-size: 10px;
+  margin-left: 2px;
 }
 
 .profile-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   right: 0;
-  min-width: 180px;
-  padding: 8px;
-  border-radius: var(--radius);
-  z-index: 20;
-  display: grid;
-  gap: 4px;
+  min-width: 200px;
+  padding: 6px;
+  border-radius: 8px;
+  z-index: 50;
+  box-shadow: 0 12px 32px rgba(16, 42, 58, 0.18);
+}
+
+.dropdown-header {
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.dropdown-header strong {
+  display: block;
+  font-size: 13px;
+}
+
+.dropdown-header small {
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .profile-dropdown button {
-  min-height: 38px;
-  padding: 0 12px;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
   border: 0;
-  border-radius: var(--radius);
+  border-radius: 6px;
   background: transparent;
   text-align: left;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 .profile-dropdown button:hover {
@@ -143,8 +173,22 @@
   color: #b42318;
 }
 
+.dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e55353;
+}
+
+.icon-button {
+  position: relative;
+}
+
 .drawer-list article {
-  padding: 12px 0;
+  padding: 10px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -152,19 +196,12 @@
   border-top: 0;
 }
 
-.drawer-list span {
-  display: block;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.logout-button {
-  min-height: 28px;
-}
-
 @media (max-width: 820px) {
   .navbar {
     grid-template-columns: 1fr;
+  }
+
+  .profile-text {
+    display: none;
   }
 }

@@ -2,11 +2,17 @@
   <div>
     <span>Doctors</span>
     <h1>{{ pageTitle }}</h1>
-    <p>Full CRUD via doctor profile APIs — grouped by {{ fieldLabel }}.</p>
+    @if (mode === 'schedule') {
+      <p>View and edit doctor shift timings. Add doctors from <strong>All Doctors</strong>.</p>
+    } @else {
+      <p>Grouped by {{ fieldLabel }}.</p>
+    }
   </div>
-  <div class="page-actions">
-    <button class="primary-button btn-sm" type="button" (click)="openAdd()">+ Add Doctor</button>
-  </div>
+  @if (mode !== 'schedule') {
+    <div class="page-actions">
+      <button class="primary-button btn-sm" type="button" (click)="openAdd()">+ Add Doctor</button>
+    </div>
+  }
 </header>
 
 <div class="toolbar glass data-panel">

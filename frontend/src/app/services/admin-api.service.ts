@@ -29,6 +29,9 @@ import {
   Donor,
   EmergencyAdmissionRequest,
   LabTest,
+  LabReport,
+  HospitalProfile,
+  HospitalProfileRequest,
   Prescription,
   RescheduleAppointmentRequest,
   TransferPatientRequest,
@@ -66,7 +69,7 @@ export class AdminApiService {
   }
 
   searchPatients(name: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.base}/patients/search`, { params: { name } });
+    return this.http.get<User[]>(`${this.base}/patients/search`, { params: { name: name.trim() } });
   }
 
   updatePatient(id: number, body: UpdatePatientRequest): Observable<string> {
@@ -95,7 +98,7 @@ export class AdminApiService {
   }
 
   searchDoctors(name: string): Observable<DoctorProfile[]> {
-    return this.http.get<DoctorProfile[]>(`${this.base}/doctors/search`, { params: { name } });
+    return this.http.get<DoctorProfile[]>(`${this.base}/doctors/search`, { params: { name: name.trim() } });
   }
 
   addDoctor(body: AddDoctorRequest): Observable<string> {
@@ -306,5 +309,17 @@ export class AdminApiService {
 
   deleteSpecialization(id: number): Observable<string> {
     return this.http.delete(`${this.base}/specializations/${id}`, { responseType: 'text' });
+  }
+
+  getHospitalProfile(): Observable<HospitalProfile> {
+    return this.http.get<HospitalProfile>(`${this.base}/hospital-profile`);
+  }
+
+  updateHospitalProfile(body: HospitalProfileRequest): Observable<string> {
+    return this.http.put(`${this.base}/hospital-profile`, body, { responseType: 'text' });
+  }
+
+  getAllLabReports(): Observable<LabReport[]> {
+    return this.http.get<LabReport[]>(`${this.base}/lab-reports`);
   }
 }

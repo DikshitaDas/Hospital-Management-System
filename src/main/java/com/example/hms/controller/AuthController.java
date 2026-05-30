@@ -1,5 +1,6 @@
 package com.example.hms.controller;
 
+import com.example.hms.dto.admin.ForgotPasswordRequest;
 import com.example.hms.dto.admin.LoginRequest;
 import com.example.hms.dto.admin.LoginResponse;
 import com.example.hms.dto.admin.RegisterRequest;
@@ -28,5 +29,8 @@ public class AuthController {
         return authService.login(request);
     }
 
-    
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        return authService.forgotPassword(request);
+    }
 }

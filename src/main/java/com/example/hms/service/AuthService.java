@@ -1,5 +1,6 @@
 package com.example.hms.service;
 
+import com.example.hms.dto.admin.ForgotPasswordRequest;
 import com.example.hms.dto.admin.LoginRequest;
 import com.example.hms.dto.admin.LoginResponse;
 import com.example.hms.dto.admin.RegisterRequest;
@@ -90,6 +91,19 @@ public class AuthService {
                 user.getName(),
                 user.getId(),
                 jwtService.generateToken(user));
+    }
+
+    public String forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByUhid(request.getUhid().trim()).orElse(null);
+        if (user == null) {
+            return "No account found for this UHID.";
+        }
+        if (!user.getMobile().equals(request.getMobile().trim())) {
+            return "Mobile number does not match our records.";
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return "Password reset successful. You can sign in with your new password.";
     }
 
     private String generateUHID() {

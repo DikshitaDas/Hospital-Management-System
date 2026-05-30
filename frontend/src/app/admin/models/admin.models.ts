@@ -90,6 +90,31 @@ export interface LabTest {
   description: string;
 }
 
+export interface LabReport {
+  id: number;
+  result: string;
+  status: string;
+  labTest?: LabTest;
+  appointment?: Appointment;
+}
+
+export interface HospitalProfile {
+  id: number;
+  hospitalName: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  logoDataUrl?: string;
+}
+
+export interface HospitalProfileRequest {
+  hospitalName: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  logoDataUrl?: string;
+}
+
 export interface DashboardStats {
   totalPatients: number;
   totalDoctors: number;

@@ -29,7 +29,10 @@ import com.example.hms.dto.admin.SpecializationRequest;
 import com.example.hms.dto.admin.UpdateWardRequest;
 import com.example.hms.dto.admin.WardOccupancyResponse;
 import com.example.hms.entity.Department;
+import com.example.hms.entity.HospitalProfile;
+import com.example.hms.entity.LabReport;
 import com.example.hms.entity.Specialization;
+import com.example.hms.dto.admin.HospitalProfileRequest;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
 import com.example.hms.entity.Bill;
@@ -513,6 +516,21 @@ public class AdminController {
     @DeleteMapping("/specializations/{id}")
     public String deleteSpecialization(@PathVariable Long id) {
         return adminService.deleteSpecialization(id);
+    }
+
+    @GetMapping("/hospital-profile")
+    public HospitalProfile getHospitalProfile() {
+        return adminService.getHospitalProfile();
+    }
+
+    @PutMapping("/hospital-profile")
+    public String updateHospitalProfile(@Valid @RequestBody HospitalProfileRequest request) {
+        return adminService.updateHospitalProfile(request);
+    }
+
+    @GetMapping("/lab-reports")
+    public List<LabReport> getAllLabReports() {
+        return adminService.getAllLabReports();
     }
 
 }

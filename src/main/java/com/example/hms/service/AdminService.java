@@ -25,11 +25,13 @@ import com.example.hms.dto.admin.UpdateDoctorRequest;
 import com.example.hms.dto.admin.UpdatePatientRequest;
 import com.example.hms.dto.admin.UpdateRoleRequest;
 import com.example.hms.dto.admin.DepartmentRequest;
+import com.example.hms.dto.admin.HospitalProfileRequest;
 import com.example.hms.dto.admin.SpecializationRequest;
 import com.example.hms.dto.admin.UpdateWardRequest;
 import com.example.hms.dto.admin.WardOccupancyResponse;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.Department;
+import com.example.hms.entity.HospitalProfile;
 import com.example.hms.entity.Specialization;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bed;
@@ -58,12 +60,14 @@ import com.example.hms.repository.LabTestRepository;
 import com.example.hms.repository.PrescriptionRepository;
 import com.example.hms.repository.UserRepository;
 import com.example.hms.repository.DepartmentRepository;
+import com.example.hms.repository.HospitalProfileRepository;
 import com.example.hms.repository.SpecializationRepository;
 import com.example.hms.repository.WardRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -132,12 +136,15 @@ public class AdminService {
         @Autowired
         private SpecializationRepository specializationRepository;
 
-        public List<User> searchPatients(String name) {
+        @Autowired
+        private HospitalProfileRepository hospitalProfileRepository;
 
-                return userRepository
-                                .findByNameContainingIgnoreCaseAndRole(
-                                                name,
-                                                "PATIENT");
+        public List<User> searchPatients(String name) {
+                String q = name == null ? "" : name.trim();
+                if (q.isEmpty()) {
+                        return List.of();
+                }
+                return userRepository.searchByRoleAndQuery("PATIENT", q);
         }
 
         public String deletePatient(Long id) {
@@ -263,11 +270,12 @@ public class AdminService {
                 return "Doctor deleted successfully!";
         }
 
-        public List<DoctorProfile> searchDoctors(
-                        String name) {
-
-                return doctorProfileRepository
-                                .findByUserNameContainingIgnoreCase(name);
+        public List<DoctorProfile> searchDoctors(String name) {
+                String q = name == null ? "" : name.trim();
+                if (q.isEmpty()) {
+                        return List.of();
+                }
+                return doctorProfileRepository.searchByQuery(q);
         }
 
         public String updateDoctor(
@@ -1277,6 +1285,11 @@ public class AdminService {
                 return labTestRepository.findAll();
         }
 
+        @Transactional(readOnly = true)
+        public List<LabReport> getAllLabReports() {
+                return labReportRepository.findAll();
+        }
+
         public String updateLabReport(
 
                         Long reportId,
@@ -1459,6 +1472,29 @@ public class AdminService {
                 }
                 specializationRepository.delete(specialization);
                 return "Specialization deleted successfully!";
+        }
+
+        public HospitalProfile getHospitalProfile() {
+                return hospitalProfileRepository.findById(1L).orElseGet(() -> {
+                        HospitalProfile profile = new HospitalProfile();
+                        profile.setId(1L);
+                        profile.setHospitalName("MediCare Hub Hospital");
+                        profile.setAddress("");
+                        profile.setPhone("");
+                        profile.setEmail("");
+                        return hospitalProfileRepository.save(profile);
+                });
+        }
+
+        public String updateHospitalProfile(HospitalProfileRequest request) {
+                HospitalProfile profile = getHospitalProfile();
+                profile.setHospitalName(request.getHospitalName().trim());
+                profile.setAddress(request.getAddress());
+                profile.setPhone(request.getPhone());
+                profile.setEmail(request.getEmail());
+                profile.setLogoDataUrl(request.getLogoDataUrl());
+                hospitalProfileRepository.save(profile);
+                return "Hospital profile updated successfully!";
         }
 
 }

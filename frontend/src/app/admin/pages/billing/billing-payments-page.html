@@ -1,29 +1,57 @@
-<header class="page-header"><div><span>Billing</span><h1>Payments</h1><p>PAID bills and pay pending invoices.</p></div></header>
+<header class="page-header">
+  <div><span>Billing</span><h1>Payments</h1><p>Pay pending invoices and download formal receipts.</p></div>
+</header>
+
+<div class="toolbar glass data-panel">
+  <input type="search" placeholder="Search invoice #, patient, UHID, mobile…" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+</div>
+
 @if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
 @else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
 @else {
 <section class="content-grid-2">
   <article class="glass data-panel">
-    <h2 style="margin:0 0 10px;font-size:16px">Pending Payments</h2>
+    <h2 class="section-title">Pending payments</h2>
     <div class="data-table-wrap">
       <table class="data-table">
-        <thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Action</th></tr></thead>
-        <tbody>@for (b of pendingBills(); track b.id) {
-          <tr><td>{{ b.id }}</td><td>{{ b.patient?.name }}</td><td>Rs. {{ b.amount }}</td>
-          <td class="row-actions"><button class="primary-button btn-sm" type="button" (click)="pay(b.id)">Pay</button></td></tr>
-        } @empty { <tr><td colspan="4" class="empty-box">No pending bills.</td></tr> }</tbody>
+        <thead><tr><th>ID</th><th>Patient</th><th>UHID</th><th>Amount</th><th>Actions</th></tr></thead>
+        <tbody>
+          @for (b of filterBills(pendingBills()); track b.id) {
+            <tr>
+              <td>{{ b.id }}</td>
+              <td>{{ b.patient?.name }}</td>
+              <td>{{ b.patient?.uhid }}</td>
+              <td>Rs. {{ b.amount }}</td>
+              <td class="row-actions">
+                <button class="primary-button btn-sm" type="button" (click)="pay(b.id)">Pay</button>
+                <button class="ghost-button btn-sm" type="button" (click)="downloadInvoice(b)">Invoice</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty-box">No pending bills.</td></tr>
+          }
+        </tbody>
       </table>
     </div>
   </article>
   <article class="glass data-panel">
-    <h2 style="margin:0 0 10px;font-size:16px">Paid Bills</h2>
+    <h2 class="section-title">Paid bills</h2>
     <div class="data-table-wrap">
       <table class="data-table">
-        <thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Status</th></tr></thead>
-        <tbody>@for (b of paidBills(); track b.id) {
-          <tr><td>{{ b.id }}</td><td>{{ b.patient?.name }}</td><td>Rs. {{ b.amount }}</td>
-          <td><span class="badge mint">{{ b.status }}</span></td></tr>
-        }</tbody>
+        <thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          @for (b of filterBills(paidBills()); track b.id) {
+            <tr>
+              <td>{{ b.id }}</td>
+              <td>{{ b.patient?.name }}</td>
+              <td>Rs. {{ b.amount }}</td>
+              <td><span class="badge mint">{{ b.status }}</span></td>
+              <td class="row-actions">
+                <button class="ghost-button btn-sm" type="button" (click)="downloadInvoice(b)">Receipt</button>
+              </td>
+            </tr>
+          }
+        </tbody>
       </table>
     </div>
   </article>

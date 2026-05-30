@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
@@ -71,16 +71,7 @@ export class AdminSidebarComponent implements OnInit {
         { label: 'Payments', route: '/admin/billing/payments' }
       ]
     },
-    {
-      label: 'Reports',
-      icon: 'reports',
-      children: [
-        { label: 'Patient Reports', route: '/admin/reports/patients' },
-        { label: 'Appointment Reports', route: '/admin/reports/appointments' },
-        { label: 'Blood Bank Reports', route: '/admin/reports/blood-bank' },
-        { label: 'Doctor Reports', route: '/admin/reports/doctors' }
-      ]
-    },
+    { label: 'Reports', route: '/admin/reports', icon: 'reports' },
     {
       label: 'Bed/Ward Management',
       icon: 'wards',
@@ -104,7 +95,8 @@ export class AdminSidebarComponent implements OnInit {
       label: 'Settings',
       icon: 'settings',
       children: [
-        { label: 'Hospital Profile', route: '/admin/settings/profile' },
+        { label: 'Hospital Profile', route: '/admin/settings/hospital' },
+        { label: 'My Account', route: '/admin/settings/account' },
         { label: 'Roles & Permissions', route: '/admin/settings/roles' },
         { label: 'Wards & Beds Overview', route: '/admin/settings/wards' }
       ]
@@ -155,6 +147,7 @@ export class AdminNavbarComponent implements OnInit {
 
   protected readonly userName: string;
   protected readonly userUhid: string;
+  protected readonly avatarUrl: string | null;
 
   constructor(
     private auth: AuthService,
@@ -163,6 +156,16 @@ export class AdminNavbarComponent implements OnInit {
   ) {
     this.userName = this.auth.getName() ?? 'Admin';
     this.userUhid = this.auth.getUhid() ?? '';
+    const id = this.auth.getUserId();
+    this.avatarUrl = id ? localStorage.getItem(`hms_avatar_${id}`) : null;
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.profile-menu')) {
+      this.profileOpen.set(false);
+    }
   }
 
   ngOnInit(): void {
@@ -182,13 +185,13 @@ export class AdminNavbarComponent implements OnInit {
 
   protected goProfile(): void {
     this.profileOpen.set(false);
-    this.router.navigate(['/admin/settings/profile']);
+    this.router.navigate(['/admin/settings/account']);
   }
 
-  protected onSearch(event: Event): void {
-    const value = (event.target as HTMLInputElement).value.trim();
-    if (value.length >= 2) {
-      this.router.navigate(['/admin/patients'], { queryParams: { search: value } });
+  protected onSearchInput(value: string): void {
+    const q = value.trim();
+    if (q.length >= 2) {
+      this.router.navigate(['/admin/patients'], { queryParams: { search: q } });
     }
   }
 

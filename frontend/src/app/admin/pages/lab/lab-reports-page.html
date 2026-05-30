@@ -1,10 +1,76 @@
-<header class="page-header"><div><span>Lab</span><h1>Upload / Update Reports</h1></div></header>
-<div class="alert info glass data-panel">No list API for lab reports. Enter the report ID from the backend and submit results via PUT /admin/lab-reports/&#123;id&#125;.</div>
-<section class="glass data-panel">
+<header class="page-header">
+  <div>
+    <span>Lab &amp; Reports</span>
+    <h1>Lab test reports</h1>
+    <p>Enter structured results and download formal PDF-style reports.</p>
+  </div>
+  <button class="ghost-button btn-sm" type="button" (click)="load()">Refresh</button>
+</header>
+
+<div class="tab-bar">
+  <button type="button" [class.active]="statusFilter() === 'ALL'" (click)="statusFilter.set('ALL')">All</button>
+  <button type="button" [class.active]="statusFilter() === 'PENDING'" (click)="statusFilter.set('PENDING')">Pending</button>
+  <button type="button" [class.active]="statusFilter() === 'COMPLETED'" (click)="statusFilter.set('COMPLETED')">Completed</button>
+</div>
+
+<div class="toolbar glass data-panel">
+  <input type="search" placeholder="Search report ID, patient, test…" [ngModel]="reportSearch" (ngModelChange)="reportSearch = $event" />
+</div>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading lab reports…</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>ID</th><th>Patient</th><th>Test</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @for (r of filteredReports(); track r.id) {
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.appointment?.patient?.name ?? '—' }}</td>
+              <td>{{ r.labTest?.testName ?? '—' }}</td>
+              <td>{{ r.appointment?.appointmentDate ?? '—' }}</td>
+              <td><span class="badge" [class.mint]="r.status === 'COMPLETED'" [class.warm]="r.status === 'PENDING'">{{ r.status }}</span></td>
+              <td class="row-actions">
+                <button class="ghost-button btn-sm" type="button" (click)="openEdit(r)">Enter results</button>
+                <button class="ghost-button btn-sm" type="button" (click)="downloadReport(r)">Download</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty-box">No lab reports. Doctors create reports from appointments.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-modal [open]="editOpen()" title="Lab report entry" (closed)="editOpen.set(false)">
   <form class="form-grid" (ngSubmit)="submit()">
-    <input [(ngModel)]="reportId" name="rid" type="number" placeholder="Lab report ID" required />
-    <textarea [(ngModel)]="form.result" name="result" placeholder="Test result" required></textarea>
-    <button class="primary-button" type="submit">Update Report</button>
+    <div class="report-meta two-col">
+      <label>Patient<input [(ngModel)]="patientName" name="pn" readonly /></label>
+      <label>Test<input [(ngModel)]="testName" name="tn" readonly /></label>
+      <label>Sample date<input type="date" [(ngModel)]="sampleDate" name="sd" /></label>
+      <app-file-upload label="Attach scan (optional)" accept="image/*,.pdf" (fileSelected)="onAttachment($event)" />
+    </div>
+    <h3 class="section-label">Test parameters</h3>
+    <div class="results-grid">
+      <span class="head">Parameter</span><span class="head">Value</span><span class="head">Unit</span><span class="head">Reference</span><span></span>
+      @for (line of lines; track $index) {
+        <input [(ngModel)]="line.parameter" [name]="'p' + $index" placeholder="e.g. Haemoglobin" />
+        <input [(ngModel)]="line.value" [name]="'v' + $index" placeholder="13.2" />
+        <input [(ngModel)]="line.unit" [name]="'u' + $index" placeholder="g/dL" />
+        <input [(ngModel)]="line.reference" [name]="'r' + $index" placeholder="12–16" />
+        <button class="ghost-button btn-sm danger-hover" type="button" (click)="removeLine($index)">×</button>
+      }
+    </div>
+    <button class="ghost-button btn-sm" type="button" (click)="addLine()">+ Add row</button>
+    <label>Clinical remarks<textarea [(ngModel)]="remarks" name="rem" rows="3" placeholder="Interpretation notes…"></textarea></label>
+    <button class="primary-button btn-sm" type="submit">Save &amp; mark completed</button>
   </form>
-</section>
+</app-modal>
+
 <app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

@@ -1,0 +1,18 @@
+<div class="file-upload">
+  <span class="field-label">{{ label }}</span>
+  @if (previewUrl) {
+    <div class="preview">
+      @if (previewUrl.startsWith('data:image')) {
+        <img [src]="previewUrl" alt="Preview" />
+      } @else {
+        <span class="file-tag">File attached</span>
+      }
+    </div>
+  }
+  <label class="upload-btn">
+    <input type="file" [accept]="accept" (change)="onFileChange($event)" hidden />
+    Choose file
+  </label>
+  @if (hint) { <small class="hint">{{ hint }}</small> }
+  @if (error()) { <small class="error">{{ error() }}</small> }
+</div>
