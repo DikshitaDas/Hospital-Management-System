@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
-import { inject } from '@angular/core';
 import { Appointment, Bill } from '../../../admin/models/admin.models';
 import { Notification, NotificationApiService } from '../../../services/notification-api.service';
 import { PatientApiService } from '../../../services/patient-api.service';
@@ -76,13 +75,13 @@ export class PatientDashboardPage implements OnInit {
   protected readonly badgeClass = statusBadgeClass;
 
   private readonly patientId: number | null;
-  private readonly auth = inject(AuthService);
 
   constructor(
     private patientApi: PatientApiService,
-    private notificationApi: NotificationApiService
+    private notificationApi: NotificationApiService,
+    auth: AuthService
   ) {
-    this.patientId = this.auth.getUserId();
+    this.patientId = auth.getUserId();
   }
 
   ngOnInit(): void {
@@ -96,13 +95,13 @@ export class PatientDashboardPage implements OnInit {
       stats: this.patientApi.getDashboard(this.patientId).pipe(
         catchError(() => of({ totalAppointments: 0, totalPrescriptions: 0, pendingBills: 0, admitted: false }))
       ),
-      profile: this.patientApi.getProfile(this.patientId!).pipe(catchError(() => of(null))),
+      profile: this.patientApi.getProfile().pipe(catchError(() => of(null))),
       appointments: this.patientApi.getAppointments(this.patientId).pipe(catchError(() => of([] as Appointment[]))),
       bills: this.patientApi.getBills(this.patientId).pipe(catchError(() => of([] as Bill[]))),
       notifications: this.notificationApi.getNotifications().pipe(catchError(() => of([])))
     }).subscribe({
       next: ({ stats, profile, appointments, bills, notifications }) => {
-        this.profileName.set(profile?.name ?? this.auth.getName() ?? 'Patient');
+        this.profileName.set(profile?.name ?? 'Patient');
         this.stats.set({
           totalPrescriptions: stats.totalPrescriptions ?? 0,
           admitted: stats.admitted ?? false
@@ -112,6 +111,9 @@ export class PatientDashboardPage implements OnInit {
         this.activities.set(this.buildActivities(appointments, bills));
         this.notifications.set(notifications.slice(0, 8));
         this.loading.set(false);
+        if (!profile) {
+          this.errorMsg.set('Some profile data could not be loaded. Try signing out and back in.');
+        }
       },
       error: () => {
         this.errorMsg.set('Unable to load dashboard. Check backend and login.');

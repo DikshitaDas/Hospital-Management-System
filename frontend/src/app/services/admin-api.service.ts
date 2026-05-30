@@ -16,7 +16,6 @@ import {
   BloodRequest,
   BloodStock,
   BookAppointmentRequest,
-  BookAppointmentResponse,
   ChangePasswordRequest,
   CreateBillRequest,
   PayBillRequest,
@@ -123,8 +122,8 @@ export class AdminApiService {
     return this.http.get<Appointment[]>(`${this.base}/appointments`);
   }
 
-  bookAppointment(body: BookAppointmentRequest): Observable<BookAppointmentResponse> {
-    return this.http.post<BookAppointmentResponse>(`${this.base}/appointments`, body);
+  bookAppointment(body: BookAppointmentRequest): Observable<string> {
+    return this.http.post(`${this.base}/appointments`, body, { responseType: 'text' });
   }
 
   cancelAppointment(id: number): Observable<string> {

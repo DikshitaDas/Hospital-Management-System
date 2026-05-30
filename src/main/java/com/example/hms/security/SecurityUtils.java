@@ -35,31 +35,4 @@ public class SecurityUtils {
 
         return null;
     }
-
-    public static User getCurrentUser() {
-
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        if (authentication == null) {
-                return null;
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof User user) {
-                return user;
-        }
-
-        return null;
-    }
-
-    public static Long getCurrentUserId() {
-
-        User user = getCurrentUser();
-
-        return user != null ? user.getId() : null;
-    }
 }

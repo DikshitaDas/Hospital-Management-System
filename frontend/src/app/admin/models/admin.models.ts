@@ -203,14 +203,6 @@ export interface BookAppointmentRequest {
   appointmentDate: string;
 }
 
-export interface BookAppointmentResponse {
-  message: string;
-  appointmentId: number | null;
-  billId: number | null;
-  consultationFee: number | null;
-  billStatus: string | null;
-}
-
 export interface RescheduleAppointmentRequest {
   appointmentDate: string;
 }

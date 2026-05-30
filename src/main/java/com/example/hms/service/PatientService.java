@@ -4,7 +4,6 @@ import com.example.hms.dto.ChangePasswordRequest;
 import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.BookAppointmentRequest;
-import com.example.hms.dto.admin.BookAppointmentResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.admin.PayBillRequest;
 import com.example.hms.dto.patient.PatientBookAppointmentRequest;
@@ -101,8 +100,7 @@ public class PatientService {
                 return adminService.searchDoctors(name);
         }
 
-        public BookAppointmentResponse bookAppointment(
-                        PatientBookAppointmentRequest request) {
+        public String bookAppointment(PatientBookAppointmentRequest request) {
 
                 User patient = getCurrentPatient();
 
@@ -111,31 +109,7 @@ public class PatientService {
                 book.setDoctorId(request.getDoctorId());
                 book.setAppointmentDate(request.getAppointmentDate());
 
-                BookAppointmentResponse response = adminService.bookAppointment(book);
-
-                if (response.getBillId() != null
-                                && Boolean.TRUE.equals(request.getPayNow())) {
-
-                        String method = request.getPaymentMethod();
-
-                        if (method == null || method.isBlank()) {
-                                method = "UPI";
-                        }
-
-                        PayBillRequest pay = new PayBillRequest();
-                        pay.setPaymentMethod(method);
-
-                        payBill(response.getBillId(), pay);
-
-                        response.setMessage(
-                                        "Appointment booked and consultation fee paid (Rs. "
-                                                        + response.getConsultationFee()
-                                                        + ").");
-
-                        response.setBillStatus("PAID");
-                }
-
-                return response;
+                return adminService.bookAppointment(book);
         }
 
         public String cancelAppointment(
@@ -269,44 +243,20 @@ public class PatientService {
 
         public User getPatientProfile() {
 
-                return resolveCurrentPatient();
-        }
-
-        public User getPatientProfile(Long patientId) {
-
-                User current = resolveCurrentPatient();
-
-                if (!current.getId().equals(patientId)) {
-                        throw new IllegalStateException(
-                                        "You can only view your own profile.");
-                }
-
-                return current;
-        }
-
-        private User resolveCurrentPatient() {
-
-                User fromContext = SecurityUtils.getCurrentUser();
-
-                if (fromContext != null) {
-                        return fromContext;
-                }
-
-                String uhid = SecurityUtils.getCurrentUhid();
-
-                if (uhid != null && !uhid.isBlank()) {
-                        return userRepository
-                                        .findByUhid(uhid)
-                                        .orElseThrow(() -> new IllegalStateException(
-                                                        "Patient not found"));
-                }
-
-                throw new IllegalStateException("Not authenticated");
+                return getCurrentPatient();
         }
 
         private User getCurrentPatient() {
 
-                return resolveCurrentPatient();
+                String uhid = SecurityUtils.getCurrentUhid();
+
+                if (uhid == null || uhid.isBlank()) {
+                        throw new IllegalStateException("Not authenticated");
+                }
+
+                return userRepository
+                                .findByUhid(uhid)
+                                .orElseThrow(() -> new IllegalStateException("Patient not found"));
         }
 
         public String updatePatientProfile(

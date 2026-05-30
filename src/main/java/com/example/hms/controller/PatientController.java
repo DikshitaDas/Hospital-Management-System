@@ -5,7 +5,6 @@ import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.admin.PayBillRequest;
-import com.example.hms.dto.admin.BookAppointmentResponse;
 import com.example.hms.dto.patient.PatientBookAppointmentRequest;
 import com.example.hms.dto.patient.PatientDashboardResponse;
 import com.example.hms.entity.DoctorProfile;
@@ -59,7 +58,7 @@ public class PatientController {
         }
 
         @PostMapping("/appointments")
-        public BookAppointmentResponse bookAppointment(
+        public String bookAppointment(
                         @Valid @RequestBody PatientBookAppointmentRequest request) {
 
                 return patientService.bookAppointment(request);
@@ -147,14 +146,8 @@ public class PatientController {
         @GetMapping("/profile")
         public User getPatientProfile() {
 
-                return patientService.getPatientProfile();
-        }
-
-        @GetMapping("/{patientId}/profile")
-        public User getPatientProfileById(
-                        @PathVariable Long patientId) {
-
-                return patientService.getPatientProfile(patientId);
+                return patientService
+                                .getPatientProfile();
         }
 
         @PutMapping("/profile/{patientId}")

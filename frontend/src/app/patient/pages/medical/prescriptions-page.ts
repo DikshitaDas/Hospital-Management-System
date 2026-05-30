@@ -36,7 +36,7 @@ export class PatientPrescriptionsPage implements OnInit {
       return;
     }
     forkJoin({
-      profile: this.patientApi.getProfile(this.patientId),
+      profile: this.patientApi.getProfile(),
       prescriptions: this.patientApi.getPrescriptions(this.patientId)
     }).subscribe({
       next: ({ profile, prescriptions }) => {
