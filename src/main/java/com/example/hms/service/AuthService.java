@@ -65,6 +65,7 @@ public class AuthService {
                     null,
                     null,
                     null,
+                    null,
                     null);
         }
 
@@ -78,6 +79,7 @@ public class AuthService {
                     null,
                     null,
                     null,
+                    null,
                     null);
         }
 
@@ -86,6 +88,7 @@ public class AuthService {
                 user.getRole(),
                 user.getUhid(),
                 user.getName(),
+                user.getId(),
                 jwtService.generateToken(user));
     }
 

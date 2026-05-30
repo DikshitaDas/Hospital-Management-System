@@ -1,0 +1,143 @@
+<main class="shell">
+  <app-sidebar role="ADMIN" />
+
+  <section class="workspace">
+    <app-navbar
+      eyebrow="Admin operations"
+      title="Hospital Control Center"
+      [userName]="userName"
+      [showNewPatient]="true"
+      searchPlaceholder="Search patients, doctors, wards"
+      (openDrawer)="openNotifications()"
+      (showSnackbar)="openNotifications()"
+      (openModal)="openSnackbar('Patient creation will connect to POST /api/admin/users next.')"
+      (logout)="logout()"
+    />
+
+    @if (loading()) {
+      <div class="loading-state glass">Loading admin dashboard from backend...</div>
+    } @else if (errorMsg()) {
+      <div class="loading-state glass">{{ errorMsg() }}</div>
+    } @else {
+      <section class="hero-grid">
+        <div class="welcome-banner">
+          <span>MediCare Hub Admin</span>
+          <h2>Unified hospital operations at a glance</h2>
+          <p>
+            Live stats from MySQL via Spring Boot — patients, doctors, appointments, revenue, and ward occupancy.
+          </p>
+        </div>
+
+        <div class="today glass">
+          <span>Registered patients</span>
+          <strong>{{ stats()?.totalPatients ?? 0 }}</strong>
+          <p>Patients in the HMS database eligible for appointments, billing, labs, and admissions.</p>
+          <div class="bar">
+            <i [style.width.%]="bedOccupancyPercent()"></i>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics">
+        <app-metric-card
+          title="Appointments"
+          [value]="String(stats()?.totalAppointments ?? 0)"
+          detail="All booked visits in the system"
+          tone="mint"
+        />
+        <app-metric-card
+          title="Doctors Active"
+          [value]="String(stats()?.totalDoctors ?? 0)"
+          detail="Registered doctor accounts"
+          tone="sky"
+        />
+        <app-metric-card
+          title="Beds Occupied"
+          [value]="bedOccupancyPercent() + '%'"
+          [detail]="(wardOccupancy().length || 0) + ' wards tracked'"
+          tone="warning"
+        />
+        <app-metric-card
+          title="Pending Bills"
+          [value]="String(pendingBills())"
+          [detail]="'Revenue collected: ' + formatRevenue(stats()?.totalRevenue ?? 0)"
+          tone="rose"
+        />
+      </section>
+
+      <section class="content-grid">
+        <article class="panel glass">
+          <header>
+            <div>
+              <span>Live queue</span>
+              <h2>Recent appointments</h2>
+            </div>
+            <button class="ghost-button" type="button" (click)="refresh()">Refresh</button>
+          </header>
+
+          @if (appointments().length === 0) {
+            <div class="empty-state">No appointments yet. Book one via POST /api/admin/appointments.</div>
+          } @else {
+            @for (item of appointments(); track item.id) {
+              <div class="queue">
+                <div>
+                  <strong>{{ item.patient?.name ?? 'Unknown patient' }}</strong>
+                  <span>
+                    Dr. {{ item.doctor?.name ?? 'Unassigned' }} / {{ item.appointmentDate }}
+                    @if (item.tokenNumber) {
+                      · Token #{{ item.tokenNumber }}
+                    }
+                  </span>
+                </div>
+                <b [class]="statusClass(item.status)">{{ item.status }}</b>
+              </div>
+            }
+          }
+        </article>
+
+        <article class="panel glass">
+          <header>
+            <div>
+              <span>Ward occupancy</span>
+              <h2>Bed availability</h2>
+            </div>
+          </header>
+
+          @if (wardOccupancy().length === 0) {
+            <div class="empty-state">No wards configured yet.</div>
+          } @else {
+            <div class="component-list">
+              @for (ward of wardOccupancy(); track ward.wardName) {
+                <span>{{ ward.wardName }}: {{ ward.availableBeds }}/{{ ward.totalBeds }} free</span>
+              }
+            </div>
+          }
+        </article>
+      </section>
+    }
+  </section>
+</main>
+
+<app-drawer [open]="drawerOpen()" title="Care activity" (closed)="drawerOpen.set(false)">
+  <div class="drawer-list">
+    @if (notifications().length === 0) {
+      <article>
+        <strong>No notifications yet</strong>
+        <span>Alerts from the backend will appear here via GET /api/notifications.</span>
+      </article>
+    } @else {
+      @for (note of notifications(); track note.id) {
+        <article>
+          <strong>{{ note.title }}</strong>
+          <span>{{ note.message }}</span>
+        </article>
+      }
+    }
+  </div>
+</app-drawer>
+
+<app-snackbar
+  [open]="snackbarOpen()"
+  [message]="snackbarMessage()"
+  (closed)="snackbarOpen.set(false)"
+/>

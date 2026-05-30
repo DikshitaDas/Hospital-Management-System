@@ -18,13 +18,23 @@
   margin-bottom: 26px;
 }
 
-.brand img {
+.brand img,
+.brand-mark {
   width: 46px;
   height: 46px;
   border-radius: var(--radius);
   object-fit: cover;
   background: white;
   box-shadow: 0 10px 24px rgba(16, 42, 58, 0.12);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  color: var(--primary-strong);
+  font-weight: 900;
+  font-size: 14px;
+  background: linear-gradient(145deg, #fff, var(--mint));
 }
 
 .brand strong,

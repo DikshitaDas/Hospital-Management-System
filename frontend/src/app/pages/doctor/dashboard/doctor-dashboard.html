@@ -1,0 +1,144 @@
+<main class="shell">
+  <app-sidebar role="DOCTOR" />
+
+  <section class="workspace">
+    <app-navbar
+      eyebrow="Doctor workspace"
+      title="Clinical Dashboard"
+      [userName]="userName"
+      searchPlaceholder="Search patients, appointments"
+      (openDrawer)="openNotifications()"
+      (showSnackbar)="openNotifications()"
+      (logout)="logout()"
+    />
+
+    @if (loading()) {
+      <div class="loading-state glass">Loading doctor dashboard from backend...</div>
+    } @else if (errorMsg()) {
+      <div class="loading-state glass">{{ errorMsg() }}</div>
+    } @else {
+      <section class="hero-grid">
+        <div class="welcome-banner">
+          <span>Today's schedule</span>
+          <h2>Patient care starts here</h2>
+          <p>
+            Appointments and lab reports are loaded from GET /api/doctor/dashboard and scoped to your logged-in doctor account.
+          </p>
+        </div>
+
+        <div class="today glass">
+          <span>Today's appointments</span>
+          <strong>{{ stats()?.todayAppointments ?? 0 }}</strong>
+          <p>Patients scheduled for you today based on the appointments table in MySQL.</p>
+          <div class="bar">
+            <i [style.width.%]="Math.min((stats()?.todayAppointments ?? 0) * 12, 100)"></i>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics">
+        <app-metric-card
+          title="Today"
+          [value]="String(stats()?.todayAppointments ?? 0)"
+          detail="Appointments scheduled today"
+          tone="mint"
+        />
+        <app-metric-card
+          title="My Patients"
+          [value]="String(stats()?.totalPatients ?? 0)"
+          detail="Distinct patients you've seen"
+          tone="sky"
+        />
+        <app-metric-card
+          title="Pending Reports"
+          [value]="String(stats()?.pendingReports ?? 0)"
+          detail="Lab reports awaiting review"
+          tone="warning"
+        />
+        <app-metric-card
+          title="Pending Queue"
+          [value]="String(pendingAppointments().length)"
+          detail="Appointments needing action"
+          tone="rose"
+        />
+      </section>
+
+      <section class="content-grid">
+        <article class="panel glass">
+          <header>
+            <div>
+              <span>Today's queue</span>
+              <h2>Patient appointments</h2>
+            </div>
+          </header>
+
+          @if (todayAppointments().length === 0) {
+            <div class="empty-state">No appointments scheduled for today.</div>
+          } @else {
+            @for (item of todayAppointments(); track item.id) {
+              <div class="queue">
+                <div>
+                  <strong>{{ item.patient?.name ?? 'Unknown patient' }}</strong>
+                  <span>
+                    UHID {{ item.patient?.uhid ?? '—' }}
+                    @if (item.tokenNumber) {
+                      · Token #{{ item.tokenNumber }}
+                    }
+                  </span>
+                </div>
+                <b [class]="statusClass(item.status)">{{ item.status }}</b>
+              </div>
+            }
+          }
+        </article>
+
+        <article class="panel glass">
+          <header>
+            <div>
+              <span>Needs attention</span>
+              <h2>Pending appointments</h2>
+            </div>
+          </header>
+
+          @if (pendingAppointments().length === 0) {
+            <div class="empty-state">No pending appointments right now.</div>
+          } @else {
+            @for (item of pendingAppointments(); track item.id) {
+              <div class="queue">
+                <div>
+                  <strong>{{ item.patient?.name ?? 'Unknown patient' }}</strong>
+                  <span>{{ item.appointmentDate }} · update via PUT /api/doctor/appointments/{{ item.id }}/status</span>
+                </div>
+                <b class="warm">{{ item.status }}</b>
+              </div>
+            }
+          }
+        </article>
+      </section>
+    }
+  </section>
+</main>
+
+<app-drawer [open]="drawerOpen()" title="Clinical alerts" (closed)="drawerOpen.set(false)">
+  <div class="drawer-list">
+    @if (notifications().length === 0) {
+      <article>
+        <strong>No alerts</strong>
+        <span>Notifications for your role will appear here.</span>
+      </article>
+    } @else {
+      @for (note of notifications(); track note.id) {
+        <article>
+          <strong>{{ note.title }}</strong>
+          <span>{{ note.message }}</span>
+        </article>
+      }
+    }
+  </div>
+</app-drawer>
+
+<app-snackbar
+  [open]="snackbarOpen()"
+  [message]="snackbarMessage()"
+  (closed)="snackbarOpen.set(false)"
+/>

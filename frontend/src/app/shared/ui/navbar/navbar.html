@@ -4,26 +4,35 @@
   </button>
 
   <div class="headline">
-    <span>Operations center</span>
-    <h1>MediCare Hub</h1>
+    <span>{{ eyebrow() }}</span>
+    <h1>{{ title() }}</h1>
   </div>
 
   <label class="search">
     <span class="sr-only">Search</span>
     <svg lucideSearch size="18"></svg>
-    <input type="search" placeholder="Search patients, doctors, wards" />
+    <input type="search" [placeholder]="searchPlaceholder()" />
   </label>
 
   <div class="actions">
+    @if (userName()) {
+      <span class="user-chip">{{ userName() }}</span>
+    }
     <button class="icon-button" type="button" aria-label="Open drawer" title="Open drawer" (click)="openDrawer.emit()">
       <svg lucidePanelLeft size="20"></svg>
     </button>
     <button class="icon-button" type="button" aria-label="Notifications" title="Notifications" (click)="showSnackbar.emit()">
       <svg lucideBell size="20"></svg>
     </button>
-    <button class="primary-button" type="button" (click)="openModal.emit()">
-      <svg lucidePlus size="18"></svg>
-      <span>New Patient</span>
+    @if (showNewPatient()) {
+      <button class="primary-button" type="button" (click)="openModal.emit()">
+        <svg lucidePlus size="18"></svg>
+        <span>New Patient</span>
+      </button>
+    }
+    <button class="ghost-button logout-button" type="button" (click)="logout.emit()">
+      <svg lucideLogOut size="18"></svg>
+      <span>Logout</span>
     </button>
   </div>
 </header>
