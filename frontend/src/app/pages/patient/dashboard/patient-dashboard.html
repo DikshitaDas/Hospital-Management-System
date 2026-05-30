@@ -22,7 +22,7 @@
           <span>Welcome back</span>
           <h2>{{ profile()?.name ?? userName }}</h2>
           <p>
-            Your UHID is {{ profile()?.uhid ?? '—' }}. Data is loaded from GET /api/patient/dashboard and linked MySQL records.
+            Your UHID is {{ profile()?.uhid ?? '—' }}. Overview of your appointments, bills, and care records.
           </p>
         </div>
 
@@ -52,7 +52,7 @@
         <app-metric-card
           title="Pending Bills"
           [value]="String(stats()?.pendingBills ?? 0)"
-          detail="Pay via PUT /api/patient/bills/{id}/pay"
+          detail="Pay pending bills online"
           tone="rose"
         />
         <app-metric-card

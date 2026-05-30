@@ -1,43 +1,153 @@
 <header class="page-header">
-  <div><span>Wards</span><h1>Admission &amp; Discharge</h1></div>
-  <button class="ghost-button btn-sm" type="button" (click)="loadAll()">Refresh</button>
+  <div>
+    <span>Wards</span>
+    <h1>Admission &amp; Discharge</h1>
+    <p>Admit patients to available beds. Add beds under Bed Allocation before admitting.</p>
+  </div>
+  <div class="page-actions">
+    <button class="ghost-button btn-sm" type="button" appTooltip="Reload admissions and beds" (click)="loadAll()">Refresh</button>
+    <a class="ghost-button btn-sm" routerLink="/admin/wards/allocation" appTooltip="Add beds to wards">Add Beds</a>
+  </div>
 </header>
-@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
-@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
-@else {
-<section class="glass data-panel" style="margin-bottom:12px">
-  <h2 class="section-title">Currently admitted ({{ admitted().length }})</h2>
-  @for (row of admitted(); track row.admission.id) {
-    <article class="activity-list"><strong>{{ row.patient.name }}</strong><span>Bed {{ row.admission.bed?.bedNumber }} · {{ row.admission.bed?.ward?.wardName }}</span></article>
-  } @empty { <div class="empty-box">No admitted patients.</div> }
-</section>
-<section class="glass data-panel form-sections">
-  <form class="form-grid" (ngSubmit)="submitAdmit()">
-    <h3>Admit</h3>
-    <app-searchable-select label="Patient" placeholder="Search patient…" [displayWith]="patientLabel" valueKey="id" [searchFn]="searchPatients" [selectedId]="admitForm.patientId || null" (selectedIdChange)="admitForm.patientId = $event ?? 0" />
-    <app-searchable-select label="Bed" placeholder="Search bed…" [displayWith]="bedLabel" valueKey="id" [staticItems]="beds()" [minSearchLength]="1" [selectedId]="admitForm.bedId || null" (selectedIdChange)="admitForm.bedId = $event ?? 0" />
-    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Admit</button></div>
-  </form>
-  <hr class="compact" />
-  <form class="form-grid" (ngSubmit)="submitDischarge()">
-    <h3>Discharge</h3>
-    <app-searchable-select label="Admitted patient" placeholder="Search…" [displayWith]="admittedPatientLabel" valueKey="id" [staticItems]="admitted().map(r => r.patient)" [minSearchLength]="1" [selectedId]="dischargeId || null" (selectedIdChange)="dischargeId = $event ?? 0" />
-    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Discharge</button></div>
-  </form>
-  <hr class="compact" />
-  <form class="form-grid" (ngSubmit)="submitTransfer()">
-    <h3>Transfer</h3>
-    <app-searchable-select label="Patient" placeholder="Search admitted…" [displayWith]="admittedPatientLabel" valueKey="id" [staticItems]="admitted().map(r => r.patient)" [minSearchLength]="1" [selectedId]="transferForm.patientId || null" (selectedIdChange)="transferForm.patientId = $event ?? 0" />
-    <app-searchable-select label="New bed" placeholder="Search bed…" [displayWith]="bedLabel" valueKey="id" [staticItems]="beds()" [minSearchLength]="1" [selectedId]="transferForm.newBedId || null" (selectedIdChange)="transferForm.newBedId = $event ?? 0" />
-    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Transfer</button></div>
-  </form>
-  <hr class="compact" />
-  <form class="form-grid" (ngSubmit)="submitEmergency()">
-    <h3>Emergency</h3>
-    <app-searchable-select label="Patient" placeholder="Search patient…" [displayWith]="patientLabel" valueKey="id" [searchFn]="searchPatients" [selectedId]="emergencyForm.patientId || null" (selectedIdChange)="emergencyForm.patientId = $event ?? 0" />
-    <label>Ward type<select [(ngModel)]="emergencyForm.wardType" name="weW"><option value="ICU">ICU</option><option value="GENERAL">General</option><option value="PRIVATE">Private</option></select></label>
-    <div class="page-actions"><button class="primary-button btn-sm" type="submit">Emergency admit</button></div>
-  </form>
-</section>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading admissions...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  @if (beds().length === 0) {
+    <div class="alert warn glass data-panel">
+      <strong>No available beds.</strong> Create a ward, then add beds at
+      <a routerLink="/admin/wards/allocation">Bed Allocation</a>.
+      Total beds in DB: {{ allBeds().length }} ({{ allBeds().length - beds().length }} occupied).
+    </div>
+  }
+
+  <section class="content-grid-2">
+    <article class="glass data-panel ui-card">
+      <h2>Admitted patients</h2>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Patient</th><th>Bed</th><th>Ward</th><th>Since</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            @for (row of admitted(); track row.admission.id) {
+              <tr>
+                <td>{{ row.patient.name }}</td>
+                <td>{{ row.admission.bed?.bedNumber ?? '—' }}</td>
+                <td>{{ row.admission.bed?.ward?.wardName ?? '—' }} ({{ row.admission.bed?.ward?.wardType ?? '—' }})</td>
+                <td>{{ row.admission.admissionDate }}</td>
+                <td><span class="badge" [class]="badgeClass(row.admission.status)">{{ row.admission.status }}</span></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="empty-box">No admitted patients.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <div>
+      <app-accordion title="Admit patient" subtitle="Assign patient to an available bed" [open]="true">
+        <form class="form-grid" (ngSubmit)="submitAdmit()">
+          <app-searchable-select
+            label="Patient"
+            placeholder="Search name, UHID, mobile…"
+            [required]="true"
+            [displayWith]="patientLabel"
+            valueKey="id"
+            [searchFn]="searchPatients"
+            [selectedId]="admitForm.patientId || null"
+            (selectedIdChange)="admitForm.patientId = $event ?? 0"
+          />
+          <app-searchable-select
+            label="Available bed"
+            placeholder="Search bed number or ward…"
+            [required]="true"
+            [displayWith]="bedLabel"
+            valueKey="id"
+            [staticItems]="beds()"
+            [minSearchLength]="1"
+            [selectedId]="admitForm.bedId || null"
+            (selectedIdChange)="admitForm.bedId = $event ?? 0"
+          />
+          <div class="page-actions">
+            <button class="ghost-button btn-sm" type="button" (click)="refreshBeds()">Reload beds</button>
+            <button class="primary-button btn-sm" type="submit" appTooltip="Assign patient to selected bed">Admit</button>
+          </div>
+        </form>
+      </app-accordion>
+
+      <app-accordion title="Discharge patient" subtitle="Release bed and close admission">
+        <form class="form-grid" (ngSubmit)="submitDischarge()">
+          <app-searchable-select
+            label="Admitted patient"
+            placeholder="Search admitted patient…"
+            [required]="true"
+            [displayWith]="admittedPatientLabel"
+            valueKey="id"
+            [staticItems]="admittedPatients()"
+            [minSearchLength]="1"
+            [selectedId]="dischargeId || null"
+            (selectedIdChange)="dischargeId = $event ?? 0"
+          />
+          <button class="primary-button btn-sm" type="submit">Discharge</button>
+        </form>
+      </app-accordion>
+
+      <app-accordion title="Transfer patient" subtitle="Move to another available bed">
+        <form class="form-grid" (ngSubmit)="submitTransfer()">
+          <app-searchable-select
+            label="Patient"
+            placeholder="Search admitted patient…"
+            [required]="true"
+            [displayWith]="admittedPatientLabel"
+            valueKey="id"
+            [staticItems]="admittedPatients()"
+            [minSearchLength]="1"
+            [selectedId]="transferForm.patientId || null"
+            (selectedIdChange)="transferForm.patientId = $event ?? 0"
+          />
+          <app-searchable-select
+            label="New bed"
+            placeholder="Search available bed…"
+            [required]="true"
+            [displayWith]="bedLabel"
+            valueKey="id"
+            [staticItems]="beds()"
+            [minSearchLength]="1"
+            [selectedId]="transferForm.newBedId || null"
+            (selectedIdChange)="transferForm.newBedId = $event ?? 0"
+          />
+          <button class="primary-button btn-sm" type="submit">Transfer</button>
+        </form>
+      </app-accordion>
+
+      <app-accordion title="Emergency admission" subtitle="Auto-picks first available bed by ward type">
+        <form class="form-grid" (ngSubmit)="submitEmergency()">
+          <app-searchable-select
+            label="Patient"
+            placeholder="Search patient…"
+            [required]="true"
+            [displayWith]="patientLabel"
+            valueKey="id"
+            [searchFn]="searchPatients"
+            [selectedId]="emergencyForm.patientId || null"
+            (selectedIdChange)="emergencyForm.patientId = $event ?? 0"
+          />
+          <label>Ward type (must match ward record exactly)
+            <select [(ngModel)]="emergencyForm.wardType" name="emergencyWard">
+              <option value="GENERAL">GENERAL</option>
+              <option value="ICU">ICU</option>
+              <option value="PRIVATE">PRIVATE</option>
+            </select>
+          </label>
+          <button class="primary-button btn-sm" type="submit">Emergency admit</button>
+        </form>
+      </app-accordion>
+    </div>
+  </section>
 }
+
 <app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

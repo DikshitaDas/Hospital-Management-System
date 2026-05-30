@@ -22,7 +22,7 @@
           <span>Today's schedule</span>
           <h2>Patient care starts here</h2>
           <p>
-            Appointments and lab reports are loaded from GET /api/doctor/dashboard and scoped to your logged-in doctor account.
+            Appointments and lab reports for your logged-in doctor account.
           </p>
         </div>
 
@@ -107,7 +107,7 @@
               <div class="queue">
                 <div>
                   <strong>{{ item.patient?.name ?? 'Unknown patient' }}</strong>
-                  <span>{{ item.appointmentDate }} · update via PUT /api/doctor/appointments/{{ item.id }}/status</span>
+                  <span>{{ item.appointmentDate }} · update status below</span>
                 </div>
                 <b class="warm">{{ item.status }}</b>
               </div>

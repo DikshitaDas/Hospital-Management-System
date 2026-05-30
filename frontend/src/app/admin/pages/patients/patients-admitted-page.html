@@ -35,8 +35,8 @@
             @for (row of admitted(); track row.admission.id) {
               <tr>
                 <td>{{ row.patient.name }}</td>
-                <td>{{ row.admission.bed.bedNumber }}</td>
-                <td>{{ row.admission.bed.ward.wardName }} ({{ row.admission.bed.ward.wardType }})</td>
+                <td>{{ row.admission.bed?.bedNumber ?? '—' }}</td>
+                <td>{{ row.admission.bed?.ward?.wardName ?? '—' }} ({{ row.admission.bed?.ward?.wardType ?? '—' }})</td>
                 <td>{{ row.admission.admissionDate }}</td>
                 <td><span class="badge" [class]="badgeClass(row.admission.status)">{{ row.admission.status }}</span></td>
               </tr>
@@ -49,7 +49,7 @@
     </article>
 
     <div>
-      <app-accordion title="Admit patient" subtitle="POST /api/admin/admissions" [open]="true">
+      <app-accordion title="Admit patient" subtitle="Assign patient to an available bed" [open]="true">
         <form class="form-grid" (ngSubmit)="submitAdmit()">
           <app-searchable-select
             label="Patient"
@@ -79,7 +79,7 @@
         </form>
       </app-accordion>
 
-      <app-accordion title="Discharge patient" subtitle="PUT /api/admin/admissions/discharge/{patientId}">
+      <app-accordion title="Discharge patient" subtitle="Release bed and close admission">
         <form class="form-grid" (ngSubmit)="submitDischarge()">
           <app-searchable-select
             label="Admitted patient"
@@ -87,7 +87,7 @@
             [required]="true"
             [displayWith]="admittedPatientLabel"
             valueKey="id"
-            [staticItems]="admitted().map(r => r.patient)"
+            [staticItems]="admittedPatients()"
             [minSearchLength]="1"
             [selectedId]="dischargeId || null"
             (selectedIdChange)="dischargeId = $event ?? 0"
@@ -96,7 +96,7 @@
         </form>
       </app-accordion>
 
-      <app-accordion title="Transfer patient" subtitle="PUT /api/admin/admissions/transfer">
+      <app-accordion title="Transfer patient" subtitle="Move to another available bed">
         <form class="form-grid" (ngSubmit)="submitTransfer()">
           <app-searchable-select
             label="Patient"
@@ -104,7 +104,7 @@
             [required]="true"
             [displayWith]="admittedPatientLabel"
             valueKey="id"
-            [staticItems]="admitted().map(r => r.patient)"
+            [staticItems]="admittedPatients()"
             [minSearchLength]="1"
             [selectedId]="transferForm.patientId || null"
             (selectedIdChange)="transferForm.patientId = $event ?? 0"

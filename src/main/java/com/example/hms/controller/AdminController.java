@@ -26,8 +26,10 @@ import com.example.hms.dto.admin.UpdatePatientRequest;
 import com.example.hms.dto.admin.UpdateRoleRequest;
 import com.example.hms.dto.admin.DepartmentRequest;
 import com.example.hms.dto.admin.SpecializationRequest;
+import com.example.hms.dto.admin.PayBillRequest;
 import com.example.hms.dto.admin.UpdateWardRequest;
 import com.example.hms.dto.admin.WardOccupancyResponse;
+import com.example.hms.entity.Admission;
 import com.example.hms.entity.Department;
 import com.example.hms.entity.HospitalProfile;
 import com.example.hms.entity.LabReport;
@@ -203,6 +205,20 @@ public class AdminController {
         return adminService.admitPatient(request);
     }
 
+    @GetMapping("/admissions/active")
+    public List<Admission> getActiveAdmissions() {
+
+        return adminService.getActiveAdmissions();
+    }
+
+    @GetMapping("/patients/{id}/admissions")
+    public List<Admission> getPatientAdmissionHistory(
+
+            @PathVariable Long id) {
+
+        return adminService.getPatientAdmissionHistory(id);
+    }
+
     @PutMapping("/admissions/discharge/{patientId}")
     public String dischargePatient(
             @PathVariable Long patientId) {
@@ -298,9 +314,10 @@ public class AdminController {
 
     @PutMapping("/bills/pay/{id}")
     public String payBill(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            @Valid @RequestBody PayBillRequest request) {
 
-        return adminService.payBill(id);
+        return adminService.payBill(id, request);
     }
 
     @GetMapping("/dashboard/stats")

@@ -48,7 +48,7 @@
                 <td>Rs. {{ d.consultationFee }}</td>
                 <td class="row-actions">
                   <button class="ghost-button btn-sm" type="button" appTooltip="Update doctor profile" (click)="openEdit(d)">Edit</button>
-                  <button class="ghost-button btn-sm" type="button" appTooltip="DELETE /api/admin/doctors/{userId}" (click)="deleteDoctor(d.user.id)">Del</button>
+                  <button class="ghost-button btn-sm" type="button" appTooltip="Remove doctor" (click)="deleteDoctor(d.user.id)">Del</button>
                 </td>
               </tr>
             }

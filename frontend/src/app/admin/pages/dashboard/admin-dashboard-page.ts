@@ -53,7 +53,7 @@ export class AdminDashboardPage implements OnInit {
       image: '',
       eyebrow: 'Live data',
       title: 'Real-time dashboards',
-      description: 'Stats from GET /api/admin/dashboard/stats and related endpoints.'
+      description: 'Live counts for patients, doctors, appointments, and revenue.'
     }
   ];
 

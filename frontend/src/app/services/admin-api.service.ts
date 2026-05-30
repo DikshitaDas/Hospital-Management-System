@@ -18,6 +18,7 @@ import {
   BookAppointmentRequest,
   ChangePasswordRequest,
   CreateBillRequest,
+  PayBillRequest,
   CreateBloodRequest,
   CreateLabTestRequest,
   CreatePrescriptionRequest,
@@ -54,7 +55,6 @@ import {
 @Injectable({ providedIn: 'root' })
 export class AdminApiService {
   private readonly base = `${API_BASE_URL}/admin`;
-  private readonly patientBase = `${API_BASE_URL}/patient`;
 
   constructor(private http: HttpClient) {}
 
@@ -89,7 +89,11 @@ export class AdminApiService {
   }
 
   getPatientAdmissions(patientId: number): Observable<Admission[]> {
-    return this.http.get<Admission[]>(`${this.patientBase}/${patientId}/admissions`);
+    return this.http.get<Admission[]>(`${this.base}/patients/${patientId}/admissions`);
+  }
+
+  getActiveAdmissions(): Observable<Admission[]> {
+    return this.http.get<Admission[]>(`${this.base}/admissions/active`);
   }
 
   // Doctors
@@ -202,8 +206,8 @@ export class AdminApiService {
     return this.http.post(`${this.base}/bills`, body, { responseType: 'text' });
   }
 
-  payBill(id: number): Observable<string> {
-    return this.http.put(`${this.base}/bills/pay/${id}`, {}, { responseType: 'text' });
+  payBill(id: number, body: PayBillRequest): Observable<string> {
+    return this.http.put(`${this.base}/bills/pay/${id}`, body, { responseType: 'text' });
   }
 
   // Blood bank

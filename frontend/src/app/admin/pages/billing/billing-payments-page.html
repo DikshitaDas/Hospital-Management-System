@@ -23,7 +23,7 @@
               <td>{{ b.patient?.uhid }}</td>
               <td>Rs. {{ b.amount }}</td>
               <td class="row-actions">
-                <button class="primary-button btn-sm" type="button" (click)="pay(b.id)">Pay</button>
+                <button class="primary-button btn-sm" type="button" (click)="openPayModal(b)">Pay</button>
                 <button class="ghost-button btn-sm" type="button" (click)="downloadInvoice(b)">Invoice</button>
               </td>
             </tr>
@@ -38,13 +38,14 @@
     <h2 class="section-title">Paid bills</h2>
     <div class="data-table-wrap">
       <table class="data-table">
-        <thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Method</th><th>Status</th><th></th></tr></thead>
         <tbody>
           @for (b of filterBills(paidBills()); track b.id) {
             <tr>
               <td>{{ b.id }}</td>
               <td>{{ b.patient?.name }}</td>
               <td>Rs. {{ b.amount }}</td>
+              <td>{{ b.paymentMethod ?? '—' }}</td>
               <td><span class="badge mint">{{ b.status }}</span></td>
               <td class="row-actions">
                 <button class="ghost-button btn-sm" type="button" (click)="downloadInvoice(b)">Receipt</button>
@@ -57,4 +58,22 @@
   </article>
 </section>
 }
+
+<app-modal [open]="payModalOpen()" title="Record payment" (closed)="closePayModal()">
+  @if (payingBill(); as bill) {
+    <p class="pay-summary">Invoice #{{ bill.id }} · {{ bill.patient?.name }} · Rs. {{ bill.amount }}</p>
+    <label>Payment method
+      <select [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" name="paymentMethod">
+        @for (m of paymentMethods; track m) {
+          <option [value]="m">{{ m.replace('_', ' ') }}</option>
+        }
+      </select>
+    </label>
+    <div class="page-actions">
+      <button class="ghost-button btn-sm" type="button" (click)="closePayModal()">Cancel</button>
+      <button class="primary-button btn-sm" type="button" (click)="confirmPay()">Confirm payment</button>
+    </div>
+  }
+</app-modal>
+
 <app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

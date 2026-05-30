@@ -64,8 +64,15 @@ export interface Bill {
   billType: string;
   status: string;
   billDate: string;
+  paymentMethod?: string;
   patient: User;
 }
+
+export interface PayBillRequest {
+  paymentMethod: string;
+}
+
+export const PAYMENT_METHODS = ['CASH', 'CARD', 'UPI', 'NET_BANKING', 'CHEQUE'] as const;
 
 export interface BloodStock {
   id: number;

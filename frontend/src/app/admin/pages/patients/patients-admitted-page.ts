@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { AdminApiService } from '../../../services/admin-api.service';
 import {
   Admission,
@@ -61,6 +61,10 @@ export class PatientsAdmittedPage implements OnInit {
     this.loadAll();
   }
 
+  protected admittedPatients(): User[] {
+    return this.admitted().map(r => r.patient);
+  }
+
   protected loadAll(): void {
     this.loading.set(true);
     this.errorMsg.set('');
@@ -68,31 +72,19 @@ export class PatientsAdmittedPage implements OnInit {
       patients: this.adminApi.getAllPatients(),
       beds: this.adminApi.getAvailableBeds(),
       allBeds: this.adminApi.getAllBeds(),
-      wards: this.adminApi.getAllWards()
-    }).pipe(
-      switchMap(({ patients, beds, allBeds, wards }) => {
-        if (!patients.length) {
-          return of({ patients, beds, allBeds, wards, admissions: [] as AdmittedRow[] });
-        }
-        return forkJoin(
-          patients.map(p =>
-            this.adminApi.getPatientAdmissions(p.id).pipe(
-              map(list =>
-                list
-                  .filter(a => a.status?.toUpperCase() === 'ADMITTED')
-                  .map(a => ({ patient: p, admission: a }))
-              )
-            )
-          )
-        ).pipe(map(nested => ({ patients, beds, allBeds, wards, admissions: nested.flat() })));
-      })
-    ).subscribe({
-      next: ({ patients, beds, allBeds, wards, admissions }) => {
+      wards: this.adminApi.getAllWards(),
+      activeAdmissions: this.adminApi.getActiveAdmissions()
+    }).subscribe({
+      next: ({ patients, beds, allBeds, wards, activeAdmissions }) => {
         this.patients.set(patients);
         this.beds.set(beds);
         this.allBeds.set(allBeds);
         this.wards.set(wards);
-        this.admitted.set(admissions);
+        this.admitted.set(
+          activeAdmissions
+            .filter(a => a.patient && a.status?.toUpperCase() === 'ADMITTED')
+            .map(a => ({ patient: a.patient, admission: a }))
+        );
         this.loading.set(false);
       },
       error: () => {

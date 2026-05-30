@@ -16,4 +16,6 @@ public interface AdmissionRepository
                         String status);
 
         List<Admission> findByPatientId(Long patientId);
+
+        List<Admission> findByStatus(String status);
 }

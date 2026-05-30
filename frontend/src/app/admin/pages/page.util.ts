@@ -67,6 +67,7 @@ export function downloadBillInvoice(bill: {
   billType: string;
   status: string;
   billDate: string;
+  paymentMethod?: string;
 }): void {
   const html = `
     <table>
@@ -78,6 +79,7 @@ export function downloadBillInvoice(bill: {
       <tr><th>Amount</th><td>Rs. ${bill.amount}</td></tr>
       <tr><th>Date</th><td>${bill.billDate}</td></tr>
       <tr><th>Status</th><td>${bill.status}</td></tr>
+      ${bill.paymentMethod ? `<tr><th>Payment method</th><td>${bill.paymentMethod}</td></tr>` : ''}
     </table>`;
   downloadPrintableHtml(`invoice-${bill.id}.pdf`, `Invoice #${bill.id}`, html);
 }

@@ -23,6 +23,8 @@ public class Bill {
 
     private LocalDate billDate;
 
+    private String paymentMethod;
+
     // MANY BILLS -> ONE PATIENT
     @ManyToOne
     @JoinColumn(name = "patient_id")

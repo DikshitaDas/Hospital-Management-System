@@ -27,6 +27,7 @@ import com.example.hms.dto.admin.UpdateRoleRequest;
 import com.example.hms.dto.admin.DepartmentRequest;
 import com.example.hms.dto.admin.HospitalProfileRequest;
 import com.example.hms.dto.admin.SpecializationRequest;
+import com.example.hms.dto.admin.PayBillRequest;
 import com.example.hms.dto.admin.UpdateWardRequest;
 import com.example.hms.dto.admin.WardOccupancyResponse;
 import com.example.hms.entity.Admission;
@@ -870,7 +871,17 @@ public class AdminService {
                 return billRepository.findAll();
         }
 
-        public String payBill(Long billId) {
+        public List<Admission> getActiveAdmissions() {
+
+                return admissionRepository.findByStatus("ADMITTED");
+        }
+
+        public List<Admission> getPatientAdmissionHistory(Long patientId) {
+
+                return admissionRepository.findByPatientId(patientId);
+        }
+
+        public String payBill(Long billId, PayBillRequest request) {
 
                 Bill bill = billRepository
                                 .findById(billId)
@@ -887,6 +898,7 @@ public class AdminService {
 
                 // UPDATE STATUS
                 bill.setStatus("PAID");
+                bill.setPaymentMethod(request.getPaymentMethod().trim().toUpperCase());
 
                 billRepository.save(bill);
 
