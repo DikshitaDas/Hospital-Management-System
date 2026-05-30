@@ -1,0 +1,23 @@
+@use '../../styles/patient-shared';
+
+.form-section {
+  max-width: 420px;
+}
+
+.availability-result {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 100, 100, 0.08);
+}
+
+.availability-result.available {
+  background: rgba(95, 208, 186, 0.12);
+}
+
+.availability-result p {
+  margin: 4px 0 0;
+}
+
+.availability-result small {
+  color: var(--muted);
+}

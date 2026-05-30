@@ -1,0 +1,54 @@
+<header class="page-header">
+  <div><span>Appointments</span><h1>My appointments</h1><p>Track status, reschedule, or cancel visits.</p></div>
+  <button class="ghost-button btn-sm" type="button" (click)="load()">Refresh</button>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>ID</th><th>Doctor</th><th>Date</th><th>Token</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @for (a of appointments(); track a.id) {
+            <tr>
+              <td>{{ a.id }}</td>
+              <td>{{ a.doctor?.name ?? '—' }}</td>
+              <td>{{ a.appointmentDate }}</td>
+              <td>{{ a.tokenNumber ?? '—' }}</td>
+              <td><span class="badge" [class]="badgeClass(a.status)">{{ a.status }}</span></td>
+              <td class="row-actions">
+                @if (canModify(a)) {
+                  <button class="ghost-button btn-sm" type="button" (click)="openReschedule(a)">Reschedule</button>
+                  <button class="ghost-button btn-sm" type="button" (click)="cancel(a.id)">Cancel</button>
+                } @else {
+                  <span class="muted-text">—</span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty-box">No appointments yet. Book your first visit.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-modal [open]="rescheduleOpen()" title="Reschedule appointment" (closed)="rescheduleOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitReschedule()">
+    <app-date-picker label="New date" [value]="rescheduleDate" (valueChange)="rescheduleDate = $event" />
+    @if (dateError()) { <p class="field-error">{{ dateError() }}</p> }
+    <div class="page-actions">
+      <button class="ghost-button btn-sm" type="button" (click)="rescheduleOpen.set(false)">Close</button>
+      <button class="primary-button btn-sm" type="submit">Save</button>
+    </div>
+  </form>
+</app-modal>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

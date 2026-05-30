@@ -1,0 +1,56 @@
+<header class="page-header">
+  <div><span>Profile</span><h1>My profile</h1><p>Update your details and account security.</p></div>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="account-hero glass">
+    <div class="avatar-wrap">
+      @if (avatarUrl) {
+        <img [src]="avatarUrl" alt="Profile" />
+      } @else {
+        <span class="avatar-fallback">{{ profileForm.name.charAt(0) || 'P' }}</span>
+      }
+    </div>
+    <div>
+      <h2>{{ profileForm.name }}</h2>
+      <p>UHID {{ profile()?.uhid }} · PATIENT</p>
+    </div>
+  </section>
+
+  <div class="content-grid-2">
+    <article class="glass data-panel ui-card">
+      <h2>Profile photo</h2>
+      <app-file-upload label="Upload photo" accept="image/*" [previewUrl]="avatarUrl" (fileSelected)="onAvatar($event)" />
+      <hr class="compact" />
+      <h2>Personal details</h2>
+      <form class="form-grid" (ngSubmit)="saveProfile()">
+        <label>Name<input [(ngModel)]="profileForm.name" name="pname" required /></label>
+        <label>Gender
+          <select [(ngModel)]="profileForm.gender" name="pgender">
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </label>
+        <label>Age<input [(ngModel)]="profileForm.age" name="page" type="number" required /></label>
+        <label>Mobile<input [(ngModel)]="profileForm.mobile" name="pmobile" required /></label>
+        <div class="page-actions"><button class="primary-button btn-sm" type="submit">Save profile</button></div>
+      </form>
+    </article>
+
+    <article class="glass data-panel ui-card">
+      <h2>Security</h2>
+      <form class="form-grid" (ngSubmit)="changePassword()">
+        <label>Current password<input [(ngModel)]="passwordForm.oldPassword" name="old" type="password" required /></label>
+        <label>New password<input [(ngModel)]="passwordForm.newPassword" name="new" type="password" required minlength="8" /></label>
+        <div class="page-actions"><button class="primary-button btn-sm" type="submit">Change password</button></div>
+      </form>
+    </article>
+  </div>
+}
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

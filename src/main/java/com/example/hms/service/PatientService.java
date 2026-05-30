@@ -3,8 +3,13 @@ package com.example.hms.service;
 import com.example.hms.dto.ChangePasswordRequest;
 import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
+import com.example.hms.dto.admin.BookAppointmentRequest;
+import com.example.hms.dto.admin.BookAppointmentResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
+import com.example.hms.dto.admin.PayBillRequest;
+import com.example.hms.dto.patient.PatientBookAppointmentRequest;
 import com.example.hms.dto.patient.PatientDashboardResponse;
+import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.User;
 import com.example.hms.repository.UserRepository;
@@ -91,6 +96,48 @@ public class PatientService {
                                 .findByPatientId(patientId);
         }
 
+        public List<DoctorProfile> searchDoctors(String name) {
+
+                return adminService.searchDoctors(name);
+        }
+
+        public BookAppointmentResponse bookAppointment(
+                        PatientBookAppointmentRequest request) {
+
+                User patient = getCurrentPatient();
+
+                BookAppointmentRequest book = new BookAppointmentRequest();
+                book.setPatientId(patient.getId());
+                book.setDoctorId(request.getDoctorId());
+                book.setAppointmentDate(request.getAppointmentDate());
+
+                BookAppointmentResponse response = adminService.bookAppointment(book);
+
+                if (response.getBillId() != null
+                                && Boolean.TRUE.equals(request.getPayNow())) {
+
+                        String method = request.getPaymentMethod();
+
+                        if (method == null || method.isBlank()) {
+                                method = "UPI";
+                        }
+
+                        PayBillRequest pay = new PayBillRequest();
+                        pay.setPaymentMethod(method);
+
+                        payBill(response.getBillId(), pay);
+
+                        response.setMessage(
+                                        "Appointment booked and consultation fee paid (Rs. "
+                                                        + response.getConsultationFee()
+                                                        + ").");
+
+                        response.setBillStatus("PAID");
+                }
+
+                return response;
+        }
+
         public String cancelAppointment(
                         Long appointmentId) {
 
@@ -158,8 +205,9 @@ public class PatientService {
                                 .findByPatientId(patientId);
         }
 
-        public String payBill(
-                        Long billId) {
+        public String payBill(Long billId, PayBillRequest request) {
+
+                User patient = getCurrentPatient();
 
                 Bill bill = billRepository
                                 .findById(billId)
@@ -169,7 +217,16 @@ public class PatientService {
                         return "Bill not found!";
                 }
 
+                if (!bill.getPatient().getId().equals(patient.getId())) {
+                        return "You can only pay your own bills!";
+                }
+
+                if ("PAID".equals(bill.getStatus())) {
+                        return "Bill already paid!";
+                }
+
                 bill.setStatus("PAID");
+                bill.setPaymentMethod(request.getPaymentMethod().trim().toUpperCase());
 
                 billRepository.save(bill);
 
@@ -202,20 +259,54 @@ public class PatientService {
                                                 bloodGroup);
         }
 
-        public String requestBlood(
-                        CreateBloodRequest request) {
+        public String requestBlood(CreateBloodRequest request) {
 
-                return adminService
-                                .requestBlood(request);
+                User patient = getCurrentPatient();
+                request.setPatientId(patient.getId());
+
+                return adminService.requestBlood(request);
         }
 
         public User getPatientProfile() {
 
+                return resolveCurrentPatient();
+        }
+
+        public User getPatientProfile(Long patientId) {
+
+                User current = resolveCurrentPatient();
+
+                if (!current.getId().equals(patientId)) {
+                        throw new IllegalStateException(
+                                        "You can only view your own profile.");
+                }
+
+                return current;
+        }
+
+        private User resolveCurrentPatient() {
+
+                User fromContext = SecurityUtils.getCurrentUser();
+
+                if (fromContext != null) {
+                        return fromContext;
+                }
+
                 String uhid = SecurityUtils.getCurrentUhid();
 
-                return userRepository
-                                .findByUhid(uhid)
-                                .orElse(null);
+                if (uhid != null && !uhid.isBlank()) {
+                        return userRepository
+                                        .findByUhid(uhid)
+                                        .orElseThrow(() -> new IllegalStateException(
+                                                        "Patient not found"));
+                }
+
+                throw new IllegalStateException("Not authenticated");
+        }
+
+        private User getCurrentPatient() {
+
+                return resolveCurrentPatient();
         }
 
         public String updatePatientProfile(

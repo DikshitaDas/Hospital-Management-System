@@ -1,0 +1,19 @@
+@use '../styles/patient-shared';
+
+.patient-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.patient-main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.patient-content {
+  padding: 16px 18px 24px;
+  overflow: auto;
+}

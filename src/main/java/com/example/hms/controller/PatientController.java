@@ -4,7 +4,11 @@ import com.example.hms.dto.ChangePasswordRequest;
 import com.example.hms.dto.UpdateProfileRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.CreateBloodRequest;
+import com.example.hms.dto.admin.PayBillRequest;
+import com.example.hms.dto.admin.BookAppointmentResponse;
+import com.example.hms.dto.patient.PatientBookAppointmentRequest;
 import com.example.hms.dto.patient.PatientDashboardResponse;
+import com.example.hms.entity.DoctorProfile;
 import com.example.hms.entity.Admission;
 import com.example.hms.entity.Appointment;
 import com.example.hms.entity.Bill;
@@ -45,6 +49,20 @@ public class PatientController {
                 return patientService
                                 .getPatientAppointments(
                                                 patientId);
+        }
+
+        @GetMapping("/doctors/search")
+        public List<DoctorProfile> searchDoctors(
+                        @RequestParam String name) {
+
+                return patientService.searchDoctors(name);
+        }
+
+        @PostMapping("/appointments")
+        public BookAppointmentResponse bookAppointment(
+                        @Valid @RequestBody PatientBookAppointmentRequest request) {
+
+                return patientService.bookAppointment(request);
         }
 
         @PutMapping("/appointments/{id}/cancel")
@@ -91,11 +109,10 @@ public class PatientController {
 
         @PutMapping("/bills/{billId}/pay")
         public String payBill(
+                        @PathVariable Long billId,
+                        @Valid @RequestBody PayBillRequest request) {
 
-                        @PathVariable Long billId) {
-
-                return patientService
-                                .payBill(billId);
+                return patientService.payBill(billId, request);
         }
 
         @GetMapping("/{patientId}/admissions")
@@ -130,8 +147,14 @@ public class PatientController {
         @GetMapping("/profile")
         public User getPatientProfile() {
 
-                return patientService
-                                .getPatientProfile();
+                return patientService.getPatientProfile();
+        }
+
+        @GetMapping("/{patientId}/profile")
+        public User getPatientProfileById(
+                        @PathVariable Long patientId) {
+
+                return patientService.getPatientProfile(patientId);
         }
 
         @PutMapping("/profile/{patientId}")

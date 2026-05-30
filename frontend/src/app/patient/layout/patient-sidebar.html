@@ -1,0 +1,36 @@
+<aside class="sidebar glass">
+  <div class="brand">
+    <div class="brand-mark">MH</div>
+    <div>
+      <strong>MediCare Hub</strong>
+      <span>Patient Portal</span>
+    </div>
+  </div>
+
+  <nav aria-label="Patient navigation">
+    @for (item of nav; track item.label) {
+      @if (item.route) {
+        <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <span class="icon">▣</span>
+          <span>{{ item.label }}</span>
+        </a>
+      } @else if (item.children) {
+        @let key = groupKey(item.label);
+        <div class="nav-group">
+          <button type="button" class="group-toggle" (click)="toggleGroup(key)">
+            <span class="icon">▤</span>
+            <span>{{ item.label }}</span>
+            <span class="chevron">{{ expanded()[key] ? '▾' : '▸' }}</span>
+          </button>
+          @if (expanded()[key]) {
+            <div class="submenu">
+              @for (child of item.children; track child.route) {
+                <a [routerLink]="child.route" routerLinkActive="active">{{ child.label }}</a>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </nav>
+</aside>

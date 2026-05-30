@@ -1,0 +1,43 @@
+<header class="page-header">
+  <div><span>Payments</span><h1>Payment history</h1><p>Paid invoices and downloadable receipts.</p></div>
+</header>
+
+<div class="toolbar glass data-panel">
+  <input type="search" placeholder="Search invoice #, type, method…" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+</div>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Invoice #</th><th>Type</th><th>Date</th><th>Amount</th><th>Method</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (b of filtered(); track b.id) {
+            <tr>
+              <td>{{ b.id }}</td>
+              <td>{{ b.billType }}</td>
+              <td>{{ b.billDate }}</td>
+              <td>Rs. {{ b.amount }}</td>
+              <td>{{ b.paymentMethod ?? '—' }}</td>
+              <td class="row-actions">
+                <button class="ghost-button btn-sm" type="button" (click)="downloadReceipt(b)">Receipt</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-box">
+                No paid bills yet. Pay a pending bill under Bills, or use Pay consultation fee now when booking.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}

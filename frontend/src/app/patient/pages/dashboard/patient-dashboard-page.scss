@@ -1,0 +1,7 @@
+@use '../../styles/patient-shared';
+
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

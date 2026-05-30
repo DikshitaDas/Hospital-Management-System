@@ -1,0 +1,41 @@
+<header class="page-header">
+  <div><span>Medical Records</span><h1>Prescriptions</h1><p>View and download your prescription history.</p></div>
+  <button class="ghost-button btn-sm" type="button" (click)="downloadAll()">Download all</button>
+</header>
+
+<div class="toolbar glass data-panel">
+  <input type="search" placeholder="Search diagnosis, medicine, date…" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+</div>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Date</th><th>Doctor</th><th>Diagnosis</th><th>Medicines</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (p of filtered(); track p.id) {
+            <tr>
+              <td>{{ p.appointment?.appointmentDate ?? '—' }}</td>
+              <td>{{ p.appointment?.doctor?.name ?? '—' }}</td>
+              <td>{{ p.diagnosis }}</td>
+              <td>{{ p.medicines }}</td>
+              <td class="row-actions">
+                <button class="ghost-button btn-sm" type="button" (click)="downloadOne(p)">Download</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty-box">No prescriptions on file.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

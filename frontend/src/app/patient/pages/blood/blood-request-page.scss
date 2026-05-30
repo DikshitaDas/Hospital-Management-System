@@ -1,0 +1,12 @@
+@use '../../styles/patient-shared';
+
+.form-section {
+  max-width: 420px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}

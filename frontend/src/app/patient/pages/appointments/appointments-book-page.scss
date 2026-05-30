@@ -1,0 +1,11 @@
+@use '../../styles/patient-shared';
+
+.form-section {
+  max-width: 520px;
+}
+
+.field-error {
+  color: var(--rose);
+  font-size: 12px;
+  margin: 0;
+}

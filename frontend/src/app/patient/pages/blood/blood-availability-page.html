@@ -1,0 +1,35 @@
+<header class="page-header">
+  <div><span>Blood Request</span><h1>Blood availability</h1><p>Check live stock for a blood group before requesting.</p></div>
+</header>
+
+<section class="glass data-panel ui-card form-section">
+  <form class="form-grid" (ngSubmit)="check()">
+    <label>Blood group
+      <select [(ngModel)]="bloodGroup" name="bg" required>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+      </select>
+    </label>
+    <div class="page-actions">
+      <button class="primary-button btn-sm" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Checking…' : 'Check availability' }}
+      </button>
+    </div>
+  </form>
+
+  @if (result(); as r) {
+    <hr class="compact" />
+    <div class="availability-result" [class.available]="r.available">
+      <strong>{{ r.bloodGroup }}</strong>
+      <p>{{ r.available ? 'Available' : 'Not available' }} · {{ r.unitsAvailable }} unit(s) in stock</p>
+    </div>
+  }
+</section>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

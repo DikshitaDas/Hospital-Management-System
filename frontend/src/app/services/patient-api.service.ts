@@ -2,7 +2,20 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/api.config';
-import { Appointment } from '../admin/models/admin.models';
+import {
+  Appointment,
+  Bill,
+  BloodAvailability,
+  ChangePasswordRequest,
+  CreateBloodRequest,
+  BookAppointmentResponse,
+  DoctorProfile,
+  LabReport,
+  PayBillRequest,
+  Prescription,
+  UpdateProfileRequest,
+  User
+} from '../admin/models/admin.models';
 
 export interface PatientDashboardStats {
   totalAppointments: number;
@@ -11,14 +24,15 @@ export interface PatientDashboardStats {
   admitted: boolean;
 }
 
-export interface PatientProfile {
-  id: number;
-  uhid: string;
-  name: string;
-  gender: string;
-  age: number;
-  mobile: string;
-  role: string;
+export interface PatientBookAppointmentRequest {
+  doctorId: number;
+  appointmentDate: string;
+  payNow?: boolean;
+  paymentMethod?: string;
+}
+
+export interface RescheduleAppointmentRequest {
+  appointmentDate: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -31,11 +45,64 @@ export class PatientApiService {
     return this.http.get<PatientDashboardStats>(`${this.base}/dashboard/${patientId}`);
   }
 
+  getProfile(patientId?: number): Observable<User> {
+    if (patientId != null) {
+      return this.http.get<User>(`${this.base}/${patientId}/profile`);
+    }
+    return this.http.get<User>(`${this.base}/profile`);
+  }
+
+  updateProfile(patientId: number, body: UpdateProfileRequest): Observable<string> {
+    return this.http.put(`${this.base}/profile/${patientId}`, body, { responseType: 'text' });
+  }
+
+  changePassword(patientId: number, body: ChangePasswordRequest): Observable<string> {
+    return this.http.put(`${this.base}/profile/${patientId}/password`, body, { responseType: 'text' });
+  }
+
   getAppointments(patientId: number): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.base}/${patientId}/appointments`);
   }
 
-  getProfile(): Observable<PatientProfile> {
-    return this.http.get<PatientProfile>(`${this.base}/profile`);
+  searchDoctors(name: string): Observable<DoctorProfile[]> {
+    return this.http.get<DoctorProfile[]>(`${this.base}/doctors/search`, {
+      params: { name: name.trim() }
+    });
+  }
+
+  bookAppointment(body: PatientBookAppointmentRequest): Observable<BookAppointmentResponse> {
+    return this.http.post<BookAppointmentResponse>(`${this.base}/appointments`, body);
+  }
+
+  cancelAppointment(id: number): Observable<string> {
+    return this.http.put(`${this.base}/appointments/${id}/cancel`, {}, { responseType: 'text' });
+  }
+
+  rescheduleAppointment(id: number, body: RescheduleAppointmentRequest): Observable<string> {
+    return this.http.put(`${this.base}/appointments/${id}/reschedule`, body, { responseType: 'text' });
+  }
+
+  getPrescriptions(patientId: number): Observable<Prescription[]> {
+    return this.http.get<Prescription[]>(`${this.base}/${patientId}/prescriptions`);
+  }
+
+  getBills(patientId: number): Observable<Bill[]> {
+    return this.http.get<Bill[]>(`${this.base}/${patientId}/bills`);
+  }
+
+  payBill(billId: number, body: PayBillRequest): Observable<string> {
+    return this.http.put(`${this.base}/bills/${billId}/pay`, body, { responseType: 'text' });
+  }
+
+  checkBloodAvailability(bloodGroup: string): Observable<BloodAvailability> {
+    return this.http.get<BloodAvailability>(`${this.base}/blood-stock/${bloodGroup}`);
+  }
+
+  requestBlood(body: Omit<CreateBloodRequest, 'patientId'>): Observable<string> {
+    return this.http.post(`${this.base}/blood-requests`, body, { responseType: 'text' });
+  }
+
+  getLabReports(patientId: number): Observable<LabReport[]> {
+    return this.http.get<LabReport[]>(`${this.base}/${patientId}/lab-reports`);
   }
 }

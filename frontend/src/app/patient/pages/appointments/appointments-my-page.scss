@@ -1,0 +1,11 @@
+@use '../../styles/patient-shared';
+
+.field-error {
+  color: var(--rose);
+  font-size: 12px;
+}
+
+.muted-text {
+  color: var(--muted);
+  font-size: 12px;
+}

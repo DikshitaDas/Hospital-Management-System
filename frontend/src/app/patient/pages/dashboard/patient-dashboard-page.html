@@ -1,0 +1,101 @@
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading dashboard…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <header class="page-header">
+    <div>
+      <span>Patient portal</span>
+      <h1>My Health Dashboard</h1>
+      <p>Welcome, {{ profileName() }}</p>
+    </div>
+    <button class="ghost-button btn-sm" type="button" (click)="openNotifications()">Notifications</button>
+  </header>
+
+  <section class="hero-row">
+    <app-carousel class="hero-carousel" [slides]="slides" />
+    <div class="today glass ui-card">
+      <span>Upcoming appointments</span>
+      <strong>{{ upcomingCount() }}</strong>
+      <p>{{ pendingBillsCount() }} pending bill(s)</p>
+      <div class="bar"><i [style.width.%]="Math.min(upcomingCount() * 12, 100)"></i></div>
+    </div>
+  </section>
+
+  <section class="metrics-row">
+    <app-metric-card
+      title="Upcoming appointments"
+      [value]="String(upcomingCount())"
+      detail="Scheduled visits ahead"
+      tone="mint"
+    />
+    <app-metric-card
+      title="Pending bills"
+      [value]="String(pendingBillsCount())"
+      detail="Awaiting payment"
+      tone="rose"
+    />
+    <app-metric-card
+      title="Prescriptions"
+      [value]="String(stats()?.totalPrescriptions ?? 0)"
+      detail="On your medical record"
+      tone="sky"
+    />
+    <app-metric-card
+      title="Admission"
+      [value]="stats()?.admitted ? 'Yes' : 'No'"
+      detail="Current ward status"
+      tone="warning"
+    />
+  </section>
+
+  <section class="content-grid-2">
+    <article class="glass data-panel ui-card">
+      <h2>Recent activity</h2>
+      @if (activities().length === 0) {
+        <div class="empty-box">No recent activity yet.</div>
+      } @else {
+        <div class="activity-list">
+          @for (item of activities(); track item.label + item.date) {
+            <article>
+              <strong>{{ item.label }}</strong>
+              <span>{{ item.detail }}</span>
+              <span class="badge" [class]="badgeClass(item.status)">{{ item.status }}</span>
+            </article>
+          }
+        </div>
+      }
+    </article>
+
+    <article class="glass data-panel ui-card">
+      <h2>Quick links</h2>
+      <div class="quick-links">
+        <a routerLink="/patient/appointments/book" class="ghost-button btn-sm">Book appointment</a>
+        <a routerLink="/patient/payments/bills" class="ghost-button btn-sm">Pay bills</a>
+        <a routerLink="/patient/medical/prescriptions" class="ghost-button btn-sm">Prescriptions</a>
+        <a routerLink="/patient/lab/reports" class="ghost-button btn-sm">Lab reports</a>
+      </div>
+      <hr class="compact" />
+      <header class="page-header" style="margin-bottom:8px">
+        <h2 style="margin:0;font-size:15px">Updates</h2>
+      </header>
+      <div class="activity-list">
+        @for (note of notifications(); track note.id) {
+          <article><strong>{{ note.title }}</strong><span>{{ note.message }}</span></article>
+        } @empty {
+          <div class="empty-box">No notifications.</div>
+        }
+      </div>
+    </article>
+  </section>
+}
+
+<app-drawer [open]="drawerOpen()" title="Health updates" (closed)="drawerOpen.set(false)">
+  <div class="activity-list">
+    @for (note of notifications(); track note.id) {
+      <article><strong>{{ note.title }}</strong><span>{{ note.message }}</span></article>
+    }
+  </div>
+</app-drawer>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

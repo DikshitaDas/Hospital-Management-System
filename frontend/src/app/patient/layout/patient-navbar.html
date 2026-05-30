@@ -1,0 +1,60 @@
+<header class="navbar glass">
+  <div class="brand-row">
+    <div class="brand-mark">MH</div>
+    <div>
+      <span>MediCare Hub</span>
+      <strong>Patient Portal</strong>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="icon-button" type="button" title="Notifications" (click)="openNotifications()">
+      🔔
+      @if (notifications().length) {
+        <i class="dot"></i>
+      }
+    </button>
+
+    <div class="profile-menu">
+      <button class="profile-button" type="button" (click)="toggleProfile(); $event.stopPropagation()">
+        @if (avatarUrl) {
+          <img class="avatar-img" [src]="avatarUrl" alt="" />
+        } @else {
+          <span class="avatar">{{ userName.charAt(0) }}</span>
+        }
+        <span class="profile-text">
+          <strong>{{ userName }}</strong>
+          <small>{{ userUhid }}</small>
+        </span>
+        <span class="chevron">{{ profileOpen() ? '▴' : '▾' }}</span>
+      </button>
+      @if (profileOpen()) {
+        <div class="profile-dropdown glass" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <strong>{{ userName }}</strong>
+            <small>{{ userUhid }}</small>
+          </div>
+          <button type="button" (click)="goProfile()">My profile</button>
+          <button type="button" class="logout-item" (click)="logout()">Sign out</button>
+        </div>
+      }
+    </div>
+  </div>
+</header>
+
+<app-drawer [open]="drawerOpen()" title="Health updates" (closed)="drawerOpen.set(false)">
+  <div class="drawer-list">
+    @if (notifications().length === 0) {
+      <article><strong>No updates yet</strong><span>Lab, billing, and admission alerts appear here.</span></article>
+    } @else {
+      @for (note of notifications(); track note.id) {
+        <article>
+          <strong>{{ note.title }}</strong>
+          <span>{{ note.message }}</span>
+        </article>
+      }
+    }
+  </div>
+</app-drawer>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

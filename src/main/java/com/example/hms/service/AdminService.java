@@ -12,6 +12,7 @@ import com.example.hms.dto.admin.AddWardRequest;
 import com.example.hms.dto.admin.AdmitPatientRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.BookAppointmentRequest;
+import com.example.hms.dto.admin.BookAppointmentResponse;
 import com.example.hms.dto.admin.CreateBillRequest;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.admin.CreatePrescriptionRequest;
@@ -319,10 +320,9 @@ public class AdminService {
                 return "Doctor updated successfully!";
         }
 
-        public String bookAppointment(
+        public BookAppointmentResponse bookAppointment(
                         BookAppointmentRequest request) {
 
-                // FIND PATIENT
                 User patient = userRepository
                                 .findById(request.getPatientId())
                                 .orElse(null);
@@ -330,10 +330,14 @@ public class AdminService {
                 if (patient == null ||
                                 !patient.getRole().equals("PATIENT")) {
 
-                        return "Patient not found!";
+                        return new BookAppointmentResponse(
+                                        "Patient not found!",
+                                        null,
+                                        null,
+                                        null,
+                                        null);
                 }
 
-                // FIND DOCTOR
                 User doctor = userRepository
                                 .findById(request.getDoctorId())
                                 .orElse(null);
@@ -341,7 +345,12 @@ public class AdminService {
                 if (doctor == null ||
                                 !doctor.getRole().equals("DOCTOR")) {
 
-                        return "Doctor not found!";
+                        return new BookAppointmentResponse(
+                                        "Doctor not found!",
+                                        null,
+                                        null,
+                                        null,
+                                        null);
                 }
 
                 if (appointmentRepository.existsActiveAppointment(
@@ -350,10 +359,14 @@ public class AdminService {
                                 request.getAppointmentDate(),
                                 null)) {
 
-                        return "Appointment already exists for this patient and doctor on this date!";
+                        return new BookAppointmentResponse(
+                                        "Appointment already exists for this patient and doctor on this date!",
+                                        null,
+                                        null,
+                                        null,
+                                        null);
                 }
 
-                // CREATE APPOINTMENT
                 Appointment appointment = new Appointment();
 
                 appointment.setAppointmentDate(
@@ -361,12 +374,9 @@ public class AdminService {
 
                 appointment.setStatus("BOOKED");
 
-                // RELATIONSHIPS
                 appointment.setPatient(patient);
 
                 appointment.setDoctor(doctor);
-
-                // GENERATE TOKEN NUMBER
 
                 Long totalAppointments = appointmentRepository
                                 .countByDoctorIdAndAppointmentDate(
@@ -378,7 +388,48 @@ public class AdminService {
 
                 appointmentRepository.save(appointment);
 
-                return "Appointment booked successfully!";
+                Bill bill = createConsultationBill(patient, doctor);
+
+                String message = "Appointment booked successfully! Consultation fee: Rs. "
+                                + bill.getAmount()
+                                + " — pay under Billing / Payments.";
+
+                return new BookAppointmentResponse(
+                                message,
+                                appointment.getId(),
+                                bill.getId(),
+                                bill.getAmount(),
+                                bill.getStatus());
+        }
+
+        private Bill createConsultationBill(User patient, User doctor) {
+
+                DoctorProfile profile = doctorProfileRepository
+                                .findByUserId(doctor.getId())
+                                .orElse(null);
+
+                double fee = 500.0;
+
+                if (profile != null
+                                && profile.getConsultationFee() != null
+                                && profile.getConsultationFee() > 0) {
+
+                        fee = profile.getConsultationFee();
+                }
+
+                Bill bill = new Bill();
+
+                bill.setAmount(fee);
+
+                bill.setBillType("CONSULTATION");
+
+                bill.setStatus("PENDING");
+
+                bill.setBillDate(LocalDate.now());
+
+                bill.setPatient(patient);
+
+                return billRepository.save(bill);
         }
 
         public List<Appointment> getAllAppointments() {

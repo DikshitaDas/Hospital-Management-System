@@ -6,7 +6,7 @@ import { LoginComponent } from './pages/login/login';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password';
 import { RegisterComponent } from './pages/register/register';
 import { DoctorDashboardComponent } from './pages/doctor/dashboard/doctor-dashboard';
-import { PatientDashboardComponent } from './pages/patient/dashboard/patient-dashboard';
+import { patientRoutes } from './patient/patient.routes';
 import { DashboardShowcaseComponent } from './pages/dashboard-showcase/dashboard-showcase';
 
 export const routes: Routes = [
@@ -16,15 +16,11 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
   { path: 'ui-showcase', component: DashboardShowcaseComponent },
   ...adminRoutes,
+  ...patientRoutes,
   {
     path: 'doctor/dashboard',
     component: DoctorDashboardComponent,
     canActivate: [authGuard, roleGuard(['DOCTOR'])]
-  },
-  {
-    path: 'patient/dashboard',
-    component: PatientDashboardComponent,
-    canActivate: [authGuard, roleGuard(['PATIENT'])]
   },
   { path: '**', redirectTo: 'login' }
 ];

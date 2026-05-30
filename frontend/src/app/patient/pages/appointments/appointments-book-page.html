@@ -1,0 +1,71 @@
+<header class="page-header">
+  <div><span>Appointments</span><h1>Book appointment</h1><p>Select a doctor, review the consultation fee, and book your visit.</p></div>
+  <a class="ghost-button btn-sm" routerLink="/patient/appointments">My appointments</a>
+</header>
+
+<section class="content-grid-2">
+  <article class="glass data-panel ui-card form-section">
+    <form class="form-grid" (ngSubmit)="submit()">
+      <app-searchable-select
+        label="Doctor"
+        placeholder="Search doctor name or UHID…"
+        [required]="true"
+        [displayWith]="doctorLabel"
+        valueKey="id"
+        [searchFn]="searchDoctorsForSelect"
+        [selectedId]="doctorId || null"
+        (selectedIdChange)="onDoctorSelected($event)"
+        (selectedItemChange)="onDoctorItem($event)"
+      />
+      <app-date-picker
+        label="Appointment date"
+        [required]="true"
+        [disallowPast]="true"
+        [(value)]="appointmentDate"
+      />
+      @if (dateError()) {
+        <p class="field-error">{{ dateError() }}</p>
+      }
+
+      @if (selectedDoctor(); as doc) {
+        <div class="fee-box glass">
+          <strong>Consultation fee</strong>
+          <p>Rs. {{ consultationFee() }} · {{ doc.department }} · {{ doc.specialization }}</p>
+          <small>A pending bill is created when you book (same as admin Billing → Invoices).</small>
+        </div>
+      }
+
+      <label class="checkbox-row">
+        <input type="checkbox" [ngModel]="payNow()" (ngModelChange)="payNow.set($event)" name="payNow" />
+        Pay consultation fee now
+      </label>
+
+      @if (payNow()) {
+        <label>Payment method
+          <select [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" name="paymentMethod">
+            @for (m of paymentMethods; track m) {
+              <option [value]="m">{{ m.replace('_', ' ') }}</option>
+            }
+          </select>
+        </label>
+      }
+
+      <div class="page-actions">
+        <button class="primary-button btn-sm" type="submit">
+          {{ payNow() ? 'Book & pay' : 'Book appointment' }}
+        </button>
+      </div>
+    </form>
+  </article>
+
+  <article class="glass data-panel ui-card">
+    <h2>How billing works</h2>
+    <ul class="help-list">
+      <li>Each booking generates a <strong>CONSULTATION</strong> bill at the doctor's fee.</li>
+      <li>Pay now, or later under <a routerLink="/patient/payments/bills">Payments → Bills</a>.</li>
+      <li>Paid invoices appear under <a routerLink="/patient/payments/history">Payment History</a>.</li>
+    </ul>
+  </article>
+</section>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

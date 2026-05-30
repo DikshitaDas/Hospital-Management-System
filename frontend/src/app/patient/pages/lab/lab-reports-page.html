@@ -1,0 +1,46 @@
+<header class="page-header">
+  <div><span>Lab &amp; Reports</span><h1>Lab reports</h1><p>View test history, report status, and download completed reports.</p></div>
+</header>
+
+<div class="tab-bar">
+  <button type="button" [class.active]="statusFilter() === 'ALL'" (click)="statusFilter.set('ALL')">All</button>
+  <button type="button" [class.active]="statusFilter() === 'PENDING'" (click)="statusFilter.set('PENDING')">Pending</button>
+  <button type="button" [class.active]="statusFilter() === 'COMPLETED'" (click)="statusFilter.set('COMPLETED')">Completed</button>
+</div>
+
+<div class="toolbar glass data-panel">
+  <input type="search" placeholder="Search report ID or test name…" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+</div>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading lab reports…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>ID</th><th>Test</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @for (r of filtered(); track r.id) {
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.labTest?.testName ?? '—' }}</td>
+              <td>{{ r.appointment?.appointmentDate ?? '—' }}</td>
+              <td><span class="badge" [class]="badgeClass(r.status)">{{ r.status }}</span></td>
+              <td class="row-actions">
+                <button class="ghost-button btn-sm" type="button" (click)="downloadReport(r)" [disabled]="r.status !== 'COMPLETED'">
+                  Download
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty-box">No lab reports yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}

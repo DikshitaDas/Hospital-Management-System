@@ -1,0 +1,112 @@
+@use '../styles/patient-shared';
+
+:host {
+  display: block;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.sidebar {
+  height: 100vh;
+  max-height: 100vh;
+  padding: 14px 12px;
+  border-radius: 0;
+  border-right: 1px solid var(--line);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #fff, var(--mint));
+  color: var(--primary-strong);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.brand strong {
+  display: block;
+  font-size: 13px;
+}
+
+.brand span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+nav {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+nav > a,
+.group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+nav > a:hover,
+.group-toggle:hover,
+.submenu a:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+nav > a.active,
+.submenu a.active {
+  background: rgba(95, 208, 186, 0.15);
+  color: var(--primary-strong);
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 28px;
+  margin-bottom: 4px;
+}
+
+.submenu a {
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.chevron {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.icon {
+  opacity: 0.7;
+  font-size: 12px;
+}

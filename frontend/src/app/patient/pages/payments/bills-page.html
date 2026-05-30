@@ -1,0 +1,60 @@
+<header class="page-header">
+  <div><span>Payments</span><h1>Bills</h1><p>Pay pending invoices online and download invoices.</p></div>
+  <button class="ghost-button btn-sm" type="button" (click)="load()">Refresh</button>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading…</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Invoice #</th><th>Type</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @for (b of pendingBills(); track b.id) {
+            <tr>
+              <td>{{ b.id }}</td>
+              <td>{{ b.billType }}</td>
+              <td>{{ b.billDate }}</td>
+              <td>Rs. {{ b.amount }}</td>
+              <td><span class="badge warm">{{ b.status }}</span></td>
+              <td class="row-actions">
+                <button class="primary-button btn-sm" type="button" (click)="openPay(b)">Pay online</button>
+                <button class="ghost-button btn-sm" type="button" (click)="downloadInvoice(b)">Invoice</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-box">
+                No pending bills. Book an appointment to generate a consultation invoice, or ask admin to add a bill under Billing → Invoices.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-modal [open]="payModalOpen()" title="Online payment" (closed)="closePay()">
+  @if (payingBill(); as bill) {
+    <p class="pay-summary">Invoice #{{ bill.id }} · Rs. {{ bill.amount }}</p>
+    <label>Payment method
+      <select [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" name="pm">
+        @for (m of paymentMethods; track m) {
+          <option [value]="m">{{ m.replace('_', ' ') }}</option>
+        }
+      </select>
+    </label>
+    <div class="page-actions">
+      <button class="ghost-button btn-sm" type="button" (click)="closePay()">Cancel</button>
+      <button class="primary-button btn-sm" type="button" (click)="confirmPay()">Confirm payment</button>
+    </div>
+  }
+</app-modal>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />
