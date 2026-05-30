@@ -1,0 +1,11 @@
+<header class="page-header"><div><span>Blood Bank</span><h1>Donor List</h1></div></header>
+<div class="alert info glass data-panel">No GET donors API is available. Register donors below via POST /admin/donors.</div>
+<section class="glass data-panel">
+  <form class="form-grid two-col" (ngSubmit)="submit()">
+    <input [(ngModel)]="form.donorName" name="dname" placeholder="Donor name" required />
+    <select [(ngModel)]="form.bloodGroup" name="dbg"><option value="A+">A+</option><option value="O+">O+</option><option value="B+">B+</option></select>
+    <input [(ngModel)]="form.mobile" name="dmob" placeholder="Mobile" required />
+    <button class="primary-button" type="submit">Add Donor</button>
+  </form>
+</section>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

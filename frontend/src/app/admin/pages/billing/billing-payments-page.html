@@ -1,0 +1,32 @@
+<header class="page-header"><div><span>Billing</span><h1>Payments</h1><p>PAID bills and pay pending invoices.</p></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="content-grid-2">
+  <article class="glass data-panel">
+    <h2 style="margin:0 0 10px;font-size:16px">Pending Payments</h2>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Action</th></tr></thead>
+        <tbody>@for (b of pendingBills(); track b.id) {
+          <tr><td>{{ b.id }}</td><td>{{ b.patient?.name }}</td><td>Rs. {{ b.amount }}</td>
+          <td><button class="primary-button" type="button" (click)="pay(b.id)">Pay</button></td></tr>
+        } @empty { <tr><td colspan="4" class="empty-box">No pending bills.</td></tr> }</tbody>
+      </table>
+    </div>
+  </article>
+  <article class="glass data-panel">
+    <h2 style="margin:0 0 10px;font-size:16px">Paid Bills</h2>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>ID</th><th>Patient</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>@for (b of paidBills(); track b.id) {
+          <tr><td>{{ b.id }}</td><td>{{ b.patient?.name }}</td><td>Rs. {{ b.amount }}</td>
+          <td><span class="badge mint">{{ b.status }}</span></td></tr>
+        }</tbody>
+      </table>
+    </div>
+  </article>
+</section>
+}
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

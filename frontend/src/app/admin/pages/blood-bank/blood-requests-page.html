@@ -1,0 +1,25 @@
+<header class="page-header"><div><span>Blood Bank</span><h1>Blood Requests</h1></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Patient</th><th>Group</th><th>Units</th><th>Status</th></tr></thead>
+      <tbody>@for (r of requests(); track r.id) {
+        <tr><td>{{ r.requestDate }}</td><td>{{ r.patient?.name }}</td><td>{{ r.bloodGroup }}</td><td>{{ r.unitsRequired }}</td>
+        <td><span class="badge" [class]="badgeClass(r.status)">{{ r.status }}</span></td></tr>
+      }</tbody>
+    </table>
+  </div>
+</section>
+}
+<section class="glass data-panel" style="margin-top:14px">
+  <form class="form-grid two-col" (ngSubmit)="submit()">
+    <select [(ngModel)]="form.patientId" name="rp" required><option [ngValue]="0" disabled>Patient</option>@for (p of patients(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }</select>
+    <select [(ngModel)]="form.bloodGroup" name="rbg"><option value="A+">A+</option><option value="O+">O+</option></select>
+    <input [(ngModel)]="form.unitsRequired" name="ru" type="number" min="1" required />
+    <button class="primary-button" type="submit">Create Request</button>
+  </form>
+</section>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

@@ -74,6 +74,10 @@ export class AuthService {
     return localStorage.getItem('hms_name');
   }
 
+  getUhid(): string | null {
+    return localStorage.getItem('hms_uhid');
+  }
+
   getUserId(): number | null {
     const id = localStorage.getItem('hms_userId');
     return id ? Number(id) : null;

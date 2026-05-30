@@ -1,0 +1,5 @@
+<header class="page-header"><div><span>Reports</span><h1>Patient Reports</h1><p>Export patients list to CSV.</p></div><button class="primary-button" type="button" (click)="exportCsv()">Export CSV</button></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else { <div class="alert info glass data-panel">{{ patients().length }} patients ready for export.</div> }
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

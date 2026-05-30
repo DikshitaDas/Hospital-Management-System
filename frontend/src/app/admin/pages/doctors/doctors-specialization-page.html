@@ -1,0 +1,15 @@
+<header class="page-header"><div><span>Doctors</span><h1>Specialization</h1><p>Doctors grouped by specialization.</p></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+  @for (spec of specKeys(); track spec) {
+    <section class="glass data-panel" style="margin-bottom:14px">
+      <h2 style="margin:0 0 10px;font-size:16px">{{ spec }} <span class="badge mint">{{ grouped()[spec].length }}</span></h2>
+      <div class="activity-list">
+        @for (d of grouped()[spec]; track d.id) {
+          <article><strong>{{ d.user.name }}</strong><span>{{ d.department }} · Rs. {{ d.consultationFee }}</span></article>
+        }
+      </div>
+    </section>
+  }
+}

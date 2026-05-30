@@ -1,0 +1,29 @@
+<header class="page-header"><div><span>Settings</span><h1>Roles &amp; Permissions</h1></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<div class="tab-bar">
+  <button type="button" [class.active]="roleFilter() === 'ALL'" (click)="roleFilter.set('ALL')">All</button>
+  <button type="button" [class.active]="roleFilter() === 'ADMIN'" (click)="roleFilter.set('ADMIN')">Admin</button>
+  <button type="button" [class.active]="roleFilter() === 'DOCTOR'" (click)="roleFilter.set('DOCTOR')">Doctor</button>
+  <button type="button" [class.active]="roleFilter() === 'PATIENT'" (click)="roleFilter.set('PATIENT')">Patient</button>
+</div>
+<section class="glass data-panel">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>UHID</th><th>Current Role</th><th>Change Role</th></tr></thead>
+      <tbody>@for (u of filtered(); track u.id) {
+        <tr>
+          <td>{{ u.name }}</td><td>{{ u.uhid }}</td><td><span class="badge sky">{{ u.role }}</span></td>
+          <td>
+            <select [ngModel]="u.role" (ngModelChange)="updateRole(u, $event)" [name]="'role-' + u.id">
+              <option value="ADMIN">ADMIN</option><option value="DOCTOR">DOCTOR</option><option value="PATIENT">PATIENT</option>
+            </select>
+          </td>
+        </tr>
+      }</tbody>
+    </table>
+  </div>
+</section>
+}
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

@@ -1,0 +1,31 @@
+<header class="page-header"><div><span>Wards</span><h1>All Wards</h1></div><button class="primary-button" type="button" (click)="addOpen.set(true)">Add Ward</button></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Type</th><th>Total Beds</th><th>Actions</th></tr></thead>
+      <tbody>@for (w of wards(); track w.id) {
+        <tr><td>{{ w.wardName }}</td><td><span class="badge sky">{{ w.wardType }}</span></td><td>{{ w.totalBeds }}</td>
+        <td class="row-actions"><button class="ghost-button" type="button" (click)="openEdit(w)">Edit</button><button class="ghost-button" type="button" (click)="deleteWard(w.id)">Delete</button></td></tr>
+      }</tbody>
+    </table>
+  </div>
+</section>
+}
+<app-modal [open]="addOpen()" title="Add Ward" (closed)="addOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitAdd()">
+    <input [(ngModel)]="addForm.wardName" name="wn" placeholder="Ward name" required />
+    <select [(ngModel)]="addForm.wardType" name="wt"><option value="GENERAL">General</option><option value="ICU">ICU</option></select>
+    <input [(ngModel)]="addForm.totalBeds" name="tb" type="number" required />
+    <button class="primary-button" type="submit">Add</button>
+  </form>
+</app-modal>
+<app-modal [open]="editOpen()" title="Edit Ward" (closed)="editOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitEdit()">
+    <input [(ngModel)]="editForm.wardName" name="ewn" required /><select [(ngModel)]="editForm.wardType" name="ewt"><option value="GENERAL">General</option><option value="ICU">ICU</option></select>
+    <input [(ngModel)]="editForm.totalBeds" name="etb" type="number" required /><button class="primary-button" type="submit">Save</button>
+  </form>
+</app-modal>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

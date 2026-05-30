@@ -1,0 +1,20 @@
+<header class="page-header"><div><span>Wards</span><h1>ICU / General Ward</h1></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<div class="tab-bar">
+  <button type="button" [class.active]="filter() === 'ALL'" (click)="filter.set('ALL')">All</button>
+  <button type="button" [class.active]="filter() === 'ICU'" (click)="filter.set('ICU')">ICU</button>
+  <button type="button" [class.active]="filter() === 'GENERAL'" (click)="filter.set('GENERAL')">General</button>
+</div>
+@if (filter() === 'ALL' || filter() === 'ICU') {
+<section class="glass data-panel" style="margin-bottom:12px"><h2 style="margin:0 0 10px;font-size:16px">ICU <span class="badge rose">{{ icu().length }}</span></h2>
+  @for (w of icu(); track w.id) { <article class="activity-list"><strong>{{ w.wardName }}</strong><span>{{ w.totalBeds }} beds</span></article> }
+</section>
+}
+@if (filter() === 'ALL' || filter() === 'GENERAL') {
+<section class="glass data-panel"><h2 style="margin:0 0 10px;font-size:16px">General <span class="badge sky">{{ general().length }}</span></h2>
+  @for (w of general(); track w.id) { <article class="activity-list"><strong>{{ w.wardName }}</strong><span>{{ w.totalBeds }} beds</span></article> }
+</section>
+}
+}

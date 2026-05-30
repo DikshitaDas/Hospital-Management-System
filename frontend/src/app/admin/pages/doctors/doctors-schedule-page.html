@@ -1,0 +1,20 @@
+<header class="page-header"><div><span>Doctors</span><h1>Doctor Schedule</h1><p>Availability from doctor profiles.</p></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Doctor</th><th>Department</th><th>Availability</th><th>Status</th></tr></thead>
+      <tbody>
+        @for (d of doctors(); track d.id) {
+          <tr>
+            <td>{{ d.user.name }}</td><td>{{ d.department }}</td><td>{{ d.availability }}</td>
+            <td><span class="badge" [class]="badgeClass(d.availabilityStatus ?? 'AVAILABLE')">{{ d.availabilityStatus ?? 'AVAILABLE' }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+}

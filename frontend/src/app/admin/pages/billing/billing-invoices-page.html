@@ -1,0 +1,28 @@
+<header class="page-header"><div><span>Billing</span><h1>Invoices</h1></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="toolbar">
+    <label><input type="checkbox" [checked]="showPendingOnly()" (change)="showPendingOnly.set(!showPendingOnly())" /> Show PENDING only</label>
+  </div>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>ID</th><th>Patient</th><th>Type</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>@for (b of filteredBills(); track b.id) {
+        <tr><td>{{ b.id }}</td><td>{{ b.patient?.name }}</td><td>{{ b.billType }}</td><td>Rs. {{ b.amount }}</td><td>{{ b.billDate }}</td>
+        <td><span class="badge" [class]="badgeClass(b.status)">{{ b.status }}</span></td></tr>
+      }</tbody>
+    </table>
+  </div>
+</section>
+}
+<section class="glass data-panel" style="margin-top:14px">
+  <form class="form-grid two-col" (ngSubmit)="submit()">
+    <select [(ngModel)]="form.patientId" name="bp" required><option [ngValue]="0" disabled>Patient</option>@for (p of patients(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }</select>
+    <input [(ngModel)]="form.amount" name="amt" type="number" placeholder="Amount" required />
+    <input [(ngModel)]="form.billType" name="btype" placeholder="Bill type" required />
+    <button class="primary-button" type="submit">Create Bill</button>
+  </form>
+</section>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

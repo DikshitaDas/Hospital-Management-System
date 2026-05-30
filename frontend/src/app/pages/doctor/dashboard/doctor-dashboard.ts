@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { Appointment } from '../../../services/admin-api.service';
+import { Appointment } from '../../../admin/models/admin.models';
 import { DoctorApiService, DoctorDashboardStats } from '../../../services/doctor-api.service';
 import { Notification, NotificationApiService } from '../../../services/notification-api.service';
 import { DrawerComponent } from '../../../shared/ui/drawer/drawer';

@@ -1,0 +1,85 @@
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading dashboard...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <header class="page-header">
+    <div>
+      <span>Admin operations</span>
+      <h1>Hospital Control Center</h1>
+      <p>Live stats from dashboard, appointments, prescriptions, and notifications.</p>
+    </div>
+    <button class="ghost-button" type="button" (click)="refresh()">Refresh</button>
+  </header>
+
+  <section class="metrics-row">
+    <app-metric-card title="Total Patients" [value]="String(stats()?.totalPatients ?? 0)" detail="Registered in HMS" tone="mint" />
+    <app-metric-card title="Total Doctors" [value]="String(stats()?.totalDoctors ?? 0)" detail="Active doctor accounts" tone="sky" />
+    <app-metric-card title="Upcoming Appointments" [value]="String(upcomingCount())" detail="Future-dated visits" tone="mint" />
+    <app-metric-card title="Prescriptions" [value]="String(prescriptionCount())" detail="Recent prescription records" tone="sky" />
+  </section>
+
+  <section class="metrics-row">
+    <app-metric-card title="All Appointments" [value]="String(stats()?.totalAppointments ?? 0)" detail="System-wide count" tone="warning" />
+    <app-metric-card title="Total Revenue" [value]="formatRevenue(stats()?.totalRevenue ?? 0)" detail="Collected payments" tone="rose" />
+  </section>
+
+  <section class="content-grid-2">
+    <article class="glass data-panel">
+      <header class="page-header">
+        <div>
+          <span>Recent activity</span>
+          <h1 style="font-size:18px;margin:4px 0 0">Appointments &amp; paid bills</h1>
+        </div>
+      </header>
+      @if (activities().length === 0) {
+        <div class="empty-box">No recent APPROVED/BOOKED appointments or PAID bills.</div>
+      } @else {
+        <div class="activity-list">
+          @for (item of activities(); track item.label + item.date) {
+            <article>
+              <strong>{{ item.label }}</strong>
+              <span>{{ item.detail }}</span>
+              <span class="badge" [class]="badgeClass(item.status)">{{ item.status }}</span>
+            </article>
+          }
+        </div>
+      }
+    </article>
+
+    <article class="glass data-panel">
+      <header class="page-header">
+        <div>
+          <span>Notifications</span>
+          <h1 style="font-size:18px;margin:4px 0 0">Care alerts</h1>
+        </div>
+        <button class="ghost-button" type="button" (click)="openNotifications()">View all</button>
+      </header>
+      @if (notifications().length === 0) {
+        <div class="empty-box">No notifications yet.</div>
+      } @else {
+        <div class="activity-list">
+          @for (note of notifications(); track note.id) {
+            <article>
+              <strong>{{ note.title }}</strong>
+              <span>{{ note.message }}</span>
+            </article>
+          }
+        </div>
+      }
+    </article>
+  </section>
+}
+
+<app-drawer [open]="drawerOpen()" title="Notifications" (closed)="drawerOpen.set(false)">
+  <div class="activity-list">
+    @for (note of notifications(); track note.id) {
+      <article>
+        <strong>{{ note.title }}</strong>
+        <span>{{ note.message }}</span>
+      </article>
+    }
+  </div>
+</app-drawer>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

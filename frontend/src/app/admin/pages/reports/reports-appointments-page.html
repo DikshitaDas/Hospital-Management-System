@@ -1,0 +1,12 @@
+<header class="page-header"><div><span>Reports</span><h1>Appointment Reports</h1></div><button class="primary-button" type="button" (click)="exportCsv()">Export CSV</button></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else {
+<section class="glass data-panel">
+  <div class="toolbar">
+    <input type="date" [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event)" />
+    <input type="date" [ngModel]="toDate()" (ngModelChange)="toDate.set($event)" />
+    <span class="badge sky">{{ filtered().length }} records</span>
+  </div>
+</section>
+}
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { Appointment } from '../../../services/admin-api.service';
+import { Appointment } from '../../../admin/models/admin.models';
 import { Notification, NotificationApiService } from '../../../services/notification-api.service';
 import {
   PatientApiService,

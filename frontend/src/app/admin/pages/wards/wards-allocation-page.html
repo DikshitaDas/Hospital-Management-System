@@ -1,0 +1,13 @@
+<header class="page-header"><div><span>Wards</span><h1>Bed Allocation</h1><p>Add beds to wards.</p></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <form class="form-grid two-col" (ngSubmit)="submit()">
+    <input [(ngModel)]="form.bedNumber" name="bn" placeholder="Bed number" required />
+    <select [(ngModel)]="form.wardId" name="wid" required><option [ngValue]="0" disabled>Ward</option>@for (w of wards(); track w.id) { <option [ngValue]="w.id">{{ w.wardName }}</option> }</select>
+    <button class="primary-button" type="submit">Add Bed</button>
+  </form>
+</section>
+}
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

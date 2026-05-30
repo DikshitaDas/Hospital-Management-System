@@ -1,0 +1,23 @@
+<header class="page-header"><div><span>Lab</span><h1>Test Types &amp; Pricing</h1></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Test</th><th>Category</th><th>Price</th><th>Description</th></tr></thead>
+      <tbody>@for (t of tests(); track t.id) { <tr><td>{{ t.testName }}</td><td>{{ t.category }}</td><td>Rs. {{ t.price }}</td><td>{{ t.description }}</td></tr> }</tbody>
+    </table>
+  </div>
+</section>
+}
+<section class="glass data-panel" style="margin-top:14px">
+  <form class="form-grid two-col" (ngSubmit)="submit()">
+    <input [(ngModel)]="form.testName" name="tn" placeholder="Test name" required />
+    <input [(ngModel)]="form.category" name="tc" placeholder="Category" required />
+    <input [(ngModel)]="form.price" name="tp" type="number" placeholder="Price" required />
+    <textarea [(ngModel)]="form.description" name="td" placeholder="Description"></textarea>
+    <button class="primary-button" type="submit">Create Test</button>
+  </form>
+</section>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

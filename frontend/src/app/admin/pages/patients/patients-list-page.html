@@ -1,0 +1,70 @@
+<header class="page-header">
+  <div>
+    <span>Patients</span>
+    <h1>All Patients</h1>
+    <p>Manage patient accounts via admin users and patients API.</p>
+  </div>
+  <button class="primary-button" type="button" (click)="openAdd()">Add Patient</button>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading patients...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="glass data-panel">
+    <div class="toolbar">
+      <input type="search" placeholder="Search by name..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="onSearch()" />
+      <button class="ghost-button" type="button" (click)="onSearch()">Search</button>
+      <button class="ghost-button" type="button" (click)="loadPatients()">Clear</button>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>UHID</th><th>Name</th><th>Gender</th><th>Age</th><th>Mobile</th><th>Role</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          @for (p of patients(); track p.id) {
+            <tr>
+              <td>{{ p.uhid }}</td>
+              <td>{{ p.name }}</td>
+              <td>{{ p.gender }}</td>
+              <td>{{ p.age }}</td>
+              <td>{{ p.mobile }}</td>
+              <td><span class="badge sky">{{ p.role }}</span></td>
+              <td class="row-actions">
+                <button class="ghost-button" type="button" (click)="openEdit(p)">Edit</button>
+                <button class="ghost-button" type="button" (click)="deletePatient(p.id)">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty-box">No patients found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}
+
+<app-modal [open]="addOpen()" title="Add Patient" (closed)="addOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitAdd()">
+    <input [(ngModel)]="addForm.name" name="name" placeholder="Name" required />
+    <select [(ngModel)]="addForm.gender" name="gender"><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select>
+    <input [(ngModel)]="addForm.age" name="age" type="number" placeholder="Age" required />
+    <input [(ngModel)]="addForm.mobile" name="mobile" placeholder="Mobile" required />
+    <input [(ngModel)]="addForm.password" name="password" type="password" placeholder="Password" required />
+    <button class="primary-button" type="submit">Create Patient</button>
+  </form>
+</app-modal>
+
+<app-modal [open]="editOpen()" title="Edit Patient" (closed)="editOpen.set(false)">
+  <form class="form-grid" (ngSubmit)="submitEdit()">
+    <input [(ngModel)]="editForm.name" name="editName" placeholder="Name" required />
+    <select [(ngModel)]="editForm.gender" name="editGender"><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select>
+    <input [(ngModel)]="editForm.age" name="editAge" type="number" placeholder="Age" required />
+    <input [(ngModel)]="editForm.mobile" name="editMobile" placeholder="Mobile" required />
+    <button class="primary-button" type="submit">Save Changes</button>
+  </form>
+</app-modal>
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

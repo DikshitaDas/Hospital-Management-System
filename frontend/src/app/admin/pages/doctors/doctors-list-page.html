@@ -1,0 +1,59 @@
+<header class="page-header">
+  <div><span>Doctors</span><h1>All Doctors</h1><p>Full CRUD for doctor profiles.</p></div>
+  <button class="primary-button" type="button" (click)="openAdd()">Add Doctor</button>
+</header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading doctors...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="toolbar">
+    <input type="search" placeholder="Search doctors..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="onSearch()" />
+    <button class="ghost-button" type="button" (click)="onSearch()">Search</button>
+  </div>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Department</th><th>Specialization</th><th>Fee</th><th>Availability</th><th>Actions</th></tr></thead>
+      <tbody>
+        @for (d of doctors(); track d.id) {
+          <tr>
+            <td>{{ d.user.name }}</td><td>{{ d.department }}</td><td>{{ d.specialization }}</td>
+            <td>Rs. {{ d.consultationFee }}</td><td>{{ d.availability }}</td>
+            <td class="row-actions">
+              <button class="ghost-button" type="button" (click)="openEdit(d)">Edit</button>
+              <button class="ghost-button" type="button" (click)="deleteDoctor(d.user.id)">Delete</button>
+            </td>
+          </tr>
+        } @empty { <tr><td colspan="6" class="empty-box">No doctors found.</td></tr> }
+      </tbody>
+    </table>
+  </div>
+</section>
+}
+<app-modal [open]="addOpen()" title="Add Doctor" (closed)="addOpen.set(false)">
+  <form class="form-grid two-col" (ngSubmit)="submitAdd()">
+    <input [(ngModel)]="addForm.name" name="dname" placeholder="Name" required />
+    <select [(ngModel)]="addForm.gender" name="dgender"><option value="MALE">Male</option><option value="FEMALE">Female</option></select>
+    <input [(ngModel)]="addForm.age" name="dage" type="number" placeholder="Age" required />
+    <input [(ngModel)]="addForm.mobile" name="dmobile" placeholder="Mobile" required />
+    <input [(ngModel)]="addForm.password" name="dpass" type="password" placeholder="Password" required />
+    <input [(ngModel)]="addForm.specialization" name="dspec" placeholder="Specialization" required />
+    <input [(ngModel)]="addForm.department" name="ddept" placeholder="Department" required />
+    <input [(ngModel)]="addForm.consultationFee" name="dfee" type="number" placeholder="Fee" required />
+    <input [(ngModel)]="addForm.availability" name="davail" placeholder="Availability" required />
+    <button class="primary-button" type="submit">Add Doctor</button>
+  </form>
+</app-modal>
+<app-modal [open]="editOpen()" title="Edit Doctor" (closed)="editOpen.set(false)">
+  <form class="form-grid two-col" (ngSubmit)="submitEdit()">
+    <input [(ngModel)]="editForm.name" name="ename" placeholder="Name" required />
+    <select [(ngModel)]="editForm.gender" name="egender"><option value="MALE">Male</option><option value="FEMALE">Female</option></select>
+    <input [(ngModel)]="editForm.age" name="eage" type="number" placeholder="Age" required />
+    <input [(ngModel)]="editForm.mobile" name="emobile" placeholder="Mobile" required />
+    <input [(ngModel)]="editForm.specialization" name="espec" placeholder="Specialization" required />
+    <input [(ngModel)]="editForm.department" name="edept" placeholder="Department" required />
+    <input [(ngModel)]="editForm.consultationFee" name="efee" type="number" placeholder="Fee" required />
+    <input [(ngModel)]="editForm.availability" name="eavail" placeholder="Availability" required />
+    <button class="primary-button" type="submit">Save</button>
+  </form>
+</app-modal>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

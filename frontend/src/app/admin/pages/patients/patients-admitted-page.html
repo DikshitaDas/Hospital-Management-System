@@ -1,0 +1,93 @@
+<header class="page-header">
+  <div>
+    <span>Patients</span>
+    <h1>Admitted &amp; Discharge</h1>
+    <p>Currently ADMITTED patients with admission management forms.</p>
+  </div>
+  <button class="ghost-button" type="button" (click)="loadAll()">Refresh</button>
+</header>
+
+@if (loading()) {
+  <div class="loading-box glass data-panel">Loading admissions...</div>
+} @else if (errorMsg()) {
+  <div class="alert error glass data-panel">{{ errorMsg() }}</div>
+} @else {
+  <section class="content-grid-2">
+    <article class="glass data-panel">
+      <h2 style="margin:0 0 12px;font-size:16px">Admitted Patients</h2>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Patient</th><th>Bed</th><th>Ward</th><th>Since</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (row of admitted(); track row.admission.id) {
+              <tr>
+                <td>{{ row.patient.name }}</td>
+                <td>{{ row.admission.bed?.bedNumber }}</td>
+                <td>{{ row.admission.bed?.ward?.wardName }}</td>
+                <td>{{ row.admission.admissionDate }}</td>
+                <td><span class="badge" [class]="badgeClass(row.admission.status)">{{ row.admission.status }}</span></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="empty-box">No admitted patients.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="glass data-panel">
+      <div class="tab-bar">
+        <span style="font-weight:800;color:var(--muted);font-size:12px">ADMISSION FORMS</span>
+      </div>
+      <form class="form-grid" (ngSubmit)="submitAdmit()">
+        <strong>Admit Patient</strong>
+        <select [(ngModel)]="admitForm.patientId" name="admitPatient" required>
+          <option [ngValue]="0" disabled>Select patient</option>
+          @for (p of patients(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
+        </select>
+        <select [(ngModel)]="admitForm.bedId" name="admitBed" required>
+          <option [ngValue]="0" disabled>Select bed</option>
+          @for (b of beds(); track b.id) { <option [ngValue]="b.id">{{ b.bedNumber }} — {{ b.ward?.wardName }}</option> }
+        </select>
+        <button class="primary-button" type="submit">Admit</button>
+      </form>
+      <hr />
+      <form class="form-grid" (ngSubmit)="submitDischarge()">
+        <strong>Discharge Patient</strong>
+        <select [(ngModel)]="dischargeId" name="dischargePatient" required>
+          <option [ngValue]="0" disabled>Select admitted patient</option>
+          @for (row of admitted(); track row.admission.id) { <option [ngValue]="row.patient.id">{{ row.patient.name }}</option> }
+        </select>
+        <button class="primary-button" type="submit">Discharge</button>
+      </form>
+      <hr />
+      <form class="form-grid" (ngSubmit)="submitTransfer()">
+        <strong>Transfer Patient</strong>
+        <select [(ngModel)]="transferForm.patientId" name="transferPatient" required>
+          <option [ngValue]="0" disabled>Select patient</option>
+          @for (row of admitted(); track row.admission.id) { <option [ngValue]="row.patient.id">{{ row.patient.name }}</option> }
+        </select>
+        <select [(ngModel)]="transferForm.newBedId" name="transferBed" required>
+          <option [ngValue]="0" disabled>Select new bed</option>
+          @for (b of beds(); track b.id) { <option [ngValue]="b.id">{{ b.bedNumber }}</option> }
+        </select>
+        <button class="primary-button" type="submit">Transfer</button>
+      </form>
+      <hr />
+      <form class="form-grid" (ngSubmit)="submitEmergency()">
+        <strong>Emergency Admission</strong>
+        <select [(ngModel)]="emergencyForm.patientId" name="emergencyPatient" required>
+          <option [ngValue]="0" disabled>Select patient</option>
+          @for (p of patients(); track p.id) { <option [ngValue]="p.id">{{ p.name }}</option> }
+        </select>
+        <select [(ngModel)]="emergencyForm.wardType" name="emergencyWard">
+          <option value="ICU">ICU</option>
+          <option value="GENERAL">General</option>
+        </select>
+        <button class="primary-button" type="submit">Emergency Admit</button>
+      </form>
+    </article>
+  </section>
+}
+
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

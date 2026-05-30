@@ -1,0 +1,20 @@
+<header class="page-header"><div><span>Doctors</span><h1>Departments</h1><p>Doctors grouped by department.</p></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+  @for (dept of deptKeys(); track dept) {
+    <section class="glass data-panel" style="margin-bottom:14px">
+      <h2 style="margin:0 0 10px;font-size:16px">{{ dept }} <span class="badge sky">{{ grouped()[dept].length }}</span></h2>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Specialization</th><th>Fee</th></tr></thead>
+          <tbody>
+            @for (d of grouped()[dept]; track d.id) {
+              <tr><td>{{ d.user.name }}</td><td>{{ d.specialization }}</td><td>Rs. {{ d.consultationFee }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+}

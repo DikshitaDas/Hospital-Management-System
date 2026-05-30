@@ -1,0 +1,4 @@
+<header class="page-header"><div><span>Reports</span><h1>Blood Bank Reports</h1></div><button class="primary-button" type="button" (click)="exportCsv()">Export CSV</button></header>
+@if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+<div class="alert info glass data-panel">Exports blood stock and requests into a single CSV.</div>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

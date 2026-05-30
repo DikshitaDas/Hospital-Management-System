@@ -1,0 +1,19 @@
+<header class="page-header"><div><span>Settings</span><h1>Wards &amp; Beds Overview</h1><p>Ward occupancy summary.</p></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Ward</th><th>Type</th><th>Occupied</th><th>Available</th><th>Total</th><th>Occupancy</th></tr></thead>
+      <tbody>@for (w of occupancy(); track w.wardName) {
+        <tr>
+          <td>{{ w.wardName }}</td><td><span class="badge sky">{{ w.wardType }}</span></td>
+          <td>{{ w.occupiedBeds }}</td><td>{{ w.availableBeds }}</td><td>{{ w.totalBeds }}</td>
+          <td><span class="badge" [class.mint]="occupancyPercent(w) < 80" [class.warm]="occupancyPercent(w) >= 80">{{ occupancyPercent(w) }}%</span></td>
+        </tr>
+      }</tbody>
+    </table>
+  </div>
+</section>
+}

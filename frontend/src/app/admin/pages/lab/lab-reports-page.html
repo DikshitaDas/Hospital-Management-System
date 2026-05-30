@@ -1,0 +1,10 @@
+<header class="page-header"><div><span>Lab</span><h1>Upload / Update Reports</h1></div></header>
+<div class="alert info glass data-panel">No list API for lab reports. Enter the report ID from the backend and submit results via PUT /admin/lab-reports/&#123;id&#125;.</div>
+<section class="glass data-panel">
+  <form class="form-grid" (ngSubmit)="submit()">
+    <input [(ngModel)]="reportId" name="rid" type="number" placeholder="Lab report ID" required />
+    <textarea [(ngModel)]="form.result" name="result" placeholder="Test result" required></textarea>
+    <button class="primary-button" type="submit">Update Report</button>
+  </form>
+</section>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

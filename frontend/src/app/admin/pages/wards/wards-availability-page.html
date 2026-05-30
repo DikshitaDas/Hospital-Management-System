@@ -1,0 +1,29 @@
+<header class="page-header"><div><span>Wards</span><h1>Bed Availability</h1></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="content-grid-2">
+  <article class="glass data-panel">
+    <h2 style="margin:0 0 10px;font-size:16px">Available Beds</h2>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Bed</th><th>Ward</th><th>Status</th></tr></thead>
+        <tbody>@for (b of beds(); track b.id) {
+          <tr><td>{{ b.bedNumber }}</td><td>{{ b.ward?.wardName }}</td><td><span class="badge mint">{{ b.status }}</span></td></tr>
+        }</tbody>
+      </table>
+    </div>
+  </article>
+  <article class="glass data-panel">
+    <h2 style="margin:0 0 10px;font-size:16px">Ward Occupancy</h2>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Ward</th><th>Occupied</th><th>Available</th><th>Total</th></tr></thead>
+        <tbody>@for (w of occupancy(); track w.wardName) {
+          <tr><td>{{ w.wardName }}</td><td>{{ w.occupiedBeds }}</td><td>{{ w.availableBeds }}</td><td>{{ w.totalBeds }}</td></tr>
+        }</tbody>
+      </table>
+    </div>
+  </article>
+</section>
+}

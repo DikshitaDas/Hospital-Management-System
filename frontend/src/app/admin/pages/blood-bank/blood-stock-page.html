@@ -1,0 +1,29 @@
+<header class="page-header"><div><span>Blood Bank</span><h1>Blood Stock</h1></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+<section class="glass data-panel">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Group</th><th>Units Available</th></tr></thead>
+      <tbody>@for (s of stock(); track s.id) { <tr><td><span class="badge rose">{{ s.bloodGroup }}</span></td><td>{{ s.unitsAvailable }}</td></tr> }</tbody>
+    </table>
+  </div>
+</section>
+}
+<section class="glass data-panel" style="margin-top:14px">
+  <form class="form-grid two-col" (ngSubmit)="submitAdd()">
+    <strong>Add / Update Stock</strong>
+    <select [(ngModel)]="addForm.bloodGroup" name="bg"><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select>
+    <input [(ngModel)]="addForm.unitsAvailable" name="units" type="number" placeholder="Units" required />
+    <button class="primary-button" type="submit">Save Stock</button>
+  </form>
+  <hr />
+  <form class="form-grid" (ngSubmit)="checkAvailability()">
+    <strong>Check Availability</strong>
+    <select [(ngModel)]="checkGroup" name="checkBg"><option value="A+">A+</option><option value="O+">O+</option><option value="B+">B+</option><option value="AB+">AB+</option></select>
+    <button class="ghost-button" type="submit">Check</button>
+    @if (availability()) { <div class="alert info">{{ availability()!.bloodGroup }}: {{ availability()!.unitsAvailable }} units</div> }
+  </form>
+</section>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />

@@ -1,0 +1,19 @@
+<header class="page-header"><div><span>Appointments</span><h1>Appointment Calendar</h1><p>Appointments grouped by date.</p></div></header>
+@if (loading()) { <div class="loading-box glass data-panel">Loading...</div> }
+@else if (errorMsg()) { <div class="alert error glass data-panel">{{ errorMsg() }}</div> }
+@else {
+  @for (day of dateKeys(); track day) {
+    <section class="glass data-panel" style="margin-bottom:12px">
+      <h2 style="margin:0 0 10px;font-size:15px">{{ day }} <span class="badge sky">{{ byDate()[day].length }}</span></h2>
+      <div class="calendar-grid">
+        @for (a of byDate()[day]; track a.id) {
+          <div class="calendar-cell">
+            <strong>{{ a.patient?.name }}</strong>
+            <span>Dr. {{ a.doctor?.name }}</span>
+            <span class="badge" [class]="badgeClass(a.status)">{{ a.status }}</span>
+          </div>
+        }
+      </div>
+    </section>
+  } @empty { <div class="empty-box glass data-panel">No appointments scheduled.</div> }
+}

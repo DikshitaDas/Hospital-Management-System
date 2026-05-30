@@ -1,0 +1,10 @@
+<header class="page-header"><div><span>Blood Bank</span><h1>Donation History</h1></div></header>
+<div class="alert info glass data-panel">No GET donations API. Record donations via POST /admin/donations using donor ID.</div>
+<section class="glass data-panel">
+  <form class="form-grid two-col" (ngSubmit)="submit()">
+    <input [(ngModel)]="form.donorId" name="donorId" type="number" placeholder="Donor ID" required />
+    <input [(ngModel)]="form.unitsDonated" name="units" type="number" min="1" placeholder="Units donated" required />
+    <button class="primary-button" type="submit">Record Donation</button>
+  </form>
+</section>
+<app-snackbar [open]="snackbarOpen()" [message]="snackbarMessage()" (closed)="snackbarOpen.set(false)" />
