@@ -56,6 +56,7 @@
       [(value)]="bookForm.appointmentDate"
     />
     @if (dateError()) { <p class="form-error">{{ dateError() }}</p> }
+    <p class="form-hint">A consultation bill is created automatically at the doctor's fee (see Billing → Invoices / Payments).</p>
     <button class="primary-button btn-sm" type="submit">Book</button>
   </form>
 </app-modal>

@@ -38,7 +38,7 @@ export class PatientProfilePage implements OnInit {
       return;
     }
     this.avatarUrl = localStorage.getItem(`hms_avatar_${this.patientId}`);
-    this.patientApi.getProfile().subscribe({
+    this.patientApi.getProfile(this.patientId).subscribe({
       next: user => {
         this.profile.set(user);
         this.profileForm = { name: user.name, gender: user.gender, age: user.age, mobile: user.mobile };

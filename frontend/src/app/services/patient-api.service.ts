@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { API_BASE_URL } from '../core/api.config';
 import {
   Appointment,
@@ -9,6 +8,7 @@ import {
   BloodAvailability,
   ChangePasswordRequest,
   CreateBloodRequest,
+  BookAppointmentResponse,
   DoctorProfile,
   LabReport,
   PayBillRequest,
@@ -27,6 +27,8 @@ export interface PatientDashboardStats {
 export interface PatientBookAppointmentRequest {
   doctorId: number;
   appointmentDate: string;
+  payNow?: boolean;
+  paymentMethod?: string;
 }
 
 export interface RescheduleAppointmentRequest {
@@ -43,7 +45,10 @@ export class PatientApiService {
     return this.http.get<PatientDashboardStats>(`${this.base}/dashboard/${patientId}`);
   }
 
-  getProfile(): Observable<User> {
+  getProfile(patientId?: number): Observable<User> {
+    if (patientId != null) {
+      return this.http.get<User>(`${this.base}/${patientId}/profile`);
+    }
     return this.http.get<User>(`${this.base}/profile`);
   }
 
@@ -59,14 +64,14 @@ export class PatientApiService {
     return this.http.get<Appointment[]>(`${this.base}/${patientId}/appointments`);
   }
 
-  searchDoctors(name: string): Observable<User[]> {
-    return this.http
-      .get<DoctorProfile[]>(`${this.base}/doctors/search`, { params: { name: name.trim() } })
-      .pipe(map(list => list.map(d => d.user)));
+  searchDoctors(name: string): Observable<DoctorProfile[]> {
+    return this.http.get<DoctorProfile[]>(`${this.base}/doctors/search`, {
+      params: { name: name.trim() }
+    });
   }
 
-  bookAppointment(body: PatientBookAppointmentRequest): Observable<string> {
-    return this.http.post(`${this.base}/appointments`, body, { responseType: 'text' });
+  bookAppointment(body: PatientBookAppointmentRequest): Observable<BookAppointmentResponse> {
+    return this.http.post<BookAppointmentResponse>(`${this.base}/appointments`, body);
   }
 
   cancelAppointment(id: number): Observable<string> {

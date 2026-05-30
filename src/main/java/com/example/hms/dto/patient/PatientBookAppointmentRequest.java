@@ -15,4 +15,9 @@ public class PatientBookAppointmentRequest {
     @NotNull
     @FutureOrPresent(message = "Appointment date cannot be in the past")
     private LocalDate appointmentDate;
+
+    /** When true, consultation fee is paid immediately after booking. */
+    private Boolean payNow = false;
+
+    private String paymentMethod;
 }

@@ -90,11 +90,11 @@ export class AppointmentsListPage implements OnInit {
     this.adminApi.bookAppointment(this.bookForm).subscribe({
       next: res => {
         this.bookOpen.set(false);
-        const detail =
-          res.billId != null
-            ? `${res.message ?? 'Booked.'} Record payment under Billing → Payments.`
-            : res.message ?? 'Booking failed.';
-        this.showSnackbar(detail);
+        const fee =
+          res.billId != null && res.consultationFee != null
+            ? ` Bill #${res.billId}: Rs. ${res.consultationFee} (${res.billStatus ?? 'PENDING'}).`
+            : '';
+        this.showSnackbar((res.message || 'Appointment booked.') + fee);
         this.load();
       },
       error: err => this.showSnackbar(err?.error?.message ?? err?.error ?? 'Booking failed.')

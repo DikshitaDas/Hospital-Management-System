@@ -12,6 +12,7 @@ import com.example.hms.dto.admin.AddWardRequest;
 import com.example.hms.dto.admin.AdmitPatientRequest;
 import com.example.hms.dto.admin.BloodAvailabilityResponse;
 import com.example.hms.dto.admin.BookAppointmentRequest;
+import com.example.hms.dto.admin.BookAppointmentResponse;
 import com.example.hms.dto.admin.CreateBillRequest;
 import com.example.hms.dto.admin.CreateBloodRequest;
 import com.example.hms.dto.admin.CreatePrescriptionRequest;
@@ -131,7 +132,7 @@ public class AdminController {
     }
 
     @PostMapping("/appointments")
-    public String bookAppointment(
+    public BookAppointmentResponse bookAppointment(
 
             @Valid @RequestBody BookAppointmentRequest request) {
 
